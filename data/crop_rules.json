@@ -1,0 +1,62 @@
+{
+  "maize": {
+    "loam": {
+      "yield_range": [3.5, 5],
+      "rain_window": [60, 90],
+      "tip": "Fertilize with nitrogen-rich compost by week 4.",
+      "source": "FAO 2019 Field Guide"
+    },
+    "clay": {
+      "yield_range": [2.5, 4],
+      "rain_window": [70, 100],
+      "tip": "Ensure deep tilling before planting.",
+      "source": "Local Ag Extension Notes 2020"
+    },
+    "sand": {
+      "yield_range": [1.8, 3],
+      "rain_window": [50, 70],
+      "tip": "Add organic matter to improve water retention.",
+      "source": "AgroSoil Study 2021"
+    }
+  },
+  "groundnuts": {
+    "loam": {
+      "yield_range": [2, 3.5],
+      "rain_window": [50, 80],
+      "tip": "Avoid waterlogging early on.",
+      "source": "Farmer Handbook 2020"
+    },
+    "clay": {
+      "yield_range": [1.5, 2.5],
+      "rain_window": [60, 90],
+      "tip": "Use raised beds for better drainage.",
+      "source": "Soil Lab Notes 2021"
+    },
+    "sand": {
+      "yield_range": [1.0, 2.2],
+      "rain_window": [45, 65],
+      "tip": "Apply gypsum to improve pod quality.",
+      "source": "Groundnut Trials - Swaziland 2022"
+    }
+  },
+  "sorghum": {
+    "loam": {
+      "yield_range": [2.8, 4.2],
+      "rain_window": [40, 70],
+      "tip": "Mulch early to retain moisture.",
+      "source": "Drought Farming Guide 2020"
+    },
+    "clay": {
+      "yield_range": [2.5, 4.0],
+      "rain_window": [50, 80],
+      "tip": "Watch for compaction and aerate soil.",
+      "source": "Ag Extension Digest 2019"
+    },
+    "sand": {
+      "yield_range": [2.2, 3.5],
+      "rain_window": [35, 60],
+      "tip": "Ideal for drought-prone areas, but mulch recommended.",
+      "source": "Dryland Crop Trials 2023"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini Agronomist</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+</head>
+<body>
+  <header>
+    <h1><span class="material-icons">agriculture</span> Mini Agronomist</h1>
+  </header>
+
+  <main>
+    <div id="errorLog" class="hidden"></div>
+    <form id="inputForm">
+      <label for="soil">Soil Type:</label>
+      <select id="soil">
+        <option value="loam">Loam</option>
+        <option value="clay">Clay</option>
+        <option value="sand">Sand</option>
+      </select>
+
+      <label for="crop">Crop Type:</label>
+      <select id="crop">
+        <option value="maize">Maize</option>
+        <option value="groundnuts">Groundnuts</option>
+        <option value="sorghum">Sorghum</option>
+      </select>
+
+      <label for="rainfall">Rainfall (mm/week):</label>
+      <input type="number" id="rainfall" min="0" max="300" required />
+
+      <label for="plantingDate">Planting Date:</label>
+      <input type="date" id="plantingDate" required />
+
+      <button type="submit">Predict</button>
+    </form>
+
+    <section id="output" class="yield-card hidden">
+    <h2><span id="cropIcon" class="material-icons">eco</span> Prediction Summary</h2>
+    <p id="conditionsSummary"></p>
+    <p id="yieldResult" class="big-yield"></p>
+    <p id="confidence"></p>
+    <p id="tip"></p>
+    <svg id="riskBar" width="100%" height="30" role="img" aria-label="Yield risk bar" title="This bar shows predicted yield risk. Green = good, Red = high risk."></svg>
+    <small id="riskLegend">
+    <span style="color: #4CAF50;">🟩 Low</span> &nbsp; 
+    <span style="color: #FFC107;">🟨 Moderate</span> &nbsp; 
+    <span style="color: #F44336;">🟥 High</span> – based on rainfall fit
+    </small>
+
+    </section>
+
+  </main>
+
+  <footer>
+  <p>
+    &copy; 2025 Mini Agronomist — Built for the field |
+    <a href="https://yourwebsite.com" target="_blank" rel="noopener noreferrer">Visit Owner Site</a>
+  </p>
+  </footer>
+
+
+  <script src="app.js"></script>
+</body>
+</html>

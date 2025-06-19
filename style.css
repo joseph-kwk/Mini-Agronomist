@@ -1,0 +1,157 @@
+/* style.css */
+
+:root {
+  --soil-loam: #A67C52;
+  --soil-clay: #7B4A12;
+  --soil-sand: #D2B48C;
+  --leaf-green: #4CAF50;
+  --dirt-brown: #5D3A00;
+  --sky-blue: #cceeff;
+  --text-dark: #2F2F2F;
+  --background-light: #fdfcf5;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--background-light) url('assets/icons/farm-bg.png') repeat;
+  color: var(--text-dark);
+}
+
+header {
+  background-color: var(--leaf-green);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+main {
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+  background-color: #ffffffdd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#errorLog {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1rem;
+  border: 1px solid #ffeeba;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.hidden {
+  display: none;
+}
+
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+input, select, button {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  background-color: var(--leaf-green);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background-color: #3b913d;
+}
+
+#output {
+  margin-top: 2rem;
+}
+
+#yieldResult {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+#tip {
+  margin-top: 0.5rem;
+  font-style: italic;
+  color: #555;
+}
+
+/* SVG risk bar */
+#riskBar {
+  margin-top: 1rem;
+}
+svg rect {
+  rx: 4;
+}
+
+.yield-card {
+  background-color: #f5fff0;
+  border: 2px solid #cdecc0;
+  padding: 1.2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  margin-top: 2rem;
+}
+
+.yield-card.hidden {
+  display: none;
+}
+
+.big-yield {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #2e7d32;
+  margin: 0.5rem 0;
+}
+
+#riskBar rect {
+  rx: 4;
+  transition: width 0.9s ease-in-out;
+}
+
+#riskLegend {
+  display: block;
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 0.4rem;
+  color: #555;
+}
+
+
+/* Footer */
+footer {
+  margin-top: 3rem;
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--dirt-brown);
+  color: white;
+}
+
+footer a {
+  color: #ffeb3b;
+  text-decoration: none;
+}
