@@ -20,27 +20,39 @@ body {
 }
 
 header {
-  background-color: var(--leaf-green);
-  color: white;
-  padding: 1rem;
-  text-align: center;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(72, 228, 90, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(226, 223, 49, 0.8);
+  height: 70px;
+
+  /* Flex centering */
+  display: flex;
+  justify-content: center;   /* centers horizontally */
+  align-items: center;       /* centers vertically */
+  overflow: hidden;          /* ensures nothing leaks outside */
+  padding: 0 1rem;           /* optional: gives space on left/right for larger screens */
 }
 
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+.logo {
+  max-width: 100%;      /* keeps it responsive */;
+  display: block;
+  /* increase the size of the logo */
+  width: 200px;         /* adjust as needed */
+  height: auto;        /* maintains aspect ratio */
 }
+
+
 
 main {
   padding: 2rem;
   max-width: 600px;
   margin: auto;
-  background-color: #ffffffdd;
+  margin-top: 1rem;
+  background-color: rgba(245, 239, 228, 0.87);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
@@ -64,6 +76,12 @@ form {
   display: flex;
   flex-direction: column;
   gap: 1.2rem;
+  margin-top: 0 rem;
+}
+
+form label {
+  font-weight: bold;
+  color: var(--text-dark);
 }
 
 input, select, button {
@@ -76,6 +94,7 @@ input, select, button {
 button {
   background-color: var(--leaf-green);
   color: white;
+  font-weight: bold;
   border: none;
   cursor: pointer;
   transition: 0.3s ease;
