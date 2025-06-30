@@ -25,33 +25,26 @@
               <div class="form-group">
                 <label for="region">Region:</label>
                 <select id="region" required aria-describedby="region-help">
-                  <option value="">Select region...</option>
-                  <option value="northern">Northern Region (Cool, Moderate Rainfall)</option>
-                  <option value="central">Central Region (Temperate, High Rainfall)</option>
-                  <option value="southern">Southern Region (Warm, Variable Rainfall)</option>
-                  <option value="coastal">Coastal Region (Humid, High Rainfall)</option>
+                  <option value="">Select agricultural region...</option>
+                  <!-- Options will be populated dynamically from regions.json -->
                 </select>
-                <small id="region-help" class="help-text">Select your agricultural region for more accurate predictions</small>
+                <small id="region-help" class="help-text">Select your agricultural region for climate-appropriate predictions</small>
               </div>
 
               <div class="form-group">
                 <label for="soil">Soil Type:</label>
                 <select id="soil" required aria-describedby="soil-help">
                   <option value="">Select soil type...</option>
-                  <option value="loam">Loam (balanced, fertile)</option>
-                  <option value="clay">Clay (retains water, dense)</option>
-                  <option value="sand">Sand (drains quickly, loose)</option>
+                  <!-- Options will be populated based on selected region -->
                 </select>
-                <small id="soil-help" class="help-text">Choose the soil type that best matches your field</small>
+                <small id="soil-help" class="help-text">Choose the soil type available in your selected region</small>
               </div>
 
               <div class="form-group">
                 <label for="crop">Crop Type:</label>
                 <select id="crop" required aria-describedby="crop-help">
                   <option value="">Select crop...</option>
-                  <option value="maize">Maize (Corn)</option>
-                  <option value="groundnuts">Groundnuts (Peanuts)</option>
-                  <option value="sorghum">Sorghum (Grain sorghum)</option>
+                  <!-- Options will be populated dynamically from crop_profiles.json -->
                 </select>
                 <small id="crop-help" class="help-text">Select the crop you plan to grow</small>
               </div>

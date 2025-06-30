@@ -1163,3 +1163,25 @@ input:focus, select:focus {
 .risk-legend span[style*="4CAF50"] { background: rgba(76, 175, 80, 0.1); }
 .risk-legend span[style*="FFC107"] { background: rgba(255, 193, 7, 0.1); }
 .risk-legend span[style*="F44336"] { background: rgba(244, 67, 54, 0.1); }
+
+/* Centered notification styling */
+.centered-notification {
+  text-align: center !important;
+  font-size: 0.9rem !important;
+  padding: 0.5rem 1rem !important;
+  margin: 0 auto !important;
+  max-width: 300px !important;
+  background: #d4edda !important;
+  color: #155724 !important;
+  border: 1px solid #c3e6cb !important;
+  border-radius: 8px !important;
+}
+
+#errorLog:has(.centered-notification) {
+  background: transparent !important;
+  border: none !important;
+  padding: 1rem !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
