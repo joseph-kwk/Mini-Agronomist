@@ -601,15 +601,18 @@ function startNewPrediction() {
   // Reset form and results to placeholder state
   resetForm();
   
-  // Show a brief centered message
-  const errorBox = document.getElementById("errorLog");
-  errorBox.innerHTML = "<p class='centered-notification'>✨ New prediction started</p>";
-  errorBox.classList.remove("hidden");
-  
-  // Auto-hide the message after 1.5 seconds
+  // Show notification AFTER reset to prevent it from being cleared
   setTimeout(() => {
-    errorBox.classList.add("hidden");
-  }, 1500);
+    const errorBox = document.getElementById("errorLog");
+    errorBox.innerHTML = "<p class='centered-notification'>✨ New prediction started</p>";
+    errorBox.classList.remove("hidden");
+    
+    // Auto-hide the message after 2 seconds
+    setTimeout(() => {
+      errorBox.classList.add("hidden");
+      errorBox.innerHTML = ""; // Clear the content too
+    }, 2000);
+  }, 50); // Small delay to ensure reset is complete
 }
 
 // Helper functions for the new three-tier data structure
