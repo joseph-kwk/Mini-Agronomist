@@ -15,6 +15,9 @@ body {
   font-family: 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--background-light) url('assets/icons/farm-bg.png') repeat;
   color: var(--text-dark);
 }
@@ -25,16 +28,11 @@ header {
   z-index: 10;
   background: rgba(72, 228, 90, 0.6);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(226, 223, 49, 0.8);
   height: 60px;
-
-  /* Flex centering */
   display: flex;
-  justify-content: center;   /* centers horizontally */
-  align-items: center;       /* centers vertically */
-  overflow: hidden;          /* ensures nothing leaks outside */
-  padding: 0 1rem;           /* optional: gives space on left/right for larger screens */
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid rgba(226, 223, 49, 0.8);
 }
 
 .logo {
@@ -48,39 +46,34 @@ header {
 
 
 main {
-  padding: 0.75rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
   max-width: 1200px;
-  margin: auto;
-  margin-top: 0.5rem;
-  background-color: rgba(245, 239, 228, 0.87);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  height: calc(100vh - 70px);
-  overflow: auto;
+  margin: 0 auto;
+  height: calc(100vh - 80px); /* Account for header and some padding */
+  box-sizing: border-box;
 }
 
 .app-container {
-  display: grid;
-  grid-template-columns: 400px 1fr;
-  height: 100%;
+  flex: 1;
+  display: flex;
   gap: 1rem;
-  min-height: 600px;
+  min-height: 0; /* Allow container to shrink */
+}
+
+.input-section, .results-section {
+  display: flex;
+  height: 100%;
 }
 
 .input-section {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  padding-right: 0.5rem;
+  width: 400px;
 }
 
 .results-section {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  gap: 0.75rem;
-  min-height: 0;
-  overflow: hidden;
+  flex: 1;
 }
 
 #errorLog {
@@ -101,41 +94,79 @@ main {
 form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.4rem;
   margin: 0;
-  padding: 1rem;
+  padding: 0.6rem;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border: 2px solid var(--leaf-green);
   flex: 1;
   height: fit-content;
-  max-height: 100%;
+  max-height: 85vh;
+}
+
+form#inputForm {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--leaf-green);
+  padding: 0.6rem;
+}
+
+/* Create a scrollable content area */
+.form-row {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.4rem; /* Space for scrollbar */
+  margin-bottom: 0.5rem;
+}
+
+/* Keep buttons fixed at bottom */
+.button-group {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+  margin-top: auto;
+  border-top: 1px solid #eee;
+  background: white;
+}
+
+.button-group button {
+  flex: 1;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
 }
 
 .form-row {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.15rem;
+  margin-bottom: 0.5rem;
 }
 
 .form-group label {
   font-weight: 600;
   color: var(--text-dark);
-  margin-bottom: 0.25rem;
-  font-size: 0.95rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.85rem;
 }
 
 .form-group input,
 .form-group select {
-  padding: 0.75rem;
-  font-size: 0.95rem;
+  padding: 0.5rem;
+  font-size: 0.85rem;
   border-radius: 8px;
   border: 2px solid #ddd;
   transition: all 0.3s ease;
@@ -149,6 +180,37 @@ form {
   border-color: var(--leaf-green);
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
   background: white;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.button-group button {
+  flex: 1;
+  margin-top: 0;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.reset-btn {
+  background: linear-gradient(135deg, #757575, #616161) !important;
+}
+
+.reset-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #616161, #757575) !important;
+}
+
+/* Help text styling - more compact */
+.help-text {
+  color: #666;
+  font-size: 0.75rem;
+  margin-top: 0.1rem;
+  display: block;
+  font-style: italic;
+  line-height: 1.1;
 }
 
 form label {
@@ -273,22 +335,131 @@ svg rect {
 }
 
 .yield-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   background: white;
   border: 3px solid var(--leaf-green);
   border-radius: 16px;
   box-shadow: 0 8px 32px rgba(76, 175, 80, 0.15);
-  margin: 0;
-  overflow-y: auto;
-  min-height: 0;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  animation: slideInFromTop 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  transform-origin: top;
+  padding: 0.75rem;
 }
 
-.yield-card.hidden {
-  display: none;
+.history-section {
+  height: 180px;
+  flex-shrink: 0;
+  background: white;
+  border: 2px solid var(--leaf-green);
+  border-radius: 12px;
+  padding: 0.6rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.tip-section {
+  background: #f0f8f0;
+  border: 1px solid var(--leaf-green);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin: 0;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  min-height: 60px;
+}
+
+/* History section - bring it closer */
+.history-section {
+  background: white;
+  border: 2px solid var(--leaf-green);
+  border-radius: 12px;
+  padding: 0.6rem;
+  height: 180px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.history-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--leaf-green);
+}
+
+/* Placeholder styles for results section */
+.placeholder {
+  opacity: 0.7;
+  font-style: italic;
+  color: #666 !important;
+}
+
+.big-yield.placeholder {
+  font-size: 1.5rem !important;
+  color: #999 !important;
+  text-shadow: none;
+}
+
+.big-yield {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--leaf-green);
+  margin: 0.5rem 0;
+  text-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+  display: block;
+  animation: pulseIn 0.8s ease-out 0.3s both;
+  text-align: center;
+}
+
+.conditions-summary {
+  font-size: 0.9rem;
+  color: #2e7d32;
+  margin: 0;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  border: 1px solid var(--leaf-green);
+  font-weight: 500;
+  text-align: center;
+}
+
+.conditions-summary.placeholder {
+  background: #f8f9fa;
+  border: 1px dashed #ddd;
+  color: #888;
+}
+
+.confidence-indicator {
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.confidence-indicator.placeholder {
+  background: #f8f9fa;
+  border: 1px dashed #ddd;
+  color: #888;
+}
+
+.tip-section.placeholder {
+  background: #f8f9fa;
+  border: 1px dashed #ddd;
+  color: #888;
+}
+
+.tip-section.placeholder strong {
+  color: #666;
 }
 
 /* Animation for when prediction results appear */
@@ -304,16 +475,6 @@ svg rect {
 }
 
 /* Pulse animation for the yield value */
-.big-yield {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: var(--leaf-green);
-  margin: 1rem 0;
-  text-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
-  display: block;
-  animation: pulseIn 0.8s ease-out 0.3s both;
-}
-
 @keyframes pulseIn {
   0% {
     opacity: 0;
@@ -434,13 +595,6 @@ footer a {
   border-left: 4px solid var(--leaf-green);
 }
 
-.big-yield {
-  font-size: 1.5rem !important;
-  color: var(--leaf-green);
-  font-weight: bold;
-  margin: 0.5rem 0;
-}
-
 .confidence-indicator {
   margin: 0.5rem 0;
   padding: 0.5rem;
@@ -548,7 +702,10 @@ input:focus, select:focus {
   
   .prediction-header {
     margin: -1rem -1rem 1rem -1rem;
-    padding: 0.75rem 1rem;
+    padding: 1rem;
+    background: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    border-radius: 13px 13px 0 0;
   }
   
   .big-yield {
@@ -850,6 +1007,29 @@ input:focus, select:focus {
   transform: translateY(-1px);
 }
 
+/* New Prediction Button */
+.new-prediction-btn {
+  background: linear-gradient(135deg, #2196F3, #1976D2) !important;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.new-prediction-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1976D2, #2196F3) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.new-prediction-btn.hidden {
+  display: none;
+}
+
 /* Enhanced prediction display */
 .prediction-header {
   display: flex;
@@ -871,6 +1051,10 @@ input:focus, select:focus {
 
 .yield-card {
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: visible;
 }
 
 .new-prediction-btn {
@@ -903,19 +1087,6 @@ input:focus, select:focus {
   padding: 1rem;
 }
 
-.risk-card {
-  background: #fafafa;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-}
-
-.risk-card h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-  color: var(--text-dark);
-}
-
 /* Responsive adjustments for prediction summary */
 @media (max-width: 768px) {
   .prediction-summary {
@@ -932,3 +1103,63 @@ input:focus, select:focus {
     flex-direction: column;
   }
 }
+
+/* New styles for form-content container */
+.form-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-right: 0.2rem; /* Space for scrollbar */
+}
+
+/* Make form groups more compact */
+.form-group {
+  margin-bottom: 0.75rem;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure the help text is compact */
+.help-text {
+  color: #666;
+  font-size: 0.75rem;
+  margin-top: 0.1rem;
+  line-height: 1.2;
+}
+
+.risk-card {
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.risk-card h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.risk-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.risk-legend span {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.risk-legend span[style*="4CAF50"] { background: rgba(76, 175, 80, 0.1); }
+.risk-legend span[style*="FFC107"] { background: rgba(255, 193, 7, 0.1); }
+.risk-legend span[style*="F44336"] { background: rgba(244, 67, 54, 0.1); }

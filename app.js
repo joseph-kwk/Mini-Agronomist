@@ -23,6 +23,7 @@ document.getElementById("resetForm").addEventListener("click", resetForm);
 // Initialize history display and clear button
 document.addEventListener('DOMContentLoaded', function() {
   updateHistoryDisplay();
+  resetResultsToPlaceholder(); // Initialize with placeholder content
   
   const clearBtn = document.getElementById('clearHistory');
   if (clearBtn) {
@@ -43,6 +44,7 @@ document.getElementById("inputForm").addEventListener("submit", function (e) {
   showLoadingState();
 
   // Get values from the form
+  const region = document.getElementById("region").value;
   const soil = document.getElementById("soil").value;
   const crop = document.getElementById("crop").value;
   const rainfall = parseInt(document.getElementById("rainfall").value);
@@ -52,6 +54,10 @@ document.getElementById("inputForm").addEventListener("submit", function (e) {
   const errors = [];
 
   // Enhanced form validation with specific messages
+  if (!region) {
+    errors.push("❌ Please select your agricultural region for accurate predictions.");
+  }
+  
   if (!soil || !crop) {
     errors.push("❌ Please select both crop and soil type to continue.");
   }
@@ -92,22 +98,24 @@ document.getElementById("inputForm").addEventListener("submit", function (e) {
 
   // Simulate processing time for better UX
   setTimeout(() => {
-    processPrediction(soil, crop, rainfall, plantingDate);
+    processPrediction(soil, crop, rainfall, plantingDate, region);
   }, 300);
 });
 
-function processPrediction(soil, crop, rainfall, plantingDate) {
+function processPrediction(soil, crop, rainfall, plantingDate, region) {
   // Run the prediction based on inputs
-  const result = predictYield(soil, crop, rainfall);
+  const result = calculateYield(crop, soil, rainfall, plantingDate, region);
 
   // Handle unknown combo
   if (!result) {
     document.getElementById("yieldResult").textContent = 
       "❌ Sorry, no prediction data available for this combination. Try different soil or crop types.";
+    document.getElementById("yieldResult").classList.remove("placeholder");
     document.getElementById("tip").textContent = "";
+    document.getElementById("tip").classList.remove("placeholder");
     renderRiskBar(1); // Max risk
     hideLoadingState();
-    document.getElementById("output").classList.remove("hidden");
+    showNewPredictionButton();
     return;
   }
 
@@ -131,50 +139,64 @@ function processPrediction(soil, crop, rainfall, plantingDate) {
   };
   const iconName = cropIcons[crop] || "eco";
 
+  // Remove placeholder classes and update content
   document.getElementById("cropIcon").textContent = iconName;
-  document.getElementById("conditionsSummary").textContent =
-    `Soil: ${soil.charAt(0).toUpperCase() + soil.slice(1)} | Rainfall: ${rainfall} mm/week`;
-  document.getElementById("yieldResult").textContent =
-    `📊 Estimated Yield: ${yieldEstimate} tons/ha`;
-  document.getElementById("confidence").textContent =
-    riskLevel <= 0.3 ? "✅ Conditions are near optimal for this crop."
+  
+  const conditionsSummary = document.getElementById("conditionsSummary");
+  const regionName = region.charAt(0).toUpperCase() + region.slice(1);
+  conditionsSummary.textContent = `Region: ${regionName} | Soil: ${soil.charAt(0).toUpperCase() + soil.slice(1)} | Rainfall: ${rainfall} mm/week`;
+  conditionsSummary.classList.remove("placeholder");
+  
+  const yieldResult = document.getElementById("yieldResult");
+  yieldResult.textContent = `📊 Estimated Yield: ${yieldEstimate} tons/ha`;
+  yieldResult.classList.remove("placeholder");
+  
+  const confidence = document.getElementById("confidence");
+  confidence.textContent = riskLevel <= 0.3 ? "✅ Conditions are near optimal for this crop."
     : riskLevel <= 0.6 ? "⚠️ Conditions are moderate - some adjustments recommended."
     : "❗ Conditions are challenging - follow tips carefully.";
-  document.getElementById("tip").innerHTML =
-    `<strong>💡 Recommendation:</strong> ${tip}<br><small><em>📚 Source: ${source}</em></small>`;
+  confidence.classList.remove("placeholder");
+  
+  const tipElement = document.getElementById("tip");
+  tipElement.innerHTML = `<strong>💡 Recommendation:</strong> ${tip}<br><small><em>📚 Source: ${source}</em></small>`;
+  tipElement.classList.remove("placeholder");
   
   hideLoadingState();
-  document.getElementById("output").classList.remove("hidden");
   renderRiskBar(riskLevel);
   updateHistoryDisplay();
+  showNewPredictionButton();
 }
 
 // Compute yield from the rule set
-function predictYield(soil, crop, rainfall) {
-  if (!cropData[crop] || !cropData[crop][soil]) return null;
-
-  const rule = cropData[crop][soil];
-  const [minYield, maxYield] = rule.yield_range;
-  const [minRain, maxRain] = rule.rain_window;
-
-  let yieldEstimate, riskLevel;
-
-  if (rainfall >= minRain && rainfall <= maxRain) {
-    yieldEstimate = ((minYield + maxYield) / 2).toFixed(1);
-    riskLevel = 0.2;
-  } else if (rainfall < minRain) {
-    yieldEstimate = minYield.toFixed(1);
-    riskLevel = 0.7;
-  } else {
-    yieldEstimate = (maxYield - 0.3).toFixed(1);
-    riskLevel = 0.5;
-  }
-
+function calculateYield(crop, soil, rainfall, plantingDate, region) {
+  const cropRules = cropData[crop][soil];
+  const regionModifier = cropData.regions[region]?.yield_modifier || 1.0;
+  
+  // Get base yield range
+  const [minYield, maxYield] = cropRules.yield_range;
+  
+  // Apply regional modifier
+  const adjustedMinYield = minYield * regionModifier;
+  const adjustedMaxYield = maxYield * regionModifier;
+  
+  // Calculate rainfall impact (existing logic)
+  const [minRain, maxRain] = cropRules.rain_window;
+  const rainScore = calculateRainfallScore(rainfall, minRain, maxRain);
+  
+  // Calculate season timing impact (existing logic)
+  const seasonScore = calculateSeasonScore(plantingDate, crop);
+  
+  // Combine all factors
+  const finalScore = (rainScore + seasonScore) / 2;
+  const predictedYield = adjustedMinYield + (adjustedMaxYield - adjustedMinYield) * finalScore;
+  
   return {
-    yieldEstimate,
-    tip: rule.tip,
-    riskLevel,
-    source: rule.source || "Agronomic reference"
+    yield: predictedYield,
+    confidence: finalScore,
+    tips: [
+      cropRules.tip,
+      cropData.regions[region]?.tips || "No region-specific tips available."
+    ]
   };
 }
 
@@ -200,13 +222,17 @@ function renderRiskBar(level) {
 
 // Check crop_rules.json for missing fields or bad data
 function validateCropData(data) {
-  const requiredFields = ["yield_range", "rain_window", "tip", "source"];
   const warnings = [];
 
-  Object.keys(data).forEach(crop => {
+  // Skip validation for the regions object
+  const crops = Object.keys(data).filter(key => key !== 'regions');
+  
+  // Validate crop data
+  const cropRequiredFields = ["yield_range", "rain_window", "tip", "source"];
+  crops.forEach(crop => {
     Object.keys(data[crop]).forEach(soil => {
       const rule = data[crop][soil];
-      requiredFields.forEach(field => {
+      cropRequiredFields.forEach(field => {
         if (
           !(field in rule) ||
           rule[field] === null ||
@@ -218,6 +244,19 @@ function validateCropData(data) {
       });
     });
   });
+  
+  // Validate regions data
+  if (data.regions) {
+    const regionRequiredFields = ["yield_modifier", "description", "tips"];
+    Object.keys(data.regions).forEach(region => {
+      const regionData = data.regions[region];
+      regionRequiredFields.forEach(field => {
+        if (!(field in regionData) || regionData[field] === null || regionData[field] === "") {
+          warnings.push(`⚠️ Region ${region.toUpperCase()} is missing or has invalid '${field}'.`);
+        }
+      });
+    });
+  }
 
   const errorBox = document.getElementById("errorLog");
   if (warnings.length > 0) {
@@ -404,8 +443,8 @@ function resetForm() {
   const feedbackElements = document.querySelectorAll('.error-feedback, .warning-feedback, .success-feedback');
   feedbackElements.forEach(el => el.remove());
   
-  // Hide results
-  document.getElementById("output").classList.add("hidden");
+  // Reset results to placeholder state
+  resetResultsToPlaceholder();
   
   // Hide any error messages
   const errorBox = document.getElementById("errorLog");
@@ -416,11 +455,54 @@ function resetForm() {
   document.getElementById("soil").focus();
 }
 
-function startNewPrediction() {
-  // Hide current results to encourage new prediction
-  document.getElementById("output").classList.add("hidden");
+function resetResultsToPlaceholder() {
+  // Reset crop icon
+  document.getElementById("cropIcon").textContent = "eco";
   
-  // Optionally reset form
+  // Reset conditions summary
+  const conditionsSummary = document.getElementById("conditionsSummary");
+  conditionsSummary.textContent = "Fill out the form and click \"Predict Yield\" to see your crop yield prediction";
+  conditionsSummary.classList.add("placeholder");
+  
+  // Reset yield result
+  const yieldResult = document.getElementById("yieldResult");
+  yieldResult.textContent = "🌱 Ready to predict";
+  yieldResult.classList.add("placeholder");
+  
+  // Reset confidence indicator
+  const confidence = document.getElementById("confidence");
+  confidence.textContent = "Select your crop, soil type, rainfall, and planting date to get started";
+  confidence.classList.add("placeholder");
+  
+  // Reset tip section
+  const tipElement = document.getElementById("tip");
+  tipElement.innerHTML = "<strong>💡 Tips will appear here:</strong> Get personalized recommendations based on your specific crop and soil conditions.";
+  tipElement.classList.add("placeholder");
+  
+  // Reset risk bar to empty state
+  const svg = document.getElementById("riskBar");
+  svg.innerHTML = '<rect x="0" y="5" width="100%" height="20" fill="#e0e0e0" rx="4" />';
+  
+  // Hide new prediction button
+  hideNewPredictionButton();
+}
+
+function showNewPredictionButton() {
+  const newPredictionBtn = document.getElementById('newPrediction');
+  if (newPredictionBtn) {
+    newPredictionBtn.classList.remove('hidden');
+  }
+}
+
+function hideNewPredictionButton() {
+  const newPredictionBtn = document.getElementById('newPrediction');
+  if (newPredictionBtn) {
+    newPredictionBtn.classList.add('hidden');
+  }
+}
+
+function startNewPrediction() {
+  // Reset form and results to placeholder state
   resetForm();
   
   // Show a brief message

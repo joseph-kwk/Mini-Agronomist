@@ -1,4 +1,26 @@
 {
+  "regions": {
+    "northern": {
+      "yield_modifier": 0.9,
+      "description": "Cool climate, moderate rainfall",
+      "tips": "Consider cold-resistant varieties. Plant after last frost."
+    },
+    "central": {
+      "yield_modifier": 1.1,
+      "description": "Temperate climate, high rainfall",
+      "tips": "Focus on drainage management. Monitor for fungal diseases."
+    },
+    "southern": {
+      "yield_modifier": 1.0,
+      "description": "Warm climate, variable rainfall",
+      "tips": "Use drought-resistant varieties. Consider irrigation systems."
+    },
+    "coastal": {
+      "yield_modifier": 1.05,
+      "description": "Humid climate, high rainfall",
+      "tips": "Monitor salt levels. Use raised beds in flood-prone areas."
+    }
+  },
   "maize": {
     "loam": {
       "yield_range": [3.5, 5.2],

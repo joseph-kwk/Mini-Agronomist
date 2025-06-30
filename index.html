@@ -20,67 +20,80 @@
     <div class="app-container">
       <div class="input-section">
         <form id="inputForm" novalidate>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="soil">Soil Type:</label>
-              <select id="soil" required aria-describedby="soil-help">
-                <option value="">Select soil type...</option>
-                <option value="loam">Loam (balanced, fertile)</option>
-                <option value="clay">Clay (retains water, dense)</option>
-                <option value="sand">Sand (drains quickly, loose)</option>
-              </select>
-              <small id="soil-help" class="help-text">Choose the soil type that best matches your field</small>
+          <div class="form-content">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="region">Region:</label>
+                <select id="region" required aria-describedby="region-help">
+                  <option value="">Select region...</option>
+                  <option value="northern">Northern Region (Cool, Moderate Rainfall)</option>
+                  <option value="central">Central Region (Temperate, High Rainfall)</option>
+                  <option value="southern">Southern Region (Warm, Variable Rainfall)</option>
+                  <option value="coastal">Coastal Region (Humid, High Rainfall)</option>
+                </select>
+                <small id="region-help" class="help-text">Select your agricultural region for more accurate predictions</small>
+              </div>
+
+              <div class="form-group">
+                <label for="soil">Soil Type:</label>
+                <select id="soil" required aria-describedby="soil-help">
+                  <option value="">Select soil type...</option>
+                  <option value="loam">Loam (balanced, fertile)</option>
+                  <option value="clay">Clay (retains water, dense)</option>
+                  <option value="sand">Sand (drains quickly, loose)</option>
+                </select>
+                <small id="soil-help" class="help-text">Choose the soil type that best matches your field</small>
+              </div>
+
+              <div class="form-group">
+                <label for="crop">Crop Type:</label>
+                <select id="crop" required aria-describedby="crop-help">
+                  <option value="">Select crop...</option>
+                  <option value="maize">Maize (Corn)</option>
+                  <option value="groundnuts">Groundnuts (Peanuts)</option>
+                  <option value="sorghum">Sorghum (Grain sorghum)</option>
+                </select>
+                <small id="crop-help" class="help-text">Select the crop you plan to grow</small>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label for="crop">Crop Type:</label>
-              <select id="crop" required aria-describedby="crop-help">
-                <option value="">Select crop...</option>
-                <option value="maize">Maize (Corn)</option>
-                <option value="groundnuts">Groundnuts (Peanuts)</option>
-                <option value="sorghum">Sorghum (Grain sorghum)</option>
-              </select>
-              <small id="crop-help" class="help-text">Select the crop you plan to grow</small>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rainfall">Rainfall (mm/week):</label>
+                <input type="number" id="rainfall" min="0" max="500" step="1" required 
+                       aria-describedby="rainfall-help" placeholder="e.g. 75" />
+                <small id="rainfall-help" class="help-text">Enter weekly rainfall estimate (typical range: 30-150mm)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="plantingDate">Planting Date:</label>
+                <input type="date" id="plantingDate" required aria-describedby="date-help" />
+                <small id="date-help" class="help-text">When do you plan to plant this crop?</small>
+              </div>
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="rainfall">Expected Rainfall (mm/week):</label>
-              <input type="number" id="rainfall" min="0" max="500" step="1" required 
-                     aria-describedby="rainfall-help" placeholder="e.g. 75" />
-              <small id="rainfall-help" class="help-text">Enter weekly rainfall estimate (typical range: 30-150mm)</small>
-            </div>
-
-            <div class="form-group">
-              <label for="plantingDate">Planting Date:</label>
-              <input type="date" id="plantingDate" required aria-describedby="date-help" />
-              <small id="date-help" class="help-text">When do you plan to plant this crop?</small>
-            </div>
-          </div>
-
           <div class="button-group">
             <button type="submit">Predict Yield</button>
-            <button type="button" id="resetForm" class="reset-btn">Reset Form</button>
+            <button type="button" id="resetForm" class="reset-btn">Reset</button>
           </div>
         </form>
       </div>
 
       <div class="results-section">
-        <section id="output" class="yield-card hidden" role="main">
+        <section id="output" class="yield-card" role="main">
           <div class="prediction-header">
             <h2>
               <span id="cropIcon" class="material-icons" aria-hidden="true">eco</span> 
               Yield Prediction Results
             </h2>
-            <button id="newPrediction" class="new-prediction-btn" type="button">+ New Prediction</button>
+            <button id="newPrediction" class="new-prediction-btn hidden" type="button">+ New Prediction</button>
           </div>
           
           <div class="prediction-summary">
             <div class="summary-card">
-              <p id="conditionsSummary" class="conditions-summary"></p>
-              <p id="yieldResult" class="big-yield" role="status"></p>
-              <div id="confidence" class="confidence-indicator"></div>
+              <p id="conditionsSummary" class="conditions-summary">Fill out the form and click "Predict Yield" to see your crop yield prediction</p>
+              <p id="yieldResult" class="big-yield placeholder" role="status">🌱 Ready to predict</p>
+              <div id="confidence" class="confidence-indicator placeholder">Select your crop, soil type, rainfall, and planting date to get started</div>
             </div>
             
             <div class="risk-card">
@@ -88,25 +101,18 @@
               <svg id="riskBar" width="100%" height="30" role="img" 
                    aria-label="Yield risk indicator" 
                    title="This bar shows predicted yield risk level">
+                <rect x="0" y="5" width="100%" height="20" fill="#e0e0e0" rx="4" />
               </svg>
-              <small id="riskLegend" class="risk-legend">
-                <span style="color: #4CAF50;">🟩 Low Risk</span> &nbsp; 
-                <span style="color: #FFC107;">🟨 Moderate Risk</span> &nbsp; 
+              <div id="riskLegend" class="risk-legend">
+                <span style="color: #4CAF50;">🟩 Low Risk</span>
+                <span style="color: #FFC107;">🟨 Moderate Risk</span>
                 <span style="color: #F44336;">🟥 High Risk</span>
-              </small>
+              </div>
             </div>
           </div>
           
-          <div id="tip" class="tip-section"></div>
-        </section>
-
-        <section class="history-section">
-          <div class="history-header">
-            <h3>📊 Recent Predictions</h3>
-            <button id="clearHistory" class="clear-history-btn" type="button">Clear All</button>
-          </div>
-          <div id="historyContainer" class="history-container">
-            <p class="no-history">No recent predictions</p>
+          <div id="tip" class="tip-section placeholder">
+            <strong>💡 Tips will appear here:</strong> Get personalized recommendations based on your specific crop and soil conditions.
           </div>
         </section>
       </div>
