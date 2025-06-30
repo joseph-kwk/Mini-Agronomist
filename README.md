@@ -8,9 +8,14 @@
 
 - 📱 *Offline-capable* (PWA-compatible)
 - 🌿 User-friendly interface with farm-inspired visuals
-- 🌧️ Yield estimation based on rainfall and soil condition ranges
-- 🎯 Visual risk bar and agronomy tips
-- 🧠 Customizable dataset loaded from local JSON
+- 🌧️ Advanced yield estimation with enhanced validation
+- 🎯 Real-time input validation and feedback
+- 📊 Visual risk assessment with improved indicators
+- 🧠 Expanded crop database with detailed recommendations
+- 📝 Prediction history tracking (last 10 predictions)
+- 📱 Fully responsive design for mobile devices
+- ♿ Enhanced accessibility features
+- 🎨 Modern UI with loading states and animations
 - 🧩 No server or database required
 
 ---
