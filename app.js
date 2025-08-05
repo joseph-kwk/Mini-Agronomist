@@ -1,20 +1,29 @@
 // Enhanced Mini Agronomist Application
-// Version 2.0 - Comprehensive agricultural yield prediction system
+// Version 2.0 Pro - Comprehensive agricultural yield prediction system with Pro features
 
 class MiniAgronomist {
   constructor() {
     this.cropData = {};
     this.cropProfiles = {};
     this.regionData = {};
+    this.proCropData = {}; // Pro specialty crops
     this.currentPrediction = null;
     this.predictionHistory = [];
     this.isLoading = false;
+    
+    // Pro feature managers
+    this.proFeatureManager = null;
+    this.fieldManager = null;
+    this.advancedAnalytics = null;
     
     this.init();
   }
 
   async init() {
     try {
+      // Initialize Pro features first
+      await this.initializeProFeatures();
+      
       await this.loadData();
       this.setupEventListeners();
       this.setupFormValidation();
@@ -25,25 +34,60 @@ class MiniAgronomist {
     }
   }
 
-  // Enhanced Data Loading with better error handling
+  // Initialize Pro Features
+  async initializeProFeatures() {
+    // Initialize Pro Feature Manager
+    if (window.ProFeatureManager) {
+      this.proFeatureManager = new ProFeatureManager();
+      
+      // Initialize Field Manager if Pro features available
+      if (this.proFeatureManager.hasFeature('fieldManagement') && window.FieldManager) {
+        this.fieldManager = new FieldManager(this.proFeatureManager);
+      }
+      
+      // Initialize Advanced Analytics if available
+      if (this.proFeatureManager.hasFeature('advancedAnalytics') && window.AdvancedAnalytics) {
+        this.advancedAnalytics = new AdvancedAnalytics(this.proFeatureManager, this.fieldManager);
+      }
+    }
+  }
+
+  // Enhanced Data Loading with Pro features
   async loadData() {
     this.showLoadingOverlay('Loading agricultural data...');
     
     try {
-      const [rules, profiles, regions] = await Promise.all([
+      const loadPromises = [
         this.fetchJSON("data/crop_rules.json"),
         this.fetchJSON("data/crop_profiles.json"),
         this.fetchJSON("data/regions.json")
-      ]);
+      ];
 
-      this.cropData = rules;
-      this.cropProfiles = profiles;
-      this.regionData = regions;
+      // Load Pro data if available
+      if (this.proFeatureManager?.hasFeature('advancedCrops')) {
+        loadPromises.push(this.fetchJSON("data/pro-crop-data.json"));
+      }
+
+      const results = await Promise.all(loadPromises);
+      
+      this.cropData = results[0];
+      this.cropProfiles = results[1];
+      this.regionData = results[2];
+      
+      // Load Pro crop data if available
+      if (results[3]) {
+        this.proCropData = results[3];
+        // Merge specialty crops into main crop profiles
+        if (this.proCropData.specialty_crops) {
+          this.cropProfiles = { ...this.cropProfiles, ...this.proCropData.specialty_crops };
+        }
+      }
 
       console.log("✅ Data loaded successfully:", {
         regions: Object.keys(this.regionData).length,
         crops: Object.keys(this.cropProfiles).length,
-        rules: Object.keys(this.cropData).length
+        rules: Object.keys(this.cropData).length,
+        pro_features: this.proFeatureManager?.userTier || 'free'
       });
 
       this.validateDataIntegrity();
@@ -711,10 +755,468 @@ class MiniAgronomist {
     this.showErrorMessage(`❌ ${context}: ${error.message}`);
   }
 
-  // Enhanced dropdown population
+  // Enhanced dropdown population with Pro features
   populateDropdowns() {
-    this.populateRegionDropdown();
-    this.populateCropDropdown();
+    try {
+      this.populateRegionDropdown();
+      this.populateCropDropdown();
+      
+      // Initialize Pro features if available
+      if (this.proFeatureManager) {
+        this.initializeProUI();
+      }
+      
+      console.log("✅ Dropdowns populated successfully");
+    } catch (error) {
+      console.error("❌ Error populating dropdowns:", error);
+      this.showError("Failed to initialize application. Please refresh and try again.", 5000);
+    }
+  }
+
+  // Initialize Pro UI elements
+  initializeProUI() {
+    try {
+      // Add Pro indicators to specialty crops
+      const cropSelect = document.getElementById("crop");
+      if (cropSelect && this.proCropData?.specialty_crops) {
+        for (const [cropId, cropData] of Object.entries(this.proCropData.specialty_crops)) {
+          const option = cropSelect.querySelector(`option[value="${cropId}"]`);
+          if (option) {
+            option.textContent += " 🌟 Pro";
+            option.classList.add("pro-crop");
+          }
+        }
+      }
+
+      // Add Pro features to UI
+      this.addProFeatureButtons();
+      this.updateUIForTier();
+      
+      console.log("✅ Pro UI initialized for tier:", this.proFeatureManager.userTier);
+    } catch (error) {
+      console.error("❌ Error initializing Pro UI:", error);
+    }
+  }
+
+  // Add Pro feature buttons to interface
+  addProFeatureButtons() {
+    const container = document.querySelector('.container');
+    if (!container) return;
+
+    // Create Pro features section
+    const proSection = document.createElement('div');
+    proSection.className = 'pro-features-section';
+    proSection.innerHTML = `
+      <div class="pro-features-header">
+        <h3>🌟 Professional Features</h3>
+        <span class="tier-badge tier-${this.proFeatureManager.userTier}">${this.proFeatureManager.userTier.toUpperCase()}</span>
+      </div>
+      <div class="pro-features-grid">
+        ${this.generateProFeatureButtons()}
+      </div>
+    `;
+
+    // Insert after prediction form
+    const form = document.querySelector('.prediction-form');
+    if (form) {
+      form.after(proSection);
+    }
+  }
+
+  // Generate Pro feature buttons based on user tier
+  generateProFeatureButtons() {
+    const features = [
+      {
+        id: 'field-manager',
+        title: 'Field Manager',
+        description: 'Track and manage multiple fields',
+        icon: '🏞️',
+        feature: 'fieldManagement'
+      },
+      {
+        id: 'advanced-analytics',
+        title: 'Advanced Analytics',
+        description: 'Yield prediction and profitability analysis',
+        icon: '📊',
+        feature: 'advancedAnalytics'
+      },
+      {
+        id: 'specialty-crops',
+        title: 'Specialty Crops',
+        description: 'Access to high-value crop varieties',
+        icon: '🌿',
+        feature: 'advancedCrops'
+      },
+      {
+        id: 'export-data',
+        title: 'Data Export',
+        description: 'Export reports and predictions',
+        icon: '📈',
+        feature: 'dataExport'
+      }
+    ];
+
+    return features.map(feature => {
+      const hasAccess = this.proFeatureManager.hasFeature(feature.feature);
+      return `
+        <div class="pro-feature-card ${hasAccess ? 'available' : 'locked'}">
+          <div class="feature-icon">${feature.icon}</div>
+          <h4>${feature.title}</h4>
+          <p>${feature.description}</p>
+          <button 
+            class="feature-btn ${hasAccess ? 'primary' : 'locked'}" 
+            onclick="miniAgronomist.handleProFeature('${feature.id}')"
+            ${!hasAccess ? 'disabled' : ''}
+          >
+            ${hasAccess ? 'Open' : '🔒 Pro Only'}
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Handle Pro feature activation
+  handleProFeature(featureId) {
+    try {
+      switch (featureId) {
+        case 'field-manager':
+          this.openFieldManager();
+          break;
+        case 'advanced-analytics':
+          this.openAdvancedAnalytics();
+          break;
+        case 'specialty-crops':
+          this.showSpecialtyCrops();
+          break;
+        case 'export-data':
+          this.exportData();
+          break;
+        default:
+          console.warn('Unknown Pro feature:', featureId);
+      }
+    } catch (error) {
+      console.error('Error handling Pro feature:', error);
+      this.showError('Failed to access Pro feature. Please try again.');
+    }
+  }
+
+  // Update UI based on user tier
+  updateUIForTier() {
+    const tier = this.proFeatureManager.userTier;
+    document.body.classList.add(`tier-${tier}`);
+    
+    // Update UI elements based on tier
+    if (tier === 'free') {
+      this.showUpgradePrompts();
+    }
+  }
+
+  // Show upgrade prompts for free tier users
+  showUpgradePrompts() {
+    // Add subtle upgrade prompts in the UI
+    const upgradeHints = document.querySelectorAll('.upgrade-hint');
+    upgradeHints.forEach(hint => {
+      hint.style.display = 'block';
+    });
+  }
+
+  // Pro Feature Methods
+  openFieldManager() {
+    if (!this.proFeatureManager.hasFeature('fieldManagement')) {
+      this.showUpgradeModal('Field Management');
+      return;
+    }
+
+    // Create field manager modal
+    const modal = this.createModal('Field Manager', this.generateFieldManagerHTML());
+    document.body.appendChild(modal);
+    this.initializeFieldManagerEvents();
+  }
+
+  openAdvancedAnalytics() {
+    if (!this.proFeatureManager.hasFeature('advancedAnalytics')) {
+      this.showUpgradeModal('Advanced Analytics');
+      return;
+    }
+
+    // Create analytics modal
+    const modal = this.createModal('Advanced Analytics', this.generateAnalyticsHTML());
+    document.body.appendChild(modal);
+    this.initializeAnalyticsEvents();
+  }
+
+  showSpecialtyCrops() {
+    if (!this.proFeatureManager.hasFeature('advancedCrops')) {
+      this.showUpgradeModal('Specialty Crops');
+      return;
+    }
+
+    // Highlight specialty crops in dropdown
+    this.highlightSpecialtyCrops();
+    this.showMessage('🌟 Specialty crops are now highlighted in the crop selection!', 'success');
+  }
+
+  exportData() {
+    if (!this.proFeatureManager.hasFeature('dataExport')) {
+      this.showUpgradeModal('Data Export');
+      return;
+    }
+
+    this.generateDataExport();
+  }
+
+  // Create modal for Pro features
+  createModal(title, content) {
+    const modal = document.createElement('div');
+    modal.className = 'pro-modal';
+    modal.innerHTML = `
+      <div class="modal-overlay" onclick="this.parentElement.remove()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>${title}</h3>
+          <button class="modal-close" onclick="this.closest('.pro-modal').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          ${content}
+        </div>
+      </div>
+    `;
+    return modal;
+  }
+
+  // Generate Field Manager HTML
+  generateFieldManagerHTML() {
+    return `
+      <div class="field-manager">
+        <div class="field-manager-toolbar">
+          <button class="btn primary" onclick="miniAgronomist.addNewField()">
+            + Add New Field
+          </button>
+          <button class="btn secondary" onclick="miniAgronomist.importFields()">
+            📁 Import Fields
+          </button>
+        </div>
+        <div class="fields-list" id="fieldsList">
+          ${this.generateFieldsList()}
+        </div>
+      </div>
+    `;
+  }
+
+  // Generate Analytics HTML
+  generateAnalyticsHTML() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="analytics-tabs">
+          <button class="tab-btn active" data-tab="yield">Yield Analysis</button>
+          <button class="tab-btn" data-tab="profit">Profitability</button>
+          <button class="tab-btn" data-tab="risk">Risk Assessment</button>
+          <button class="tab-btn" data-tab="sustainability">Sustainability</button>
+        </div>
+        <div class="analytics-content">
+          <div class="tab-panel active" id="yield-panel">
+            <div class="analytics-placeholder">
+              📊 Advanced yield predictions and historical analysis will appear here
+            </div>
+          </div>
+          <div class="tab-panel" id="profit-panel">
+            <div class="analytics-placeholder">
+              💰 Profitability analysis and market insights will appear here
+            </div>
+          </div>
+          <div class="tab-panel" id="risk-panel">
+            <div class="analytics-placeholder">
+              ⚠️ Risk assessment and mitigation strategies will appear here
+            </div>
+          </div>
+          <div class="tab-panel" id="sustainability-panel">
+            <div class="analytics-placeholder">
+              🌱 Sustainability metrics and recommendations will appear here
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Show upgrade modal for locked features
+  showUpgradeModal(featureName) {
+    const modal = this.createModal('Upgrade Required', `
+      <div class="upgrade-modal">
+        <div class="upgrade-icon">🌟</div>
+        <h4>Unlock ${featureName}</h4>
+        <p>This feature is available in our Pro and Enterprise plans.</p>
+        <div class="upgrade-benefits">
+          <ul>
+            <li>✓ Advanced crop analytics</li>
+            <li>✓ Field management tools</li>
+            <li>✓ Specialty crop database</li>
+            <li>✓ Data export capabilities</li>
+            <li>✓ Priority support</li>
+          </ul>
+        </div>
+        <div class="upgrade-actions">
+          <button class="btn primary" onclick="miniAgronomist.simulateUpgrade()">
+            Try Pro Features
+          </button>
+          <button class="btn secondary" onclick="this.closest('.pro-modal').remove()">
+            Maybe Later
+          </button>
+        </div>
+      </div>
+    `);
+    document.body.appendChild(modal);
+  }
+
+  // Simulate upgrade for demo purposes
+  simulateUpgrade() {
+    this.proFeatureManager.userTier = 'pro';
+    localStorage.setItem('miniAgronomist_tier', 'pro');
+    
+    // Close any open modals
+    document.querySelectorAll('.pro-modal').forEach(modal => modal.remove());
+    
+    // Refresh Pro UI
+    this.updateUIForTier();
+    this.showMessage('🎉 Pro features activated! You now have access to all premium features.', 'success', 5000);
+    
+    // Refresh the page to show new features
+    setTimeout(() => location.reload(), 2000);
+  }
+
+  // Additional Pro feature helper methods
+  generateFieldsList() {
+    const fields = this.fieldManager?.getFields() || [];
+    
+    if (fields.length === 0) {
+      return `
+        <div class="empty-state">
+          <div class="empty-icon">🏞️</div>
+          <h4>No fields yet</h4>
+          <p>Start by adding your first field to track crop performance and analytics.</p>
+        </div>
+      `;
+    }
+
+    return fields.map(field => `
+      <div class="field-card">
+        <div class="field-header">
+          <h4>${field.name}</h4>
+          <span class="field-size">${field.size} ${field.sizeUnit}</span>
+        </div>
+        <div class="field-details">
+          <p><strong>Location:</strong> ${field.location}</p>
+          <p><strong>Soil Type:</strong> ${field.soilType}</p>
+          <p><strong>Current Crop:</strong> ${field.currentCrop || 'None'}</p>
+        </div>
+        <div class="field-actions">
+          <button class="btn secondary" onclick="miniAgronomist.editField('${field.id}')">
+            Edit
+          </button>
+          <button class="btn secondary" onclick="miniAgronomist.viewFieldAnalytics('${field.id}')">
+            Analytics
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  highlightSpecialtyCrops() {
+    const cropSelect = document.getElementById("crop");
+    if (!cropSelect) return;
+
+    // Remove existing highlights
+    cropSelect.querySelectorAll('option').forEach(option => {
+      option.classList.remove('specialty-highlight');
+    });
+
+    // Add highlights to specialty crops
+    if (this.proCropData?.specialty_crops) {
+      Object.keys(this.proCropData.specialty_crops).forEach(cropId => {
+        const option = cropSelect.querySelector(`option[value="${cropId}"]`);
+        if (option) {
+          option.classList.add('specialty-highlight');
+          option.style.background = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
+          option.style.color = '#333';
+          option.style.fontWeight = '600';
+        }
+      });
+    }
+
+    // Animate the dropdown to draw attention
+    cropSelect.style.animation = 'pulse 1.5s ease-in-out 3';
+  }
+
+  generateDataExport() {
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      user_tier: this.proFeatureManager.userTier,
+      predictions: this.lastPrediction || null,
+      fields: this.fieldManager?.getFields() || [],
+      analytics: this.advancedAnalytics?.getLastAnalysis() || null,
+      usage_stats: this.proFeatureManager.getUsageStats()
+    };
+
+    // Create and download JSON file
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+      type: 'application/json' 
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mini-agronomist-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    this.showMessage('📊 Data exported successfully!', 'success');
+  }
+
+  initializeFieldManagerEvents() {
+    const modal = document.querySelector('.pro-modal');
+    if (!modal) return;
+
+    // Tab switching for analytics
+    const tabBtns = modal.querySelectorAll('.tab-btn');
+    const tabPanels = modal.querySelectorAll('.tab-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.dataset.tab;
+        
+        // Update active states
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        
+        btn.classList.add('active');
+        const targetPanel = document.getElementById(`${targetTab}-panel`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+        }
+      });
+    });
+  }
+
+  initializeAnalyticsEvents() {
+    this.initializeFieldManagerEvents(); // Reuse tab functionality
+  }
+
+  // Placeholder methods for future implementation
+  addNewField() {
+    this.showMessage('🚧 Field creation interface coming soon!', 'info');
+  }
+
+  importFields() {
+    this.showMessage('🚧 Field import functionality coming soon!', 'info');
+  }
+
+  editField(fieldId) {
+    this.showMessage(`🚧 Editing field ${fieldId} - coming soon!`, 'info');
+  }
+
+  viewFieldAnalytics(fieldId) {
+    this.showMessage(`🚧 Field analytics for ${fieldId} - coming soon!`, 'info');
   }
 
   populateRegionDropdown() {

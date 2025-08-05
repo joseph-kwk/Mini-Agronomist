@@ -1,0 +1,178 @@
+{
+  "specialty_crops": {
+    "avocado": {
+      "scientific_name": "Persea americana",
+      "photosynthesis_type": "C3",
+      "days_to_maturity": [1095, 1825],
+      "growing_degree_days": [2500, 4000],
+      "optimal_temp_c": [15, 25],
+      "water_requirement_mm": [1000, 1500],
+      "soil_ph_range": [6.0, 7.0],
+      "root_depth_cm": [100, 200],
+      "sowing_depth_cm": [0, 2],
+      "plant_spacing_cm": [400, 600],
+      "common_varieties": ["Hass", "Fuerte", "Pinkerton", "Reed"],
+      "description": "High-value fruit crop requiring specific climatic conditions and intensive management.",
+      "category": "fruit",
+      "pro_features": {
+        "market_value_usd_kg": [3.50, 8.00],
+        "harvest_months": [3, 6],
+        "storage_days": [7, 21],
+        "export_potential": "high",
+        "labor_intensive": true,
+        "irrigation_critical": true
+      }
+    },
+    "cocoa": {
+      "scientific_name": "Theobroma cacao",
+      "photosynthesis_type": "C3",
+      "days_to_maturity": [1460, 2190],
+      "growing_degree_days": [3000, 5000],
+      "optimal_temp_c": [21, 32],
+      "water_requirement_mm": [1500, 2500],
+      "soil_ph_range": [6.0, 7.5],
+      "root_depth_cm": [150, 300],
+      "sowing_depth_cm": [2, 4],
+      "plant_spacing_cm": [300, 400],
+      "common_varieties": ["Trinitario", "Criollo", "Forastero", "CCN-51"],
+      "description": "Premium cash crop for tropical regions with high rainfall and stable temperatures.",
+      "category": "cash_crop",
+      "pro_features": {
+        "market_value_usd_kg": [2.20, 4.50],
+        "harvest_months": [5, 7],
+        "storage_days": [90, 180],
+        "export_potential": "very_high",
+        "labor_intensive": true,
+        "shade_required": true,
+        "disease_susceptible": ["black_pod", "witches_broom", "frosty_pod"]
+      }
+    },
+    "coffee_arabica": {
+      "scientific_name": "Coffea arabica",
+      "photosynthesis_type": "C3",
+      "days_to_maturity": [1095, 1460],
+      "growing_degree_days": [2200, 3500],
+      "optimal_temp_c": [15, 24],
+      "water_requirement_mm": [1200, 2000],
+      "soil_ph_range": [6.0, 6.5],
+      "root_depth_cm": [100, 200],
+      "sowing_depth_cm": [1, 2],
+      "plant_spacing_cm": [150, 250],
+      "common_varieties": ["Bourbon", "Typica", "Caturra", "Geisha"],
+      "description": "High-altitude specialty crop requiring precise environmental conditions.",
+      "category": "beverage_crop",
+      "pro_features": {
+        "market_value_usd_kg": [4.00, 15.00],
+        "harvest_months": [3, 5],
+        "storage_days": [180, 365],
+        "export_potential": "very_high",
+        "altitude_requirement": [1000, 2000],
+        "processing_complex": true,
+        "quality_grades": ["specialty", "premium", "commercial"]
+      }
+    },
+    "vanilla": {
+      "scientific_name": "Vanilla planifolia",
+      "photosynthesis_type": "C3",
+      "days_to_maturity": [1095, 1460],
+      "growing_degree_days": [2800, 4200],
+      "optimal_temp_c": [20, 30],
+      "water_requirement_mm": [2000, 3000],
+      "soil_ph_range": [6.5, 7.5],
+      "root_depth_cm": [30, 60],
+      "sowing_depth_cm": [0, 1],
+      "plant_spacing_cm": [100, 150],
+      "common_varieties": ["Planifolia", "Tahitensis", "Pompona"],
+      "description": "Ultra-premium spice crop requiring manual pollination and intensive processing.",
+      "category": "spice",
+      "pro_features": {
+        "market_value_usd_kg": [200, 600],
+        "harvest_months": [8, 10],
+        "storage_days": [730, 1095],
+        "export_potential": "ultra_high",
+        "labor_intensive": true,
+        "hand_pollination": true,
+        "curing_required": true,
+        "quality_factors": ["vanillin_content", "moisture", "length"]
+      }
+    },
+    "quinoa": {
+      "scientific_name": "Chenopodium quinoa",
+      "photosynthesis_type": "C3",
+      "days_to_maturity": [90, 150],
+      "growing_degree_days": [1000, 1800],
+      "optimal_temp_c": [10, 25],
+      "water_requirement_mm": [300, 500],
+      "soil_ph_range": [6.0, 8.5],
+      "root_depth_cm": [60, 120],
+      "sowing_depth_cm": [1, 2],
+      "plant_spacing_cm": [20, 30],
+      "common_varieties": ["Real", "Sajama", "Chucapaca", "Kankolla"],
+      "description": "Superfood grain crop with high protein content and climate resilience.",
+      "category": "superfood",
+      "pro_features": {
+        "market_value_usd_kg": [3.00, 8.00],
+        "harvest_months": [1, 1],
+        "storage_days": [365, 730],
+        "export_potential": "high",
+        "protein_content": [12, 18],
+        "saponin_processing": true,
+        "altitude_tolerant": true
+      }
+    }
+  },
+  "market_data": {
+    "price_ranges": {
+      "maize": { "min": 0.20, "max": 0.45, "currency": "USD", "unit": "kg" },
+      "groundnuts": { "min": 0.80, "max": 1.50, "currency": "USD", "unit": "kg" },
+      "sorghum": { "min": 0.18, "max": 0.35, "currency": "USD", "unit": "kg" },
+      "soybeans": { "min": 0.35, "max": 0.60, "currency": "USD", "unit": "kg" },
+      "avocado": { "min": 3.50, "max": 8.00, "currency": "USD", "unit": "kg" },
+      "cocoa": { "min": 2.20, "max": 4.50, "currency": "USD", "unit": "kg" },
+      "coffee_arabica": { "min": 4.00, "max": 15.00, "currency": "USD", "unit": "kg" },
+      "vanilla": { "min": 200, "max": 600, "currency": "USD", "unit": "kg" },
+      "quinoa": { "min": 3.00, "max": 8.00, "currency": "USD", "unit": "kg" }
+    },
+    "seasonal_factors": {
+      "harvest_season": { "multiplier": 0.8, "description": "Lower prices during harvest" },
+      "off_season": { "multiplier": 1.2, "description": "Higher prices off-season" },
+      "export_window": { "multiplier": 1.1, "description": "Premium for export quality" }
+    }
+  },
+  "disease_pest_data": {
+    "common_threats": {
+      "maize": {
+        "diseases": ["gray_leaf_spot", "northern_corn_leaf_blight", "common_rust"],
+        "pests": ["corn_borer", "armyworm", "cutworm"],
+        "risk_factors": ["high_humidity", "dense_planting", "monoculture"]
+      },
+      "groundnuts": {
+        "diseases": ["early_leaf_spot", "late_leaf_spot", "rosette_virus"],
+        "pests": ["aphids", "thrips", "groundnut_bruchid"],
+        "risk_factors": ["waterlogging", "calcium_deficiency", "continuous_cropping"]
+      },
+      "cocoa": {
+        "diseases": ["black_pod", "witches_broom", "frosty_pod_rot"],
+        "pests": ["cocoa_pod_borer", "mirids", "thrips"],
+        "risk_factors": ["poor_drainage", "shade_management", "harvest_hygiene"]
+      }
+    }
+  },
+  "soil_analysis_data": {
+    "nutrient_requirements": {
+      "maize": {
+        "nitrogen": { "optimal": 120, "unit": "kg/ha", "timing": "split_application" },
+        "phosphorus": { "optimal": 60, "unit": "kg/ha", "timing": "basal" },
+        "potassium": { "optimal": 40, "unit": "kg/ha", "timing": "basal" },
+        "organic_matter": { "optimal": 3.0, "unit": "%" }
+      },
+      "avocado": {
+        "nitrogen": { "optimal": 200, "unit": "kg/ha", "timing": "multiple_splits" },
+        "phosphorus": { "optimal": 80, "unit": "kg/ha", "timing": "annual" },
+        "potassium": { "optimal": 150, "unit": "kg/ha", "timing": "pre_flowering" },
+        "calcium": { "optimal": 100, "unit": "kg/ha", "timing": "soil_amendment" },
+        "micronutrients": ["zinc", "boron", "iron"]
+      }
+    }
+  }
+}
