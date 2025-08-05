@@ -140,18 +140,36 @@
 ```
 mini-agronomist/
 ├── index.html              # Main application interface
+├── ml_demo.html            # ML Analytics demo page
 ├── style.css               # Modern responsive styling system
 ├── app.js                  # Enhanced JavaScript application class
 ├── manifest.json           # PWA manifest for installability
 ├── sw.js                   # Service worker for offline functionality
+├── STRUCTURE.md            # Project structure documentation
 ├── data/
 │   ├── crop_profiles.json   # Biological crop characteristics
 │   ├── regions.json         # Regional climate and soil data
 │   └── crop_rules.json      # Region-crop-soil specific rules
 ├── assets/
-│   ├── icons/              # Application icons and images
-│   └── screenshots/        # PWA screenshots
-├── idea/
+│   └── icons/              # Application icons and images
+├── pages/                  # Secondary HTML pages
+│   ├── onboarding.html     # User onboarding experience
+│   ├── faq.html           # FAQ page (also integrated as modal)
+│   ├── privacy-policy.html # Privacy policy
+│   ├── terms-of-service.html # Terms of service
+│   └── test-suite.html     # Testing interface
+├── js/                     # Advanced JavaScript modules
+│   ├── advanced_prediction_engine.js
+│   └── statistical_models.js
+├── docs/                   # Technical documentation
+│   ├── DEPLOYMENT_CHECKLIST.md
+│   ├── TESTING_GUIDE.md
+│   └── PROJECT_STRUCTURE.md
+├── config/                 # Configuration files
+│   ├── robots.txt          # SEO configuration
+│   ├── sitemap.xml         # SEO sitemap
+│   └── browserconfig.xml   # Browser configuration
+├── idea/                   # Project planning and ideas
 │   ├── PRD.txt             # Product Requirements Document
 │   ├── future              # Future enhancement ideas
 │   └── refine idea         # Refinement notes
