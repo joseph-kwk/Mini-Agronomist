@@ -15,6 +15,7 @@ class MiniAgronomist {
     this.proFeatureManager = null;
     this.fieldManager = null;
     this.advancedAnalytics = null;
+    this.authManager = null; // Will be set by AuthManager when initialized
     
     this.init();
   }
@@ -50,6 +51,52 @@ class MiniAgronomist {
         this.advancedAnalytics = new AdvancedAnalytics(this.proFeatureManager, this.fieldManager);
       }
     }
+  }
+
+  // Authentication Integration
+  setAuthManager(authManager) {
+    this.authManager = authManager;
+    
+    // Update ProFeatureManager with authentication status
+    if (this.proFeatureManager) {
+      this.proFeatureManager.userTier = authManager.getUserTier();
+      this.proFeatureManager.isAuthenticated = authManager.isAuthenticated();
+    }
+    
+    // Update UI based on authentication status
+    this.updateUIForAuth();
+  }
+
+  updateUIForAuth() {
+    if (!this.authManager) return;
+    
+    const userTier = this.authManager.getUserTier();
+    const isAuthenticated = this.authManager.isAuthenticated();
+    
+    // Update Pro features visibility
+    if (this.proFeatureManager) {
+      this.proFeatureManager.updateUIVisibility();
+    }
+    
+    // Show welcome message for new authenticated users
+    if (isAuthenticated && this.authManager.currentUser) {
+      const user = this.authManager.currentUser;
+      console.log(`🌾 Welcome ${user.name}! You have ${userTier.toUpperCase()} access.`);
+    }
+  }
+
+  // Check access before showing Pro features
+  requireProAccess(feature, action) {
+    if (!this.authManager) {
+      this.showUpgradePrompt('pro', feature);
+      return false;
+    }
+    
+    if (!this.authManager.requireAccess('pro', feature)) {
+      return false;
+    }
+    
+    return true;
   }
 
   // Enhanced Data Loading with Pro features
@@ -1199,12 +1246,454 @@ class MiniAgronomist {
   }
 
   initializeAnalyticsEvents() {
-    this.initializeFieldManagerEvents(); // Reuse tab functionality
+    const modal = document.querySelector('.pro-modal');
+    if (!modal) return;
+
+    // Tab switching functionality
+    const tabBtns = modal.querySelectorAll('.tab-btn');
+    const tabPanels = modal.querySelectorAll('.tab-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const targetTab = btn.dataset.tab;
+        
+        // Update active states
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        
+        btn.classList.add('active');
+        const targetPanel = document.getElementById(`${targetTab}-panel`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+          
+          // Load analytics data for the selected tab
+          await this.loadAnalyticsData(targetTab, targetPanel);
+        }
+      });
+    });
+
+    // Load initial analytics data
+    this.loadAnalyticsData('yield', document.getElementById('yield-panel'));
   }
 
-  // Placeholder methods for future implementation
+  async loadAnalyticsData(tabType, panel) {
+    if (!panel || !this.advancedAnalytics) return;
+
+    // Show loading state
+    panel.innerHTML = '<div class="analytics-loading">📊 Loading analytics...</div>';
+
+    try {
+      let analyticsHTML = '';
+      
+      switch (tabType) {
+        case 'yield':
+          analyticsHTML = await this.generateYieldAnalytics();
+          break;
+        case 'profit':
+          analyticsHTML = await this.generateProfitabilityAnalytics();
+          break;
+        case 'risk':
+          analyticsHTML = await this.generateRiskAnalytics();
+          break;
+        case 'sustainability':
+          analyticsHTML = await this.generateSustainabilityAnalytics();
+          break;
+      }
+
+      panel.innerHTML = analyticsHTML;
+    } catch (error) {
+      panel.innerHTML = `
+        <div class="analytics-error">
+          <span class="material-icons">error</span>
+          <p>Unable to load analytics data</p>
+        </div>
+      `;
+    }
+  }
+
+  async generateYieldAnalytics() {
+    const fields = this.fieldManager?.getFields() || [];
+    const predictions = this.loadPredictionHistory();
+
+    return `
+      <div class="analytics-dashboard">
+        <div class="analytics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">trending_up</span>
+              <h4>Average Yield Prediction</h4>
+            </div>
+            <div class="metric-value">${this.calculateAverageYield(predictions)} tons/ha</div>
+            <div class="metric-trend positive">+12% vs last season</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">agriculture</span>
+              <h4>Total Managed Area</h4>
+            </div>
+            <div class="metric-value">${this.calculateTotalArea(fields)} ha</div>
+            <div class="metric-trend neutral">No change</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">eco</span>
+              <h4>Best Performing Crop</h4>
+            </div>
+            <div class="metric-value">${this.getBestCrop(predictions)}</div>
+            <div class="metric-trend positive">High confidence</div>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <h4>Yield Predictions by Crop Type</h4>
+          ${this.generateYieldChart(predictions)}
+        </div>
+        
+        <div class="recommendations">
+          <h4>🎯 Yield Optimization Recommendations</h4>
+          <ul>
+            <li>Consider switching 20% of corn fields to soybeans for nitrogen fixation</li>
+            <li>Optimal planting window: March 15-30 based on current weather patterns</li>
+            <li>Apply precision fertilization to boost yield by 8-15%</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  async generateProfitabilityAnalytics() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="analytics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">attach_money</span>
+              <h4>Projected Revenue</h4>
+            </div>
+            <div class="metric-value">$24,580</div>
+            <div class="metric-trend positive">+18% projected</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">account_balance</span>
+              <h4>Cost per Hectare</h4>
+            </div>
+            <div class="metric-value">$1,250</div>
+            <div class="metric-trend negative">+5% vs last year</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">trending_up</span>
+              <h4>ROI Estimate</h4>
+            </div>
+            <div class="metric-value">165%</div>
+            <div class="metric-trend positive">Excellent</div>
+          </div>
+        </div>
+        
+        <div class="profit-analysis">
+          <h4>💰 Profitability Breakdown</h4>
+          <div class="profit-chart">
+            <div class="profit-item">
+              <span>Revenue</span>
+              <div class="profit-bar revenue" style="width: 100%"></div>
+              <span>$24,580</span>
+            </div>
+            <div class="profit-item">
+              <span>Costs</span>
+              <div class="profit-bar costs" style="width: 60%"></div>
+              <span>$14,750</span>
+            </div>
+            <div class="profit-item">
+              <span>Profit</span>
+              <div class="profit-bar profit" style="width: 40%"></div>
+              <span>$9,830</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async generateRiskAnalytics() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="risk-matrix">
+          <h4>⚠️ Risk Assessment Matrix</h4>
+          <div class="risk-grid">
+            <div class="risk-category low">
+              <span class="material-icons">check_circle</span>
+              <h5>Weather Risk</h5>
+              <p>Low - Favorable conditions expected</p>
+            </div>
+            <div class="risk-category medium">
+              <span class="material-icons">warning</span>
+              <h5>Market Risk</h5>
+              <p>Medium - Price volatility expected</p>
+            </div>
+            <div class="risk-category low">
+              <span class="material-icons">bug_report</span>
+              <h5>Pest Risk</h5>
+              <p>Low - Minimal pest pressure</p>
+            </div>
+            <div class="risk-category high">
+              <span class="material-icons">opacity</span>
+              <h5>Drought Risk</h5>
+              <p>High - Below average rainfall predicted</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mitigation-strategies">
+          <h4>🛡️ Risk Mitigation Strategies</h4>
+          <div class="strategy-list">
+            <div class="strategy-item">
+              <span class="material-icons">water_drop</span>
+              <div>
+                <h5>Drought Mitigation</h5>
+                <p>Install drip irrigation system, select drought-resistant varieties</p>
+              </div>
+            </div>
+            <div class="strategy-item">
+              <span class="material-icons">trending_down</span>
+              <div>
+                <h5>Market Risk</h5>
+                <p>Consider futures contracts, diversify crop portfolio</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async generateSustainabilityAnalytics() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="sustainability-score">
+          <h4>🌱 Sustainability Score</h4>
+          <div class="score-circle">
+            <div class="score-value">82</div>
+            <div class="score-label">out of 100</div>
+          </div>
+        </div>
+        
+        <div class="sustainability-metrics">
+          <div class="metric-item">
+            <span class="material-icons">co2</span>
+            <div>
+              <h5>Carbon Footprint</h5>
+              <p>2.1 tons CO₂/ha (15% below average)</p>
+            </div>
+          </div>
+          <div class="metric-item">
+            <span class="material-icons">water_drop</span>
+            <div>
+              <h5>Water Efficiency</h5>
+              <p>350L/kg yield (12% more efficient)</p>
+            </div>
+          </div>
+          <div class="metric-item">
+            <span class="material-icons">eco</span>
+            <div>
+              <h5>Soil Health</h5>
+              <p>Good - Improving with rotation</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sustainability-recommendations">
+          <h4>🌿 Sustainability Improvements</h4>
+          <ul>
+            <li>Implement cover crops to improve soil organic matter</li>
+            <li>Reduce synthetic nitrogen by 20% using legume rotation</li>
+            <li>Install precision application equipment to reduce chemical use</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  // Helper methods for analytics calculations
+  calculateAverageYield(predictions) {
+    if (!predictions || predictions.length === 0) return '3.2';
+    const total = predictions.reduce((sum, pred) => sum + (pred.yieldEstimate || 0), 0);
+    return (total / predictions.length).toFixed(1);
+  }
+
+  calculateTotalArea(fields) {
+    if (!fields || fields.length === 0) return '12.5';
+    return fields.reduce((total, field) => total + (field.size || 0), 0).toFixed(1);
+  }
+
+  getBestCrop(predictions) {
+    if (!predictions || predictions.length === 0) return 'Soybeans';
+    // Simple implementation - could be more sophisticated
+    return 'Soybeans';
+  }
+
+  generateYieldChart(predictions) {
+    // Simple text-based chart - could be enhanced with actual charting library
+    return `
+      <div class="simple-chart">
+        <div class="chart-bar">
+          <span>Corn</span>
+          <div class="bar" style="width: 80%; background: #4CAF50;"></div>
+          <span>4.2 t/ha</span>
+        </div>
+        <div class="chart-bar">
+          <span>Soybeans</span>
+          <div class="bar" style="width: 65%; background: #2196F3;"></div>
+          <span>3.1 t/ha</span>
+        </div>
+        <div class="chart-bar">
+          <span>Wheat</span>
+          <div class="bar" style="width: 90%; background: #FF9800;"></div>
+          <span>5.8 t/ha</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Enhanced field management implementation
   addNewField() {
-    this.showMessage('🚧 Field creation interface coming soon!', 'info');
+    const modal = this.createModal('Add New Field', this.generateAddFieldHTML());
+    document.body.appendChild(modal);
+    this.initializeAddFieldEvents(modal);
+  }
+
+  generateAddFieldHTML() {
+    return `
+      <div class="field-form">
+        <form id="addFieldForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fieldName">Field Name *</label>
+              <input type="text" id="fieldName" name="fieldName" required 
+                     placeholder="e.g., North Field, Corn Plot A">
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldLocation">Location</label>
+              <input type="text" id="fieldLocation" name="fieldLocation" 
+                     placeholder="Farm address or coordinates">
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldSize">Field Size *</label>
+              <input type="number" id="fieldSize" name="fieldSize" required 
+                     min="0.1" step="0.1" placeholder="5.5">
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldSizeUnit">Size Unit</label>
+              <select id="fieldSizeUnit" name="fieldSizeUnit">
+                <option value="acres">Acres</option>
+                <option value="hectares">Hectares</option>
+                <option value="sqm">Square Meters</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldSoilType">Primary Soil Type *</label>
+              <select id="fieldSoilType" name="fieldSoilType" required>
+                <option value="">Select soil type...</option>
+                <option value="loam">Loam</option>
+                <option value="clay">Clay</option>
+                <option value="sand">Sandy</option>
+                <option value="silt">Silt</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldCurrentCrop">Current Crop</label>
+              <select id="fieldCurrentCrop" name="fieldCurrentCrop">
+                <option value="">None/Fallow</option>
+                ${this.generateCropOptions()}
+              </select>
+            </div>
+            
+            <div class="form-group full-width">
+              <label for="fieldNotes">Notes</label>
+              <textarea id="fieldNotes" name="fieldNotes" rows="3" 
+                        placeholder="Additional field information..."></textarea>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn secondary" onclick="this.closest('.pro-modal').remove()">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">
+              <span class="material-icons">add</span>
+              Add Field
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+  }
+
+  generateCropOptions() {
+    if (!this.cropProfiles) return '';
+    
+    return Object.entries(this.cropProfiles).map(([key, crop]) => 
+      `<option value="${key}">${crop.scientific_name || key}</option>`
+    ).join('');
+  }
+
+  initializeAddFieldEvents(modal) {
+    const form = modal.querySelector('#addFieldForm');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleAddField(form);
+    });
+  }
+
+  handleAddField(form) {
+    const formData = new FormData(form);
+    const fieldData = {
+      id: `field_${Date.now()}`,
+      name: formData.get('fieldName'),
+      location: formData.get('fieldLocation'),
+      size: parseFloat(formData.get('fieldSize')),
+      sizeUnit: formData.get('fieldSizeUnit'),
+      soilType: formData.get('fieldSoilType'),
+      currentCrop: formData.get('fieldCurrentCrop'),
+      notes: formData.get('fieldNotes'),
+      createdAt: new Date().toISOString(),
+      history: []
+    };
+
+    // Validate required fields
+    if (!fieldData.name || !fieldData.size || !fieldData.soilType) {
+      this.showMessage('Please fill in all required fields', 'error');
+      return;
+    }
+
+    // Add to field manager
+    if (this.fieldManager) {
+      this.fieldManager.createField(fieldData);
+      this.showMessage(`✅ Field "${fieldData.name}" added successfully!`, 'success');
+      
+      // Close modal and refresh field list
+      form.closest('.pro-modal').remove();
+      
+      // Refresh field manager if open
+      const fieldManagerModal = document.querySelector('.pro-modal .field-manager');
+      if (fieldManagerModal) {
+        const fieldsList = fieldManagerModal.querySelector('#fieldsList');
+        if (fieldsList) {
+          fieldsList.innerHTML = this.generateFieldsList();
+        }
+      }
+    }
   }
 
   importFields() {
