@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<<<<<<< HEAD
   <meta name="description" content="Advanced agricultural yield prediction tool for farmers worldwide. Get region-specific crop yield estimates and planting advice." />
   <meta name="keywords" content="agriculture, farming, crop yield, prediction, sustainable farming" />
   <meta name="theme-color" content="#2E7D32" />
@@ -179,10 +180,90 @@
               <span class="material-icons" aria-hidden="true">add</span>
               New Prediction
             </button>
+=======
+  <title>Mini Agronomist</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="icon" href="assets/icons/favicon.png" type="image/x-icon" />
+</head>
+<body>
+  <header>
+    <img src="assets/icons/logo.png" alt="Mini Agronomist Logo" class="logo" />
+</header>
+
+
+  <main>
+    <div id="errorLog" class="hidden" role="alert" aria-live="polite"></div>
+    
+    <div class="app-container">
+      <div class="input-section">
+        <form id="inputForm" novalidate>
+          <div class="form-content">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="region">Region:</label>
+                <select id="region" required aria-describedby="region-help">
+                  <option value="">Select agricultural region...</option>
+                  <!-- Options will be populated dynamically from regions.json -->
+                </select>
+                <small id="region-help" class="help-text">Select your agricultural region for climate-appropriate predictions</small>
+              </div>
+
+              <div class="form-group">
+                <label for="soil">Soil Type:</label>
+                <select id="soil" required aria-describedby="soil-help">
+                  <option value="">Select soil type...</option>
+                  <!-- Options will be populated based on selected region -->
+                </select>
+                <small id="soil-help" class="help-text">Choose the soil type available in your selected region</small>
+              </div>
+
+              <div class="form-group">
+                <label for="crop">Crop Type:</label>
+                <select id="crop" required aria-describedby="crop-help">
+                  <option value="">Select crop...</option>
+                  <!-- Options will be populated dynamically from crop_profiles.json -->
+                </select>
+                <small id="crop-help" class="help-text">Select the crop you plan to grow</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rainfall">Rainfall (mm/week):</label>
+                <input type="number" id="rainfall" min="0" max="500" step="1" required 
+                       aria-describedby="rainfall-help" placeholder="e.g. 75" />
+                <small id="rainfall-help" class="help-text">Enter weekly rainfall estimate (typical range: 30-150mm)</small>
+              </div>
+
+              <div class="form-group">
+                <label for="plantingDate">Planting Date:</label>
+                <input type="date" id="plantingDate" required aria-describedby="date-help" />
+                <small id="date-help" class="help-text">When do you plan to plant this crop?</small>
+              </div>
+            </div>
+          </div>
+          <div class="button-group">
+            <button type="submit">Predict Yield</button>
+            <button type="button" id="resetForm" class="reset-btn">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="results-section">
+        <section id="output" class="yield-card" role="main">
+          <div class="prediction-header">
+            <h2>
+              <span id="cropIcon" class="material-icons" aria-hidden="true">eco</span> 
+              Yield Prediction Results
+            </h2>
+            <button id="newPrediction" class="new-prediction-btn hidden" type="button">+ New Prediction</button>
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
           </div>
           
           <div class="prediction-summary">
             <div class="summary-card">
+<<<<<<< HEAD
               <div class="summary-header">
                 <h3>
                   <span class="material-icons" aria-hidden="true">summarize</span>
@@ -214,10 +295,29 @@
                 <span class="risk-low">🟩 Low Risk</span>
                 <span class="risk-medium">🟨 Moderate Risk</span>
                 <span class="risk-high">🟥 High Risk</span>
+=======
+              <p id="conditionsSummary" class="conditions-summary">Fill out the form and click "Predict Yield" to see your crop yield prediction</p>
+              <p id="yieldResult" class="big-yield placeholder" role="status">🌱 Ready to predict</p>
+              <div id="confidence" class="confidence-indicator placeholder">Select your crop, soil type, rainfall, and planting date to get started</div>
+            </div>
+            
+            <div class="risk-card">
+              <h3>Risk Assessment</h3>
+              <svg id="riskBar" width="100%" height="30" role="img" 
+                   aria-label="Yield risk indicator" 
+                   title="This bar shows predicted yield risk level">
+                <rect x="0" y="5" width="100%" height="20" fill="#e0e0e0" rx="4" />
+              </svg>
+              <div id="riskLegend" class="risk-legend">
+                <span style="color: #4CAF50;">🟩 Low Risk</span>
+                <span style="color: #FFC107;">🟨 Moderate Risk</span>
+                <span style="color: #F44336;">🟥 High Risk</span>
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
               </div>
             </div>
           </div>
           
+<<<<<<< HEAD
           <!-- Enhanced Tip Section -->
           <div id="tip" class="tip-section placeholder">
             <div class="tip-header">
@@ -492,5 +592,24 @@
       });
     }
   </script>
+=======
+          <div id="tip" class="tip-section placeholder">
+            <strong>💡 Tips will appear here:</strong> Get personalized recommendations based on your specific crop and soil conditions.
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+  <p>
+    &copy; 2025 Mini Agronomist — Built for the field |
+    <a href="https://yourwebsite.com" target="_blank" rel="noopener noreferrer">Visit Owner Site</a>
+  </p>
+  </footer>
+
+
+  <script src="app.js"></script>
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 </body>
 </html>

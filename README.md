@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🌾 Mini Agronomist v2.0 - Enhanced Agricultural Intelligence
 
 **Mini Agronomist** is a sophisticated, offline-first progressive web application designed to assist farmers worldwide with comprehensive yield predictions and region-specific planting advice. This enhanced version features modern UI design, improved prediction algorithms, and advanced analytics capabilities.
@@ -58,6 +59,31 @@
 - **Responsive design** for mobile, tablet, and desktop
 - **Keyboard navigation** and screen reader support
 - **Offline-first architecture**
+=======
+# 🌾 Mini Agronomist
+
+**Mini Agronomist** is a sophisticated, offline-first web app designed to assist farmers worldwide with yield predictions and region-specific planting advice. Users select their region, crop type, soil type, and planting conditions—and receive locally-appropriate, scientifically-grounded estimates powered by a three-tier agricultural intelligence system.
+
+---
+
+## ✨ Features
+
+- 🌍 **Global Regional Intelligence** - 14 major agricultural regions with climate-specific data
+- 📱 *Offline-capable* (PWA-compatible)
+- 🌿 Intuitive interface with farm-inspired visuals  
+- 🧬 **Biological Crop Profiles** - Scientific crop data including maturity periods, growing degree days, and water requirements
+- 🌧️ **Advanced Climate Modeling** - Regional rainfall patterns, temperature curves, and seasonal windows
+- 🌱 **Region-Specific Varieties** - Local cultivar recommendations for each region
+- 📊 **Enhanced Yield Estimation** - Multi-factor analysis considering rainfall, timing, soil pH, and water requirements
+- 🎯 Real-time input validation and planting window alerts
+- � Visual risk assessment with improved confidence indicators
+- 🗓️ **Dynamic Harvest Date Prediction** - Calculated from planting date and crop maturity
+- 📝 Prediction history tracking (last 10 predictions)
+- 📱 Fully responsive design for mobile devices
+- ♿ Enhanced accessibility features
+- 🎨 Modern UI with loading states and animations
+- 🧩 No server or database required
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 
 ---
 
@@ -76,12 +102,16 @@
 - **Central America** (Mexico, Guatemala, Honduras)
 - **The Caribbean** (Cuba, Jamaica, Dominican Republic)
 - **New Zealand**
+<<<<<<< HEAD
 - *More regions coming soon...*
+=======
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 
 ---
 
 ## 🌱 Supported Crops
 
+<<<<<<< HEAD
 ### Cereals
 - **Maize/Corn** (Zea mays) - C4 photosynthesis, 90-150 days
 - **Sorghum** (Sorghum bicolor) - Drought-tolerant cereal
@@ -94,6 +124,15 @@
 - **Common Beans** (Phaseolus vulgaris) - Nitrogen-fixing
 
 ### Vegetables & Others
+=======
+- **Maize/Corn** (Zea mays) - C4 photosynthesis, 90-150 days to maturity
+- **Groundnuts/Peanuts** (Arachis hypogaea) - Nitrogen-fixing legume
+- **Sorghum** (Sorghum bicolor) - Drought-tolerant cereal
+- **Rice** (Oryza sativa) - Flooded crop systems
+- **Soybeans** (Glycine max) - High-protein legume
+- **Barley** (Hordeum vulgare) - Cool-season cereal
+- **Common Beans** (Phaseolus vulgaris) - Nitrogen-fixing legume
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 - **Tomatoes** (Solanum lycopersicum) - Warm-season vegetable
 - **Sweet Potato** (Ipomoea batatas) - Root vegetable
 
@@ -101,6 +140,7 @@
 
 ## 🚀 Getting Started
 
+<<<<<<< HEAD
 ### Quick Start
 1. **Clone the repository**
    ```bash
@@ -159,10 +199,48 @@ mini-agronomist/
 │   └── refine idea         # Refinement notes
 └── .vscode/
     └── tasks.json          # VS Code development tasks
+=======
+1. Clone or download this repository
+2. Run locally using a static file server:
+   ```bash
+   python -m http.server 8000
+   ```
+   Or use VS Code Live Server extension
+3. Open `index.html` at `http://localhost:8000`
+4. Select your region → crop → soil type → planting conditions
+5. Get region-specific yield predictions and agricultural advice!
+
+> 📦 All prediction logic and agricultural data live in `/data/` folder with three core files:
+> - `crop_profiles.json` - Biological crop characteristics
+> - `regions.json` - Climate and regional data  
+> - `crop_rules.json` - Region-crop-soil specific rules
+
+---
+
+## 📁 Enhanced Folder Structure
+
+```
+mini-agronomist/
+├── index.html              # Main application interface
+├── style.css               # Styling and responsive design
+├── app.js                  # Three-tier agricultural intelligence engine
+├── data/
+│   ├── crop_profiles.json   # Biological crop data (NEW)
+│   ├── regions.json         # Regional climate data (NEW)  
+│   └── crop_rules.json      # Region-crop-soil rules (ENHANCED)
+├── assets/
+│   └── icons/
+│       ├── farm-bg.png
+│       ├── favicon.png
+│       └── logo.png
+└── .vscode/
+    └── tasks.json           # VS Code development tasks
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 ```
 
 ---
 
+<<<<<<< HEAD
 ## 🧠 Enhanced Intelligence System
 
 ### 1. **Biological Crop Profiles** (`crop_profiles.json`)
@@ -325,11 +403,68 @@ Our predictions are based on data from:
 - **Regional Agricultural Extension Services**
 - **Peer-reviewed Agricultural Publications**
 - **Climate Data Organizations** (Köppen classifications)
+=======
+## 🧠 Three-Tier Intelligence System
+
+### 1. **Crop Profiles** (`crop_profiles.json`)
+Biological fundamentals for each crop including:
+- Scientific classification and photosynthesis type
+- Days to maturity and growing degree day requirements
+- Optimal temperature ranges and water needs
+- Soil pH preferences and root characteristics
+- Planting depth and spacing recommendations
+
+### 2. **Regional Data** (`regions.json`)
+Climate and environmental context including:
+- Köppen climate classifications
+- Monthly rainfall and temperature patterns
+- Regional soil profile characteristics
+- Optimal planting windows by crop
+- Common local varieties and pest/disease risks
+
+### 3. **Crop Rules** (`crop_rules.json`)
+Region-crop-soil specific combinations providing:
+- Localized yield ranges and rainfall windows
+- Evidence-based agricultural tips
+- Scientific sources and references
+- Variety-specific recommendations
+
+---
+
+## 🌱 Future Enhancements
+
+- ✅ **Expanded Dataset**  
+  Add more crops, regions, and climate data sources.
+
+- 🔍 **Prediction Explainability**  
+  Detailed factor breakdown and confidence analysis.
+
+- 📂 **Field Profile Uploads**  
+  Enable CSV uploads for personalized field data.
+
+- 🌡️ **Weather API Integration**  
+  Real-time weather data integration (optional online mode).
+
+- 📱 **Mobile App Version**  
+  Native mobile applications for iOS/Android.
+
+---
+
+## � Data Sources
+
+Agricultural data compiled from:
+- FAO (Food and Agriculture Organization)
+- CGIAR Research Centers (CIMMYT, ICRISAT, IRRI)
+- National Agricultural Research Institutes
+- Regional Agricultural Extension Services
+- Peer-reviewed agricultural research publications
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 
 ---
 
 ## 🤝 Contributing
 
+<<<<<<< HEAD
 We welcome contributions! Areas where you can help:
 
 ### Code Contributions
@@ -350,11 +485,20 @@ We welcome contributions! Areas where you can help:
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+=======
+Contributions welcome! Areas of focus:
+- Additional regional data and crop varieties
+- Enhanced prediction algorithms
+- User interface improvements
+- Mobile responsiveness enhancements
+- Accessibility features
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 
 ---
 
 ## 📄 License
 
+<<<<<<< HEAD
 MIT License - Free to use, modify, and distribute for agricultural and educational purposes.
 
 ---
@@ -392,3 +536,29 @@ MIT License - Free to use, modify, and distribute for agricultural and education
 ---
 
 *Built for farmers, by technologists who care about global food security. 🌍🌾*
+=======
+Open source agricultural tool for global food security initiatives.
+
+- 💾 **Local Result History**  
+  Use `localStorage` to keep recent predictions or allow exports to text.
+
+- 📊 **Data Visualizations**  
+  Seasonal planting calendars, rainfall overlays, and trend graphs.
+
+- 🧠 **Algorithm Enhancements**  
+  Introduce adaptive scoring or integrate a mini learning model via TensorFlow.js.
+
+---
+
+## 🧑‍🌾 Credits
+
+Built with curiosity and care by [Joseph](https://yourwebsite.com)
+
+Background visuals & iconography inspired by real farms and real farmers.
+
+---
+
+## 🔒 License
+
+MIT — free to build, adapt, and grow 🌿
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483

@@ -2,12 +2,17 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+<<<<<<< HEAD
 			"label": "Start Mini Agronomist Pro Server",
+=======
+			"label": "Start Mini Agronomist Server",
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 			"type": "shell",
 			"command": "python -m http.server 8000",
 			"group": "build",
 			"isBackground": true,
 			"problemMatcher": []
+<<<<<<< HEAD
 		},
 		{
 			"label": "Open Mini Agronomist Pro",
@@ -30,6 +35,8 @@
 				"command": "start",
 				"args": ["http://localhost:8000/ml_demo.html"]
 			}
+=======
+>>>>>>> c276696f34853a1fae9b9c7e6da44cd6622dc483
 		}
 	]
 }
