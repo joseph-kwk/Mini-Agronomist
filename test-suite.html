@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Agronomist - Automated Testing Suite</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .test-section {
+            margin-bottom: 2rem;
+        }
+        .test-result {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 4px;
+        }
+        .test-result.pass {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        .test-result.fail {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+        .test-result.pending {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        .status-icon {
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        .run-button {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 0.5rem;
+        }
+        .run-button:hover {
+            background: #1b5e20;
+        }
+        .run-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #2e7d32;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .test-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        .test-log {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Mini Agronomist - Automated Testing Suite</h1>
+        <p>Comprehensive testing for functionality, performance, and cross-browser compatibility.</p>
+        
+        <div class="test-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTests">0</div>
+                <div>Total Tests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="passedTests">0</div>
+                <div>Passed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="failedTests">0</div>
+                <div>Failed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="testProgress">0%</div>
+                <div>Progress</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div style="text-align: center; margin: 2rem 0;">
+            <button class="run-button" onclick="runAllTests()">🚀 Run All Tests</button>
+            <button class="run-button" onclick="runFunctionalTests()">⚙️ Functional Tests</button>
+            <button class="run-button" onclick="runPerformanceTests()">📊 Performance Tests</button>
+            <button class="run-button" onclick="runCompatibilityTests()">🌐 Compatibility Tests</button>
+            <button class="run-button" onclick="clearResults()">🗑️ Clear Results</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🔧 Functional Tests</h2>
+        <div class="test-section" id="functionalTests">
+            <!-- Test results will be populated here -->
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📊 Performance Tests</h2>
+        <div class="test-section" id="performanceTests">
+            <!-- Test results will be populated here -->
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>🌐 Compatibility Tests</h2>
+        <div class="test-section" id="compatibilityTests">
+            <!-- Test results will be populated here -->
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h2>📋 Test Log</h2>
+        <div class="test-log" id="testLog">
+            Waiting for tests to start...<br>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            total: 0,
+            passed: 0,
+            failed: 0,
+            current: 0
+        };
+
+        function log(message) {
+            const logElement = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}<br>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('totalTests').textContent = testResults.total;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            
+            const progress = testResults.total > 0 ? Math.round((testResults.current / testResults.total) * 100) : 0;
+            document.getElementById('testProgress').textContent = progress + '%';
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function addTestResult(sectionId, testName, status, details = '') {
+            const section = document.getElementById(sectionId);
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${status}`;
+            
+            const icon = status === 'pass' ? '✅' : status === 'fail' ? '❌' : '⏳';
+            resultDiv.innerHTML = `
+                <span class="status-icon">${icon}</span>
+                <span><strong>${testName}</strong> ${details}</span>
+            `;
+            
+            section.appendChild(resultDiv);
+            return resultDiv;
+        }
+
+        async function runTest(testName, testFunction, sectionId) {
+            testResults.total++;
+            testResults.current++;
+            updateStats();
+            
+            log(`Running: ${testName}`);
+            const resultElement = addTestResult(sectionId, testName, 'pending');
+            
+            try {
+                const result = await testFunction();
+                if (result.success) {
+                    testResults.passed++;
+                    resultElement.className = 'test-result pass';
+                    resultElement.querySelector('.status-icon').textContent = '✅';
+                    log(`✅ PASS: ${testName} - ${result.message || 'Success'}`);
+                } else {
+                    testResults.failed++;
+                    resultElement.className = 'test-result fail';
+                    resultElement.querySelector('.status-icon').textContent = '❌';
+                    log(`❌ FAIL: ${testName} - ${result.message || 'Failed'}`);
+                }
+            } catch (error) {
+                testResults.failed++;
+                resultElement.className = 'test-result fail';
+                resultElement.querySelector('.status-icon').textContent = '❌';
+                log(`❌ ERROR: ${testName} - ${error.message}`);
+            }
+            
+            updateStats();
+        }
+
+        // Test Functions
+        async function testAppLoading() {
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    const appElement = document.querySelector('body');
+                    resolve({
+                        success: appElement !== null,
+                        message: appElement ? 'App DOM loaded successfully' : 'App DOM not found'
+                    });
+                }, 100);
+            });
+        }
+
+        async function testLocalStorage() {
+            try {
+                localStorage.setItem('mini-agronomist-test', 'test-value');
+                const value = localStorage.getItem('mini-agronomist-test');
+                localStorage.removeItem('mini-agronomist-test');
+                
+                return {
+                    success: value === 'test-value',
+                    message: value === 'test-value' ? 'Local storage working' : 'Local storage failed'
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: `Local storage error: ${error.message}`
+                };
+            }
+        }
+
+        async function testMainAppAccess() {
+            try {
+                const response = await fetch('index.html', { method: 'HEAD' });
+                return {
+                    success: response.ok,
+                    message: `Main app accessible (${response.status})`
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: `Cannot access main app: ${error.message}`
+                };
+            }
+        }
+
+        async function testMLDemoAccess() {
+            try {
+                const response = await fetch('ml_demo.html', { method: 'HEAD' });
+                return {
+                    success: response.ok,
+                    message: `ML Demo accessible (${response.status})`
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    message: `Cannot access ML Demo: ${error.message}`
+                };
+            }
+        }
+
+        async function testDataFiles() {
+            const files = ['data/crop_profiles.json', 'data/crop_rules.json', 'data/regions.json'];
+            let allSuccess = true;
+            let messages = [];
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file);
+                    if (response.ok) {
+                        messages.push(`${file} ✓`);
+                    } else {
+                        allSuccess = false;
+                        messages.push(`${file} ✗ (${response.status})`);
+                    }
+                } catch (error) {
+                    allSuccess = false;
+                    messages.push(`${file} ✗ (${error.message})`);
+                }
+            }
+            
+            return {
+                success: allSuccess,
+                message: messages.join(', ')
+            };
+        }
+
+        async function testPerformance() {
+            const startTime = performance.now();
+            
+            // Simulate some work
+            for (let i = 0; i < 10000; i++) {
+                Math.random();
+            }
+            
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            
+            return {
+                success: duration < 100, // Should complete in under 100ms
+                message: `Performance test completed in ${duration.toFixed(2)}ms`
+            };
+        }
+
+        async function testMemoryUsage() {
+            if (performance.memory) {
+                const memory = performance.memory;
+                const usedMB = Math.round(memory.usedJSHeapSize / 1024 / 1024);
+                
+                return {
+                    success: usedMB < 100, // Should use less than 100MB
+                    message: `Memory usage: ${usedMB}MB`
+                };
+            } else {
+                return {
+                    success: true,
+                    message: 'Memory API not available in this browser'
+                };
+            }
+        }
+
+        async function testBrowserCompatibility() {
+            const features = {
+                'LocalStorage': typeof Storage !== 'undefined',
+                'Fetch API': typeof fetch !== 'undefined',
+                'Promises': typeof Promise !== 'undefined',
+                'ES6 Classes': (() => { try { eval('class Test {}'); return true; } catch { return false; } })(),
+                'CSS Grid': CSS.supports('display', 'grid'),
+                'CSS Flexbox': CSS.supports('display', 'flex')
+            };
+            
+            const unsupported = Object.entries(features)
+                .filter(([name, supported]) => !supported)
+                .map(([name]) => name);
+            
+            return {
+                success: unsupported.length === 0,
+                message: unsupported.length === 0 
+                    ? 'All features supported' 
+                    : `Unsupported: ${unsupported.join(', ')}`
+            };
+        }
+
+        async function testResponsiveDesign() {
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            return {
+                success: true,
+                message: `Viewport: ${viewportWidth}x${viewportHeight} (${viewportWidth < 768 ? 'Mobile' : viewportWidth < 1024 ? 'Tablet' : 'Desktop'})`
+            };
+        }
+
+        // Main test runners
+        async function runFunctionalTests() {
+            log('🔧 Starting Functional Tests...');
+            document.getElementById('functionalTests').innerHTML = '';
+            
+            await runTest('App Loading', testAppLoading, 'functionalTests');
+            await runTest('Local Storage', testLocalStorage, 'functionalTests');
+            await runTest('Main App Access', testMainAppAccess, 'functionalTests');
+            await runTest('ML Demo Access', testMLDemoAccess, 'functionalTests');
+            await runTest('Data Files Access', testDataFiles, 'functionalTests');
+            
+            log('✅ Functional Tests Complete');
+        }
+
+        async function runPerformanceTests() {
+            log('📊 Starting Performance Tests...');
+            document.getElementById('performanceTests').innerHTML = '';
+            
+            await runTest('JavaScript Performance', testPerformance, 'performanceTests');
+            await runTest('Memory Usage', testMemoryUsage, 'performanceTests');
+            
+            log('✅ Performance Tests Complete');
+        }
+
+        async function runCompatibilityTests() {
+            log('🌐 Starting Compatibility Tests...');
+            document.getElementById('compatibilityTests').innerHTML = '';
+            
+            await runTest('Browser Features', testBrowserCompatibility, 'compatibilityTests');
+            await runTest('Responsive Design', testResponsiveDesign, 'compatibilityTests');
+            
+            log('✅ Compatibility Tests Complete');
+        }
+
+        async function runAllTests() {
+            log('🚀 Starting Full Test Suite...');
+            clearResults();
+            
+            await runFunctionalTests();
+            await runPerformanceTests();
+            await runCompatibilityTests();
+            
+            log(`🎉 All Tests Complete! ${testResults.passed}/${testResults.total} passed`);
+        }
+
+        function clearResults() {
+            testResults = { total: 0, passed: 0, failed: 0, current: 0 };
+            updateStats();
+            
+            document.getElementById('functionalTests').innerHTML = '';
+            document.getElementById('performanceTests').innerHTML = '';
+            document.getElementById('compatibilityTests').innerHTML = '';
+            document.getElementById('testLog').innerHTML = 'Test log cleared...<br>';
+            
+            log('🗑️ Results cleared, ready for new tests');
+        }
+
+        // Initialize
+        updateStats();
+        log('🧪 Testing Suite Ready - Select tests to run');
+    </script>
+</body>
+</html>

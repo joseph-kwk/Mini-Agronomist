@@ -3,11 +3,80 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Advanced agricultural yield prediction tool for farmers worldwide. Get region-specific crop yield estimates and planting advice." />
-  <meta name="keywords" content="agriculture, farming, crop yield, prediction, sustainable farming" />
-  <meta name="theme-color" content="#2E7D32" />
   
-  <title>Mini Agronomist - Agricultural Yield Prediction</title>
+  <!-- Primary Meta Tags -->
+  <title>Mini Agronomist - AI-Powered Agricultural Yield Prediction | Free Farming Tool</title>
+  <meta name="title" content="Mini Agronomist - AI-Powered Agricultural Yield Prediction | Free Farming Tool">
+  <meta name="description" content="Get accurate crop yield predictions for 25+ crops across 14+ global regions. Free AI-powered farming tool with offline capability. Optimize your harvest with data-driven agriculture insights." />
+  <meta name="keywords" content="agriculture, farming, crop yield prediction, AI farming, agricultural intelligence, precision agriculture, farming calculator, crop planning, yield estimation, sustainable farming, farm management" />
+  <meta name="author" content="Mini Agronomist Team">
+  <meta name="robots" content="index, follow">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://miniagronomist.com/">
+  <meta property="og:title" content="Mini Agronomist - AI-Powered Agricultural Yield Prediction">
+  <meta property="og:description" content="Free AI-powered farming tool that predicts crop yields for 25+ crops across 14+ global regions. Optimize your harvest with data-driven agriculture insights.">
+  <meta property="og:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="Mini Agronomist">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://miniagronomist.com/">
+  <meta property="twitter:title" content="Mini Agronomist - AI-Powered Agricultural Yield Prediction">
+  <meta property="twitter:description" content="Free AI-powered farming tool that predicts crop yields for 25+ crops across 14+ global regions. Optimize your harvest with data-driven insights.">
+  <meta property="twitter:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  <meta property="twitter:image:alt" content="Mini Agronomist - Agricultural Yield Prediction Dashboard">
+  
+  <!-- Additional Meta Tags -->
+  <meta name="theme-color" content="#2E7D32" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Mini Agronomist">
+  <meta name="application-name" content="Mini Agronomist">
+  <meta name="msapplication-TileColor" content="#2E7D32">
+  <meta name="msapplication-config" content="browserconfig.xml">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://miniagronomist.com/">
+  
+  <!-- Favicon and Icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon.png">
+  <link rel="apple-touch-icon" href="assets/icons/logo.png">
+  <link rel="shortcut icon" href="assets/icons/favicon.png">
+  
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Mini Agronomist",
+    "description": "AI-powered agricultural yield prediction tool for farmers worldwide",
+    "url": "https://miniagronomist.com",
+    "applicationCategory": "Agriculture",
+    "operatingSystem": "Web Browser",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "creator": {
+      "@type": "Organization",
+      "name": "Mini Agronomist Team"
+    },
+    "featureList": [
+      "Crop yield prediction",
+      "Agricultural recommendations",
+      "Regional climate analysis",
+      "Offline functionality",
+      "25+ crop types",
+      "14+ global regions"
+    ]
+  }
+  </script>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,21 +102,45 @@
         <span>Mini Agronomist</span>
       </a>
       <div class="header-actions">
-        <div class="nav-links">
-          <a href="#" class="active">🌾 Yield Predictor</a>
-          <a href="ml_demo.html">🤖 ML Analytics</a>
+        <nav class="nav-links" role="navigation">
+          <a href="#" class="active" role="button" tabindex="0">🌾 Yield Predictor</a>
+          <a href="ml_demo.html" role="button" tabindex="0">🤖 ML Analytics</a>
+          <a href="#" onclick="document.getElementById('helpBtn').click(); return false;" role="button" tabindex="0">📚 Help & FAQ</a>
+        </nav>
+        <div class="header-buttons">
+          <button id="helpBtn" class="icon-btn" aria-label="Show app tutorial and help guide" title="📖 Help & Tutorial - Learn how to use Mini Agronomist effectively">
+            <span class="material-icons">help_outline</span>
+          </button>
+          <button id="settingsBtn" class="icon-btn" aria-label="Open app settings and preferences" title="⚙️ Settings - Customize your experience and preferences">
+            <span class="material-icons">settings</span>
+          </button>
+          <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Toggle mobile navigation menu" title="🔽 Menu">
+            <span class="material-icons">menu</span>
+          </button>
         </div>
-        <button id="helpBtn" class="icon-btn" aria-label="Show app tutorial and help guide" title="📖 Help & Tutorial - Learn how to use Mini Agronomist effectively">
-          <span class="material-icons">help_outline</span>
-        </button>
-        <button id="settingsBtn" class="icon-btn" aria-label="Open app settings and preferences" title="⚙️ Settings - Customize your experience and preferences">
-          <span class="material-icons">settings</span>
-        </button>
       </div>
     </div>
   </header>
 
   <main role="main">
+    <!-- Welcome Banner for New Users -->
+    <div id="welcomeBanner" class="welcome-banner">
+      <div class="welcome-content">
+        <div class="welcome-text">
+          <h2>🌾 Welcome to Mini Agronomist!</h2>
+          <p>Get AI-powered crop yield predictions in 4 simple steps. New here?</p>
+        </div>
+        <div class="welcome-actions">
+          <button class="btn btn-primary" onclick="window.open('onboarding.html', '_blank')">
+            📚 Take the Tour
+          </button>
+          <button class="btn btn-secondary" id="dismissWelcome">
+            ✓ I've got this
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Enhanced Status Display -->
     <div id="errorLog" class="hidden" role="alert" aria-live="polite"></div>
     <div id="statusMessage" class="hidden" role="status" aria-live="polite"></div>
@@ -367,46 +460,177 @@
     </div>
   </div>
 
-  <!-- Modal Templates -->
+  <!-- Enhanced Help & FAQ Modal -->
   <div id="helpModal" class="modal hidden" role="dialog" aria-labelledby="help-title" aria-modal="true">
-    <div class="modal-content">
+    <div class="modal-content large-modal">
       <div class="modal-header">
-        <h2 id="help-title">How to Use Mini Agronomist</h2>
+        <h2 id="help-title">🤔 Help & FAQ</h2>
         <button class="modal-close" aria-label="Close help dialog">
           <span class="material-icons">close</span>
         </button>
       </div>
       <div class="modal-body">
-        <div class="help-step">
-          <span class="step-number">1</span>
-          <div>
-            <h3>Select Your Region</h3>
-            <p>Choose your agricultural region to get climate-appropriate predictions.</p>
+        <!-- FAQ Navigation Tabs -->
+        <div class="faq-tabs">
+          <button class="faq-tab active" data-tab="quickstart">🚀 Quick Start</button>
+          <button class="faq-tab" data-tab="features">⚙️ Features</button>
+          <button class="faq-tab" data-tab="troubleshooting">🔧 Troubleshooting</button>
+          <button class="faq-tab" data-tab="about">ℹ️ About</button>
+        </div>
+
+        <!-- FAQ Search -->
+        <input type="text" class="faq-search" placeholder="🔍 Search FAQ..." id="faqModalSearch">
+
+        <!-- Quick Start Tab -->
+        <div class="faq-content active" id="quickstart">
+          <div class="help-section">
+            <h3>🌱 Getting Started in 4 Steps</h3>
+            <div class="help-step">
+              <span class="step-number">1</span>
+              <div>
+                <h4>Select Your Region</h4>
+                <p>Choose from 14+ global agricultural regions. This affects climate data, growing seasons, and local crop varieties.</p>
+                <div class="help-tip">💡 <strong>Tip:</strong> Choose the region closest to your farm location for best results.</div>
+              </div>
+            </div>
+            <div class="help-step">
+              <span class="step-number">2</span>
+              <div>
+                <h4>Choose Soil & Crop</h4>
+                <p>Select your soil type (clay, sandy, loam, etc.) and crop from our database of 25+ varieties.</p>
+                <div class="help-tip">💡 <strong>Not sure about soil?</strong> Most farms have loam or clay-loam soil.</div>
+              </div>
+            </div>
+            <div class="help-step">
+              <span class="step-number">3</span>
+              <div>
+                <h4>Enter Growing Conditions</h4>
+                <p>Provide expected rainfall (mm) and planting date. Use local weather forecasts or historical data.</p>
+                <div class="help-tip">💡 <strong>Rainfall tip:</strong> Check your local weather service for seasonal forecasts.</div>
+              </div>
+            </div>
+            <div class="help-step">
+              <span class="step-number">4</span>
+              <div>
+                <h4>Get Your Prediction</h4>
+                <p>Review yield estimate, confidence score, risk assessment, and personalized recommendations.</p>
+                <div class="help-tip">✨ <strong>Pro tip:</strong> Try different planting dates to optimize your timing!</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="help-step">
-          <span class="step-number">2</span>
-          <div>
-            <h3>Choose Crop & Soil</h3>
-            <p>Select your crop type and soil conditions for accurate yield estimates.</p>
+
+        <!-- Features Tab -->
+        <div class="faq-content" id="features">
+          <div class="faq-item">
+            <div class="faq-question">What crops and regions are supported?</div>
+            <div class="faq-answer">
+              <p><strong>Regions:</strong> United States, India, China, Brazil, Europe, Australia, Canada, Argentina, and more.</p>
+              <p><strong>Crops:</strong> Wheat, Rice, Corn, Soybeans, Cotton, Potatoes, Tomatoes, and 18+ others.</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">How accurate are the predictions?</div>
+            <div class="faq-answer">
+              <p>Typically 75-90% accuracy depending on crop and region. Each prediction includes a confidence score.</p>
+              <p><strong>Remember:</strong> These are estimates - combine with your local knowledge!</p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Can I save and export my predictions?</div>
+            <div class="faq-answer">
+              <p>Yes! Your last 10 predictions are automatically saved locally. You can also:</p>
+              <ul>
+                <li>📊 Export as JSON files</li>
+                <li>🖨️ Print professional reports</li>
+                <li>📈 Compare different scenarios</li>
+              </ul>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Is my farm data private and secure?</div>
+            <div class="faq-answer">
+              <p><strong>100% Private!</strong> Mini Agronomist runs entirely on your device:</p>
+              <ul>
+                <li>🔒 No data sent to servers</li>
+                <li>💻 All processing done locally</li>
+                <li>🏠 Data stored only on your device</li>
+                <li>✨ Works completely offline</li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div class="help-step">
-          <span class="step-number">3</span>
-          <div>
-            <h3>Enter Growing Conditions</h3>
-            <p>Provide rainfall estimates and planting date for precise calculations.</p>
+
+        <!-- Troubleshooting Tab -->
+        <div class="faq-content" id="troubleshooting">
+          <div class="faq-item">
+            <div class="faq-question">The app isn't loading or is showing errors</div>
+            <div class="faq-answer">
+              <p><strong>Try these steps:</strong></p>
+              <ol>
+                <li>Refresh the page (Ctrl+F5 or Cmd+Shift+R)</li>
+                <li>Clear your browser cache</li>
+                <li>Check your internet connection</li>
+                <li>Try a different browser</li>
+              </ol>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">Predictions seem unrealistic or wrong</div>
+            <div class="faq-answer">
+              <p><strong>Check your inputs:</strong></p>
+              <ul>
+                <li>Verify region matches your location</li>
+                <li>Confirm soil type is correct</li>
+                <li>Check rainfall amounts are reasonable</li>
+                <li>Ensure planting date is appropriate for your crop</li>
+              </ul>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question">My region or crop isn't listed</div>
+            <div class="faq-answer">
+              <p>Choose the closest available option:</p>
+              <ul>
+                <li>🌍 Pick a region with similar climate</li>
+                <li>🌱 Select a crop from the same family</li>
+                <li>📧 Contact us to request additions</li>
+              </ul>
+            </div>
           </div>
         </div>
-        <div class="help-step">
-          <span class="step-number">4</span>
-          <div>
-            <h3>Get Predictions</h3>
-            <p>Review yield estimates, risk assessment, and agricultural recommendations.</p>
+
+        <!-- About Tab -->
+        <div class="faq-content" id="about">
+          <div class="about-section">
+            <h3>🌾 About Mini Agronomist</h3>
+            <p>Mini Agronomist is a free, privacy-first agricultural intelligence tool designed to help farmers worldwide make informed planting decisions.</p>
+            
+            <h4>🔬 How It Works</h4>
+            <ul>
+              <li><strong>Statistical Models:</strong> Based on historical agricultural data</li>
+              <li><strong>Machine Learning:</strong> Advanced AI predictions using TensorFlow.js</li>
+              <li><strong>Regional Data:</strong> Climate and soil profiles for accurate estimates</li>
+            </ul>
+
+            <h4>🎯 Our Mission</h4>
+            <p>To democratize agricultural intelligence and help farmers optimize their yields through data-driven insights, while keeping their data completely private.</p>
+
+            <h4>📞 Need More Help?</h4>
+            <div class="contact-info">
+              <p><strong>📧 Support:</strong> support@miniagronomist.com</p>
+              <p><strong>🌐 Website:</strong> www.miniagronomist.com</p>
+              <p><strong>📚 Full Guide:</strong> <a href="onboarding.html" target="_blank">Complete Tutorial</a></p>
+            </div>
           </div>
         </div>
       </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Close</button>
+        <button class="btn btn-primary" onclick="window.open('onboarding.html', '_blank')">📚 Full Tutorial</button>
+      </div>
     </div>
+  </div>
   </div>
 
   <!-- Footer -->
@@ -433,10 +657,11 @@
       <div class="footer-section">
         <h4>Resources</h4>
         <ul>
-          <li><a href="#" id="aboutLink">About</a></li>
-          <li><a href="#help">Help & Tutorial</a></li>
-          <li><a href="#" id="supportLink">Support</a></li>
-          <li><a href="#" id="privacyLink">Privacy Policy</a></li>
+          <li><a href="#" onclick="document.getElementById('helpBtn').click(); return false;">📚 Help Center</a></li>
+          <li><a href="onboarding.html" target="_blank">🎯 Complete Guide</a></li>
+          <li><a href="test-suite.html" target="_blank">🧪 Test Suite</a></li>
+          <li><a href="terms-of-service.html" target="_blank">📋 Terms</a></li>
+          <li><a href="privacy-policy.html" target="_blank">🔒 Privacy</a></li>
         </ul>
       </div>
       

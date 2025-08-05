@@ -91,6 +91,21 @@ class MiniAgronomist {
     document.getElementById("helpBtn")?.addEventListener("click", () => this.showHelpModal());
     document.getElementById("settingsBtn")?.addEventListener("click", () => this.showSettingsModal());
     
+    // Mobile menu toggle
+    document.getElementById("mobileMenuBtn")?.addEventListener("click", () => this.toggleMobileMenu());
+    
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const mobileMenu = document.querySelector('.nav-links');
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const headerContainer = document.querySelector('.header-container');
+      
+      if (mobileMenu?.classList.contains('mobile-open') && 
+          !headerContainer?.contains(e.target)) {
+        this.closeMobileMenu();
+      }
+    });
+    
     // Modal close handlers
     document.querySelectorAll('.modal-close').forEach(btn => {
       btn.addEventListener('click', (e) => this.closeModal(e.target.closest('.modal')));
@@ -98,6 +113,23 @@ class MiniAgronomist {
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => this.handleKeyboardNavigation(e));
+    
+    // Enhanced header scroll behavior
+    let lastScrollY = window.scrollY;
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('header');
+      const currentScrollY = window.scrollY;
+      
+      if (header) {
+        if (currentScrollY > 50) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+      }
+      
+      lastScrollY = currentScrollY;
+    });
   }
 
   // Enhanced Form Validation
@@ -848,13 +880,97 @@ class MiniAgronomist {
     `).join('');
   }
 
-  // Modal Functions
+  // Enhanced Modal Functions
   showHelpModal() {
     const modal = document.getElementById('helpModal');
     if (modal) {
       modal.classList.remove('hidden');
-      modal.querySelector('.modal-close')?.focus();
+      
+      // Initialize FAQ functionality
+      this.initializeFAQModal();
+      
+      // Focus management
+      const firstTab = modal.querySelector('.faq-tab');
+      if (firstTab) firstTab.focus();
     }
+  }
+
+  initializeFAQModal() {
+    // Tab functionality
+    const tabs = document.querySelectorAll('.faq-tab');
+    const contents = document.querySelectorAll('.faq-content');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        tabs.forEach(t => t.classList.remove('active'));
+        contents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        const targetContent = document.getElementById(tab.dataset.tab);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+
+    // FAQ search functionality
+    const searchInput = document.getElementById('faqModalSearch');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.filterFAQContent(e.target.value.toLowerCase());
+      });
+    }
+
+    // FAQ item toggle functionality
+    const faqQuestions = document.querySelectorAll('.faq-question');
+    faqQuestions.forEach(question => {
+      question.addEventListener('click', () => {
+        const answer = question.nextElementSibling;
+        const isActive = question.classList.contains('active');
+        
+        // Close all other FAQ items
+        faqQuestions.forEach(q => {
+          q.classList.remove('active');
+          q.nextElementSibling.classList.remove('active');
+        });
+        
+        // Toggle current item
+        if (!isActive) {
+          question.classList.add('active');
+          answer.classList.add('active');
+        }
+      });
+    });
+  }
+
+  filterFAQContent(searchTerm) {
+    const faqItems = document.querySelectorAll('.faq-item');
+    const helpSteps = document.querySelectorAll('.help-step');
+    
+    // Filter FAQ items
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question').textContent.toLowerCase();
+      const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+      
+      if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+    
+    // Filter help steps
+    helpSteps.forEach(step => {
+      const content = step.textContent.toLowerCase();
+      
+      if (content.includes(searchTerm)) {
+        step.style.display = 'flex';
+      } else {
+        step.style.display = 'none';
+      }
+    });
   }
 
   showSettingsModal() {
@@ -1058,6 +1174,36 @@ class MiniAgronomist {
     this.loadPredictionHistory();
     this.updateHistoryDisplay();
     this.resetResultsToPlaceholder();
+    this.initializeWelcomeBanner();
+  }
+
+  // Welcome Banner functionality
+  initializeWelcomeBanner() {
+    const welcomeBanner = document.getElementById('welcomeBanner');
+    const dismissButton = document.getElementById('dismissWelcome');
+    
+    // Check if user has seen welcome before
+    const hasSeenWelcome = localStorage.getItem('mini-agronomist-welcome-dismissed');
+    
+    if (hasSeenWelcome) {
+      welcomeBanner?.classList.add('hidden');
+    }
+    
+    // Handle dismiss button
+    dismissButton?.addEventListener('click', () => {
+      welcomeBanner?.classList.add('hidden');
+      localStorage.setItem('mini-agronomist-welcome-dismissed', 'true');
+      this.showStatusMessage('Welcome! Start by selecting your region above.', 'info');
+    });
+    
+    // Auto-hide after 10 seconds if user doesn't interact
+    if (!hasSeenWelcome) {
+      setTimeout(() => {
+        if (welcomeBanner && !welcomeBanner.classList.contains('hidden')) {
+          welcomeBanner.style.opacity = '0.7';
+        }
+      }, 10000);
+    }
   }
 
   // Helper functions
@@ -1068,6 +1214,45 @@ class MiniAgronomist {
       'September': 8, 'October': 9, 'November': 10, 'December': 11
     };
     return months[monthName] ?? 0;
+  }
+
+  // Mobile menu functionality
+  toggleMobileMenu() {
+    const mobileMenu = document.querySelector('.nav-links');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const menuIcon = mobileMenuBtn?.querySelector('.material-icons');
+    
+    if (mobileMenu) {
+      const isOpen = mobileMenu.classList.toggle('mobile-open');
+      
+      // Update button icon
+      if (menuIcon) {
+        menuIcon.textContent = isOpen ? 'close' : 'menu';
+      }
+      
+      // Update aria attributes
+      mobileMenuBtn?.setAttribute('aria-expanded', isOpen.toString());
+      mobileMenuBtn?.setAttribute('title', isOpen ? '✕ Close Menu' : '🔽 Open Menu');
+    }
+  }
+  
+  closeMobileMenu() {
+    const mobileMenu = document.querySelector('.nav-links');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const menuIcon = mobileMenuBtn?.querySelector('.material-icons');
+    
+    if (mobileMenu?.classList.contains('mobile-open')) {
+      mobileMenu.classList.remove('mobile-open');
+      
+      // Reset button icon
+      if (menuIcon) {
+        menuIcon.textContent = 'menu';
+      }
+      
+      // Update aria attributes
+      mobileMenuBtn?.setAttribute('aria-expanded', 'false');
+      mobileMenuBtn?.setAttribute('title', '🔽 Open Menu');
+    }
   }
 
   isWithinPlantingWindow(plantMonth, startMonth, endMonth) {
