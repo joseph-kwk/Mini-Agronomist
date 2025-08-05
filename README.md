@@ -120,18 +120,115 @@
    # Right-click on index.html and select "Open with Live Server"
    ```
 
-3. **Open the application**
-   - Navigate to `http://localhost:8000`
-   - Open `index.html` for the main application
+3. **Optional: Start Python Backend for Advanced Features**
+   ```bash
+   # Install Python dependencies
+   cd backend
+   pip install -r requirements.txt
+   
+   # Start Python API server
+   python main.py
+   ```
 
-4. **Start predicting**
+4. **Open the application**
+   - Navigate to `http://localhost:8000`
+   - Backend API docs: `http://localhost:8001/docs` (if running)
+
+5. **Start predicting**
    - Select your region → crop → soil type → conditions
    - Get comprehensive yield predictions and recommendations!
+
+### 🐍 Python Integration Options
+
+**Option 1: Browser-based Python (Pyodide)**
+- Advanced scientific computing in the browser
+- Offline functionality maintained
+- NumPy, SciPy, Scikit-learn available
+- Automatic loading for Pro users
+
+**Option 2: Python Backend API**
+- FastAPI server for maximum performance
+- Advanced machine learning models
+- Real-time weather integration ready
+- Scalable for production use
+
+**Option 3: Hybrid Mode (Recommended)**
+- Best of both worlds
+- Pyodide for offline, backend for online
+- Seamless fallback between modes
 
 ### PWA Installation
 - **Desktop**: Click the install icon in your browser's address bar
 - **Mobile**: Use "Add to Home Screen" from your browser menu
 - **Offline**: Works completely offline after first load
+
+---
+
+## 🏗️ Architecture & Python Integration
+
+### 🌟 **Multi-Language Architecture**
+
+Mini Agronomist now supports **three computational approaches** for maximum flexibility:
+
+#### 1. **JavaScript + Browser APIs** (Core)
+- Offline-first PWA functionality
+- Real-time UI interactions
+- Local data storage
+- Core prediction algorithms
+
+#### 2. **Python in Browser** (Pyodide)
+- **NumPy** for numerical computing
+- **SciPy** for scientific algorithms
+- **Scikit-learn** for machine learning
+- **Pandas** for data analysis
+- **Maintains offline functionality**
+
+#### 3. **Python Backend API** (FastAPI)
+- **High-performance server-side computing**
+- **Advanced machine learning models**
+- **Real-time data integration**
+- **Scalable for production**
+
+### 🔄 **Hybrid Computing Model**
+
+```
+Frontend (JavaScript/HTML/CSS)
+    ↕️
+Browser Python (Pyodide) ←→ Backend Python (FastAPI)
+    ↕️                           ↕️
+Scientific Libraries         ML Models & Database
+```
+
+### 🎯 **When to Use Each Approach**
+
+| Use Case | JavaScript | Pyodide | Backend API |
+|----------|------------|---------|-------------|
+| **Basic Predictions** | ✅ Fast | ⚡ Enhanced | 🚀 Most Accurate |
+| **Offline Use** | ✅ Yes | ✅ Yes | ❌ No |
+| **Scientific Computing** | ⚠️ Limited | ✅ Full | ✅ Full |
+| **Machine Learning** | ⚠️ Basic | ✅ Advanced | 🚀 Production |
+| **Real-time Data** | ❌ No | ❌ No | ✅ Yes |
+| **Multi-user Scale** | ⚠️ Client-side | ⚠️ Client-side | ✅ Server-side |
+
+### 🧮 **Advanced Features with Python**
+
+#### Scientific Computing
+- **Growing Degree Days**: Precise agricultural calculations
+- **Evapotranspiration**: Penman-Monteith equation implementation
+- **Water Balance**: Soil moisture and stress analysis
+- **Climate Risk**: Statistical climate change projections
+
+#### Machine Learning
+- **Yield Prediction**: Random Forest regression models
+- **Feature Importance**: Data-driven insights
+- **Cross-validation**: Model accuracy assessment
+- **Prediction Intervals**: Uncertainty quantification
+
+#### Agricultural Modeling
+- **Crop Growth Simulation**: Science-based growth models
+- **Planting Date Optimization**: Weather-based recommendations
+- **Risk Assessment**: Climate and market risk analysis
+- **Sustainability Metrics**: Carbon footprint calculations
 
 ---
 

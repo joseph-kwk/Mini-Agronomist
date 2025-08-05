@@ -16,6 +16,7 @@ class MiniAgronomist {
     this.fieldManager = null;
     this.advancedAnalytics = null;
     this.authManager = null; // Will be set by AuthManager when initialized
+    this.pythonIntegration = null; // Will be set when Python loads
     
     this.init();
   }
@@ -97,6 +98,193 @@ class MiniAgronomist {
     }
     
     return true;
+  }
+
+  // Python Integration Callback
+  onPythonReady() {
+    console.log('🐍 Python scientific computing is now available!');
+    this.pythonIntegration = window.pythonIntegration;
+    
+    // Update UI to show Python-enhanced features
+    this.updatePythonFeatureUI();
+    
+    // Show notification
+    this.showMessage('🧮 Advanced scientific computing enabled! Enhanced predictions now available.', 'success');
+  }
+
+  updatePythonFeatureUI() {
+    // Add Python badges to enhanced features
+    const enhancedSections = document.querySelectorAll('.analytics-section, .pro-feature');
+    enhancedSections.forEach(section => {
+      if (!section.querySelector('.python-feature-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'python-feature-badge';
+        badge.textContent = 'Scientific';
+        section.appendChild(badge);
+      }
+    });
+    
+    // Enable advanced prediction options
+    this.enableAdvancedPredictions();
+  }
+
+  enableAdvancedPredictions() {
+    // Add advanced prediction toggle to existing predictions
+    const predictionContainer = document.getElementById('predictionResult');
+    if (predictionContainer && !document.getElementById('pythonEnhancedToggle')) {
+      const advancedToggle = document.createElement('div');
+      advancedToggle.innerHTML = `
+        <div class="advanced-section python-available">
+          <div class="advanced-section-header">
+            <div class="advanced-section-title">
+              🔬 Scientific Analysis
+            </div>
+            <button class="advanced-toggle" id="pythonEnhancedToggle">
+              Enable Enhanced Predictions
+            </button>
+          </div>
+          <div class="advanced-content" id="pythonEnhancedContent">
+            <p>Get scientific-grade predictions using advanced algorithms:</p>
+            <ul>
+              <li>Growing Degree Day calculations</li>
+              <li>Evapotranspiration modeling</li>
+              <li>Water balance analysis</li>
+              <li>Machine learning predictions</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      predictionContainer.appendChild(advancedToggle);
+      
+      // Add event listener
+      document.getElementById('pythonEnhancedToggle').addEventListener('click', this.togglePythonPredictions.bind(this));
+    }
+  }
+
+  async togglePythonPredictions() {
+    const toggle = document.getElementById('pythonEnhancedToggle');
+    const content = document.getElementById('pythonEnhancedContent');
+    
+    if (toggle.classList.contains('active')) {
+      // Disable enhanced predictions
+      toggle.classList.remove('active');
+      content.classList.remove('visible');
+      toggle.textContent = 'Enable Enhanced Predictions';
+    } else {
+      // Enable enhanced predictions
+      toggle.classList.add('active');
+      content.classList.add('visible');
+      toggle.textContent = 'Enhanced Mode Active';
+      
+      // Re-run current prediction with Python enhancement
+      if (this.currentPrediction) {
+        await this.runPythonEnhancedPrediction();
+      }
+    }
+  }
+
+  async runPythonEnhancedPrediction() {
+    if (!this.pythonIntegration?.isReady() || !this.currentPrediction) {
+      return;
+    }
+    
+    try {
+      this.showLoadingOverlay('Running scientific analysis...');
+      
+      // Get current prediction data
+      const currentData = this.currentPrediction;
+      
+      // Prepare data for Python analysis
+      const predictionData = {
+        temperature: {
+          min: parseFloat(document.getElementById('tempMin')?.value || 20),
+          max: parseFloat(document.getElementById('tempMax')?.value || 30),
+          avg: (parseFloat(document.getElementById('tempMin')?.value || 20) + parseFloat(document.getElementById('tempMax')?.value || 30)) / 2
+        },
+        rainfall: parseFloat(document.getElementById('rainfall')?.value || 500),
+        soilType: {
+          ph: 7 // This would come from soil selection in a real implementation
+        },
+        cropData: currentData.crop || {},
+        regionData: currentData.region || {}
+      };
+      
+      // Run enhanced prediction
+      const enhancedResults = await this.pythonIntegration.enhancedPrediction(predictionData);
+      
+      // Display enhanced results
+      this.displayPythonResults(enhancedResults);
+      
+      this.hideLoadingOverlay();
+      
+    } catch (error) {
+      console.error('Enhanced prediction error:', error);
+      this.hideLoadingOverlay();
+      this.showMessage('Enhanced prediction failed. Using standard prediction.', 'warning');
+    }
+  }
+
+  displayPythonResults(results) {
+    const content = document.getElementById('pythonEnhancedContent');
+    if (!content) return;
+    
+    // Create enhanced results display
+    const resultsHTML = `
+      <div class="python-computation-result">
+        <div class="computation-title">Growing Degree Days Analysis</div>
+        <div class="computation-details">
+          <div class="computation-metric">
+            <span class="metric-value">${results.gdd?.toFixed(1) || 'N/A'}</span>
+            <span class="metric-label">Daily GDD</span>
+          </div>
+        </div>
+      </div>
+      
+      ${results.waterBalance ? `
+      <div class="python-computation-result">
+        <div class="computation-title">Water Balance Analysis</div>
+        <div class="computation-details">
+          <div class="computation-metric">
+            <span class="metric-value">${results.waterBalance.soil_moisture?.toFixed(1) || 'N/A'}%</span>
+            <span class="metric-label">Soil Moisture</span>
+          </div>
+          <div class="computation-metric">
+            <span class="metric-value">${(results.waterBalance.water_stress * 100)?.toFixed(1) || 'N/A'}%</span>
+            <span class="metric-label">Water Stress</span>
+          </div>
+          <div class="computation-metric">
+            <span class="metric-value">${results.waterBalance.deficit?.toFixed(1) || 'N/A'}mm</span>
+            <span class="metric-label">Water Deficit</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      ${results.mlPrediction ? `
+      <div class="python-computation-result">
+        <div class="computation-title">Machine Learning Prediction</div>
+        <div class="computation-details">
+          <div class="computation-metric">
+            <span class="metric-value">${results.mlPrediction.predicted_yield?.toFixed(2) || 'N/A'}</span>
+            <span class="metric-label">Predicted Yield</span>
+          </div>
+          <div class="computation-metric">
+            <span class="metric-value">${(results.mlPrediction.confidence * 100)?.toFixed(1) || 'N/A'}%</span>
+            <span class="metric-label">Confidence</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(55, 118, 171, 0.1); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+        <strong>🐍 Powered by Python Scientific Computing</strong><br>
+        Advanced calculations using NumPy, SciPy, and Scikit-learn
+      </div>
+    `;
+    
+    // Replace existing content with enhanced results
+    content.innerHTML = resultsHTML;
   }
 
   // Enhanced Data Loading with Pro features
