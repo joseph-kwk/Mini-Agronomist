@@ -134,8 +134,7 @@ class AdvancedPredictionEngine {
   // STATISTICAL MODELS
   // ========================================
 
-  // (Statistical models initialized in the method above.)
-
+  
   initializeStatisticalModels() {
     this.statisticalModels = {
       regression: new MultipleLinearRegression(),
@@ -605,6 +604,7 @@ class AdvancedPredictionEngine {
     }
   }
 
+<<<<<<< HEAD
   // Stubs for online sync methods - these functions are placeholders so
   // calls to them do not throw errors if a server integration isn't present.
   // Implement these to integrate with your backend or CDN for model sync.
@@ -628,6 +628,8 @@ class AdvancedPredictionEngine {
     return null;
   }
 
+=======
+>>>>>>> origin/main
   // ========================================
   // UTILITY METHODS
   // ========================================

@@ -178,7 +178,7 @@ async function handleStaticRequest(request) {
     console.error('Static request failed:', error);
     
     // Return offline fallback page
-    if (request.url.includes('.html') || request.headers.get('Accept')?.includes('text/html')) {
+        if (request.url.includes('.html') || request.headers.get('Accept')?.includes('text/html')) {
       return caches.match('/index.html');
     }
     
