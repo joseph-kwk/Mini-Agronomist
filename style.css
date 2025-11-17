@@ -145,6 +145,41 @@ body {
   position: relative;
 }
 
+/* Explicitly enforce light backgrounds for main cards and modals */
+.input-section,
+.yield-card,
+.history-section,
+.tools-section,
+.auth-modal .modal-content {
+  background-color: #ffffff !important;
+  color-scheme: light;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background-color: #ffffff !important;
+  color: var(--text-primary);
+}
+
+/* If the OS/browser prefers dark, keep these light for readability */
+@media (prefers-color-scheme: dark) {
+  .input-section,
+  .yield-card,
+  .history-section,
+  .tools-section,
+  .auth-modal .modal-content {
+    background-color: #ffffff !important;
+    color-scheme: light;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background-color: #ffffff !important;
+    color: var(--text-primary);
+  }
+}
+
 /* Add subtle grass blade animation */
 body::before {
   content: '';
@@ -910,11 +945,74 @@ footer {
 .footer-content, .footer-container {
   max-width: 1400px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  align-items: start;
+  gap: var(--space-8);
+}
+
+.footer-section h4 {
+  margin: 0 0 var(--space-3) 0;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.footer-section ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.footer-section ul a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.footer-section ul a:hover {
+  color: var(--primary-green);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.footer-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.footer-bottom {
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--surface-tertiary);
+}
+
+.footer-bottom-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: var(--space-4);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  gap: var(--space-4);
   flex-wrap: wrap;
-  gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+  .footer-content, .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .footer-content, .footer-container {
+    grid-template-columns: 1fr;
+  }
 }
 
 .footer-container p {

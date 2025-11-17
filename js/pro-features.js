@@ -136,6 +136,38 @@ class ProFeatureManager {
     });
   }
 
+  // Update UI visibility based on auth and tier
+  updateUIVisibility() {
+    // Remove old pro badge if exists
+    const oldBadge = document.querySelector('.pro-badge');
+    if (oldBadge) oldBadge.remove();
+
+    // Update body class for tier-specific styling
+    document.body.classList.remove('tier-free', 'tier-pro', 'tier-enterprise');
+    document.body.classList.add(`tier-${this.userTier}`);
+
+    // Show/hide Pro feature sections based on tier
+    this.updateProFeatureSectionsVisibility();
+
+    // Add Pro badge for authenticated users
+    if (this.isAuthenticated && this.userTier !== 'free') {
+      this.addProBadge();
+    }
+  }
+
+  updateProFeatureSectionsVisibility() {
+    // Hide Pro-only sections for free users
+    const proSections = document.querySelectorAll('[data-pro-tier]');
+    proSections.forEach(section => {
+      const requiredTier = section.getAttribute('data-pro-tier');
+      const isVisible = this.userTier === requiredTier || 
+                        (requiredTier === 'pro' && (this.userTier === 'pro' || this.userTier === 'enterprise')) ||
+                        (requiredTier === 'enterprise' && this.userTier === 'enterprise');
+      
+      section.style.display = isVisible ? 'block' : 'none';
+    });
+  }
+
   // Setup Pro UI elements
   setupProUI() {
     // Add pro badges and indicators
@@ -220,8 +252,11 @@ class ProFeatureManager {
 
   // Show upgrade modal
   showUpgradeModal(message, feature) {
-    // This will be implemented with the Pro upgrade flow
-    console.log('Upgrade needed:', message, feature);
+    if (window.miniAgronomist) {
+      window.miniAgronomist.showUpgradePrompt(this.userTier === 'pro' ? 'enterprise' : 'pro', feature);
+    } else {
+      console.log('Upgrade needed:', message, feature);
+    }
   }
 
   // Inject upgrade hints into UI

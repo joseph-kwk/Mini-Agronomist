@@ -948,9 +948,22 @@ class AuthManager {
       if (window.miniAgronomist.proFeatureManager) {
         window.miniAgronomist.proFeatureManager.userTier = this.getUserTier();
         window.miniAgronomist.proFeatureManager.isAuthenticated = this.isAuthenticated();
-        window.miniAgronomist.proFeatureManager.updateUIVisibility();
+        window.miniAgronomist.proFeatureManager.currentUser = this.currentUser;
+        
+        // Reinitialize features based on new tier
+        window.miniAgronomist.proFeatureManager.features = window.miniAgronomist.proFeatureManager.initializeFeatures();
+        window.miniAgronomist.proFeatureManager.limits = window.miniAgronomist.proFeatureManager.getUserLimits();
+        
+        // Update UI visibility
+        if (window.miniAgronomist.proFeatureManager.updateUIVisibility) {
+          window.miniAgronomist.proFeatureManager.updateUIVisibility();
+        }
       }
     }
+  }
+
+  linkProFeatureManager(proManager) {
+    this.proFeatureManager = proManager;
   }
 
   async initializeUserFeatures() {

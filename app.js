@@ -58,10 +58,20 @@ class MiniAgronomist {
   setAuthManager(authManager) {
     this.authManager = authManager;
     
+    // Link AuthManager to ProFeatureManager for bi-directional sync
+    if (this.authManager && this.proFeatureManager) {
+      this.authManager.linkProFeatureManager(this.proFeatureManager);
+    }
+    
     // Update ProFeatureManager with authentication status
     if (this.proFeatureManager) {
       this.proFeatureManager.userTier = authManager.getUserTier();
       this.proFeatureManager.isAuthenticated = authManager.isAuthenticated();
+      this.proFeatureManager.currentUser = authManager.currentUser;
+      
+      // Reinitialize features based on authenticated tier
+      this.proFeatureManager.features = this.proFeatureManager.initializeFeatures();
+      this.proFeatureManager.limits = this.proFeatureManager.getUserLimits();
     }
     
     // Update UI based on authentication status
@@ -76,14 +86,47 @@ class MiniAgronomist {
     
     // Update Pro features visibility
     if (this.proFeatureManager) {
-      this.proFeatureManager.updateUIVisibility();
+      // Rebuild Pro feature buttons with current tier
+      this.updateProFeatureButtons();
+      
+      if (this.proFeatureManager.updateUIVisibility) {
+        this.proFeatureManager.updateUIVisibility();
+      }
     }
     
     // Show welcome message for new authenticated users
     if (isAuthenticated && this.authManager.currentUser) {
       const user = this.authManager.currentUser;
       console.log(`🌾 Welcome ${user.name}! You have ${userTier.toUpperCase()} access.`);
+      this.showMessage(`Welcome, ${user.name}! Pro features for ${userTier.toUpperCase()} tier are now available.`, 'success');
+    } else if (!isAuthenticated) {
+      console.log('🌾 Logged out - Free tier features available.');
+      this.showMessage('You have been signed out. Basic features are still available.', 'info');
     }
+  }
+
+  updateProFeatureButtons() {
+    // Regenerate Pro feature buttons with updated tier
+    const proSection = document.querySelector('.pro-features-section');
+    if (proSection) {
+      const gridContainer = proSection.querySelector('.pro-features-grid');
+      if (gridContainer) {
+        gridContainer.innerHTML = this.generateProFeatureButtons();
+        this.attachProFeatureListeners();
+      }
+    }
+  }
+
+  attachProFeatureListeners() {
+    // Attach click handlers to newly generated Pro feature buttons
+    document.querySelectorAll('.pro-feature-card .feature-btn').forEach(btn => {
+      const featureCard = btn.closest('.pro-feature-card');
+      const featureId = featureCard?.getAttribute('data-feature-id');
+      if (featureId) {
+        btn.removeEventListener('click', () => {});
+        btn.addEventListener('click', () => this.handleProFeature(featureId));
+      }
+    });
   }
 
   // Check access before showing Pro features
@@ -1117,71 +1160,126 @@ class MiniAgronomist {
 
   // Generate Pro feature buttons based on user tier
   generateProFeatureButtons() {
+    const isAuthenticated = this.authManager?.isAuthenticated() ?? false;
+    const userTier = this.authManager?.getUserTier() ?? 'free';
+
     const features = [
       {
         id: 'field-manager',
         title: 'Field Manager',
         description: 'Track and manage multiple fields',
         icon: '🏞️',
-        feature: 'fieldManagement'
+        feature: 'fieldManagement',
+        tier: 'pro'
       },
       {
         id: 'advanced-analytics',
         title: 'Advanced Analytics',
         description: 'Yield prediction and profitability analysis',
         icon: '📊',
-        feature: 'advancedAnalytics'
+        feature: 'advancedAnalytics',
+        tier: 'enterprise'
       },
       {
         id: 'specialty-crops',
         title: 'Specialty Crops',
         description: 'Access to high-value crop varieties',
         icon: '🌿',
-        feature: 'advancedCrops'
+        feature: 'advancedCrops',
+        tier: 'pro'
       },
       {
         id: 'export-data',
         title: 'Data Export',
         description: 'Export reports and predictions',
         icon: '📈',
-        feature: 'dataExport'
+        feature: 'dataExport',
+        tier: 'pro'
       }
     ];
 
     return features.map(feature => {
-      const hasAccess = this.proFeatureManager.hasFeature(feature.feature);
+      let hasAccess = false;
+      let buttonText = '🔒 Sign In';
+      let buttonClass = 'locked';
+      let isDisabled = true;
+
+      if (!isAuthenticated) {
+        hasAccess = false;
+        buttonText = '🔒 Sign In';
+      } else if (this.proFeatureManager?.hasFeature(feature.feature)) {
+        hasAccess = true;
+        buttonText = 'Open';
+        buttonClass = 'primary';
+        isDisabled = false;
+      } else if (userTier === 'pro' && feature.tier === 'enterprise') {
+        hasAccess = false;
+        buttonText = '⭐ Enterprise';
+      } else {
+        hasAccess = false;
+        buttonText = `🔒 ${feature.tier.toUpperCase()}`;
+      }
+
       return `
-        <div class="pro-feature-card ${hasAccess ? 'available' : 'locked'}">
+        <div class="pro-feature-card ${hasAccess ? 'available' : 'locked'}" data-feature-id="${feature.id}">
           <div class="feature-icon">${feature.icon}</div>
           <h4>${feature.title}</h4>
           <p>${feature.description}</p>
           <button 
-            class="feature-btn ${hasAccess ? 'primary' : 'locked'}" 
+            class="feature-btn ${buttonClass}" 
             onclick="miniAgronomist.handleProFeature('${feature.id}')"
-            ${!hasAccess ? 'disabled' : ''}
+            ${isDisabled ? 'disabled' : ''}
           >
-            ${hasAccess ? 'Open' : '🔒 Pro Only'}
+            ${buttonText}
           </button>
         </div>
       `;
     }).join('');
   }
 
-  // Handle Pro feature activation
+  // Handle Pro feature activation with gating
   handleProFeature(featureId) {
     try {
+      // Check if user is authenticated and has Pro tier
+      if (!this.authManager?.isAuthenticated()) {
+        this.showAuthRequired('Sign in to access Pro features');
+        return;
+      }
+
+      const userTier = this.authManager.getUserTier();
+      if (userTier === 'free') {
+        this.showUpgradePrompt('pro', featureId);
+        return;
+      }
+
       switch (featureId) {
         case 'field-manager':
-          this.openFieldManager();
+          if (this.proFeatureManager.hasFeature('fieldManagement')) {
+            this.openFieldManager();
+          } else {
+            this.showUpgradePrompt('enterprise', 'fieldManagement');
+          }
           break;
         case 'advanced-analytics':
-          this.openAdvancedAnalytics();
+          if (this.proFeatureManager.hasFeature('advancedAnalytics')) {
+            this.openAdvancedAnalytics();
+          } else {
+            this.showUpgradePrompt('enterprise', 'advancedAnalytics');
+          }
           break;
         case 'specialty-crops':
-          this.showSpecialtyCrops();
+          if (this.proFeatureManager.hasFeature('advancedCrops')) {
+            this.showSpecialtyCrops();
+          } else {
+            this.showUpgradePrompt('pro', 'specialtyCrops');
+          }
           break;
         case 'export-data':
-          this.exportData();
+          if (this.proFeatureManager.hasFeature('dataExport')) {
+            this.exportData();
+          } else {
+            this.showUpgradePrompt('pro', 'dataExport');
+          }
           break;
         default:
           console.warn('Unknown Pro feature:', featureId);
@@ -1189,6 +1287,13 @@ class MiniAgronomist {
     } catch (error) {
       console.error('Error handling Pro feature:', error);
       this.showError('Failed to access Pro feature. Please try again.');
+    }
+  }
+
+  showAuthRequired(message) {
+    this.showMessage(message, 'warning');
+    if (this.authManager) {
+      this.authManager.showAuthModal();
     }
   }
 
@@ -1331,25 +1436,57 @@ class MiniAgronomist {
     `;
   }
 
-  // Show upgrade modal for locked features
-  showUpgradeModal(featureName) {
+  // Show upgrade modal for locked features with tier-specific messaging
+  showUpgradePrompt(requiredTier, featureName) {
+    const tierMessages = {
+      pro: {
+        title: 'Upgrade to Pro',
+        subtitle: 'Unlock Professional Features',
+        benefits: [
+          '✓ 100 predictions per day (vs 10 free)',
+          '✓ Manage up to 25 fields',
+          '✓ All crop varieties included',
+          '✓ Advanced analytics & insights',
+          '✓ Data export in multiple formats',
+          '✓ Priority support'
+        ],
+        price: '$9.99/month or $99/year',
+        cta: 'Upgrade to Pro'
+      },
+      enterprise: {
+        title: 'Enterprise Plan',
+        subtitle: 'Unlock Enterprise Features',
+        benefits: [
+          '✓ Unlimited predictions',
+          '✓ Unlimited fields & custom crops',
+          '✓ Advanced analytics dashboard',
+          '✓ REST API access',
+          '✓ White-label deployment',
+          '✓ Dedicated support team'
+        ],
+        price: 'Contact sales for pricing',
+        cta: 'Contact Sales'
+      }
+    };
+
+    const tierInfo = tierMessages[requiredTier] || tierMessages.pro;
+    const featureDisplay = featureName?.replace(/([A-Z])/g, ' $1').trim() || 'this feature';
+
     const modal = this.createModal('Upgrade Required', `
       <div class="upgrade-modal">
         <div class="upgrade-icon">🌟</div>
-        <h4>Unlock ${featureName}</h4>
-        <p>This feature is available in our Pro and Enterprise plans.</p>
+        <h3>${tierInfo.title}</h3>
+        <p class="upgrade-subtitle">${tierInfo.subtitle}</p>
+        <p class="upgrade-feature">Unlock <strong>${featureDisplay}</strong> and more.</p>
         <div class="upgrade-benefits">
           <ul>
-            <li>✓ Advanced crop analytics</li>
-            <li>✓ Field management tools</li>
-            <li>✓ Specialty crop database</li>
-            <li>✓ Data export capabilities</li>
-            <li>✓ Priority support</li>
+            ${tierInfo.benefits.map(b => `<li>${b}</li>`).join('')}
           </ul>
         </div>
+        <div class="upgrade-price"><strong>${tierInfo.price}</strong></div>
         <div class="upgrade-actions">
-          <button class="btn primary" onclick="miniAgronomist.simulateUpgrade()">
-            Try Pro Features
+          <button class="btn primary" onclick="miniAgronomist.simulateUpgrade('${requiredTier}')">
+            ${tierInfo.cta}
           </button>
           <button class="btn secondary" onclick="this.closest('.pro-modal').remove()">
             Maybe Later
@@ -1361,16 +1498,25 @@ class MiniAgronomist {
   }
 
   // Simulate upgrade for demo purposes
-  simulateUpgrade() {
-    this.proFeatureManager.userTier = 'pro';
-    localStorage.setItem('miniAgronomist_tier', 'pro');
+  simulateUpgrade(tier = 'pro') {
+    this.proFeatureManager.userTier = tier;
+    localStorage.setItem('miniAgronomist-pro-status', 'active');
+    localStorage.setItem('miniAgronomist_tier', tier);
     
     // Close any open modals
     document.querySelectorAll('.pro-modal').forEach(modal => modal.remove());
     
-    // Refresh Pro UI
+    // Refresh Pro features
+    if (this.proFeatureManager) {
+      this.proFeatureManager.userTier = tier;
+      this.proFeatureManager.features = this.proFeatureManager.initializeFeatures();
+      this.proFeatureManager.limits = this.proFeatureManager.getUserLimits();
+      this.proFeatureManager.updateUIVisibility();
+    }
+
+    // Update UI
     this.updateUIForTier();
-    this.showMessage('🎉 Pro features activated! You now have access to all premium features.', 'success', 5000);
+    this.showMessage(`🎉 ${tier.toUpperCase()} features activated! You now have access to all premium features.`, 'success', 5000);
     
     // Refresh the page to show new features
     setTimeout(() => location.reload(), 2000);
