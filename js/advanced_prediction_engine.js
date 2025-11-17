@@ -1,6 +1,8 @@
 // Advanced Prediction Engine with Machine Learning and Statistical Models
 // Mini Agronomist Pro - AI-Enhanced Agricultural Intelligence System
 
+import { MultipleLinearRegression, BayesianInference, TimeSeriesAnalysis, MonteCarloSimulation, KMeansClustering } from './statistical_models.js';
+
 class AdvancedPredictionEngine {
   constructor() {
     this.models = {
@@ -787,6 +789,4 @@ class AdvancedPredictionEngine {
 }
 
 // Export for use in main application
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = AdvancedPredictionEngine;
-}
+export default AdvancedPredictionEngine;

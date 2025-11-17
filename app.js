@@ -354,7 +354,8 @@ class MiniAgronomist {
       // Initialize advanced prediction engine if not already done
       if (!this.advancedEngine) {
         try {
-          const { default: AdvancedPredictionEngine } = await import('./advanced_prediction_engine.js');
+          // Import advanced engine as ES module from `js` directory
+          const { default: AdvancedPredictionEngine } = await import('./js/advanced_prediction_engine.js');
           this.advancedEngine = new AdvancedPredictionEngine();
         } catch (importError) {
           console.warn('Advanced prediction engine not available, using legacy method:', importError);

@@ -931,11 +931,17 @@
 
   <!-- Core Scripts -->
   <script src="app.js"></script>
-  <script src="statistical_models.js"></script>
-  <script src="advanced_prediction_engine.js"></script>
-  
-  <!-- TensorFlow.js for Machine Learning -->
+
+  <!-- TensorFlow.js for Machine Learning (make sure TF is available before creating models) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+
+  <!-- Advanced ML Engine as ES module -->
+  <script type="module">
+    import AdvancedPredictionEngine from './js/advanced_prediction_engine.js';
+
+    // Expose the class to the page so non-module scripts can instantiate it
+    window.AdvancedPredictionEngine = AdvancedPredictionEngine;
+  </script>
   
   <script>
     let predictionEngine = null;

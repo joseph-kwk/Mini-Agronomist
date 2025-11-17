@@ -407,12 +407,11 @@ class KMeansClustering {
 }
 
 // Export classes for use
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    MultipleLinearRegression,
-    BayesianInference,
-    TimeSeriesAnalysis,
-    MonteCarloSimulation,
-    KMeansClustering
-  };
-}
+// Export classes for ES module usage
+export {
+  MultipleLinearRegression,
+  BayesianInference,
+  TimeSeriesAnalysis,
+  MonteCarloSimulation,
+  KMeansClustering
+};
