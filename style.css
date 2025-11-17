@@ -235,6 +235,9 @@ header.scrolled {
 .nav-logo {
   width: 48px;
   height: 48px;
+  max-width: 48px; /* prevent oversized scales if container grows */
+  display: block; /* avoid inline img quirks */
+  object-fit: cover; /* crop/fill nicely for non-square sources */
   border-radius: 12px;
   box-shadow: 0 3px 12px rgba(46, 125, 50, 0.3);
   transition: all 0.2s ease;
@@ -2774,6 +2777,9 @@ input:focus, select:focus {
 .footer-logo {
   width: 40px;
   height: 40px;
+  max-width: 40px;
+  display: block;
+  object-fit: cover;
   border-radius: 8px;
   box-shadow: var(--elevation-2);
 }
