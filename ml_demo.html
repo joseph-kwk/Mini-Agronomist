@@ -933,7 +933,9 @@
   <script src="app.js"></script>
 
   <!-- TensorFlow.js for Machine Learning (make sure TF is available before creating models) -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+
+  <!-- Load TF.js with crossorigin to reduce blocking; if blocked, fall back to statistical models -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js" crossorigin="anonymous"></script>
 
   <!-- Advanced ML Engine as ES module -->
   <script type="module">
@@ -941,6 +943,17 @@
 
     // Expose the class to the page so non-module scripts can instantiate it
     window.AdvancedPredictionEngine = AdvancedPredictionEngine;
+    
+    // Check if TFJS loaded — browsers with Tracking Prevention may block it.
+    if (typeof tf === 'undefined') {
+      // Show a notice to the user.
+      setTimeout(() => {
+        showNotification('TensorFlow.js appears to be blocked by your browser. Machine learning features will be disabled. Use statistical models or allow the CDN.', 'warning');
+      }, 700);
+    } else {
+      // TF loaded, we can log a success (not critical for users).
+      console.log('TensorFlow.js loaded');
+    }
   </script>
   
   <script>

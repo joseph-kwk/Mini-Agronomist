@@ -5,7 +5,7 @@ const CACHE_NAME = 'mini-agronomist-pro-v2.0';
 const STATIC_CACHE_NAME = 'mini-agronomist-static-v2.0';
 const DATA_CACHE_NAME = 'mini-agronomist-data-v2.0';
 
-// Resources to cache for offline use
+// Resources to cache for offline use (only same-origin resources are cached here)
 const STATIC_RESOURCES = [
   '/',
   '/index.html',
@@ -18,9 +18,9 @@ const STATIC_RESOURCES = [
   '/assets/icons/logo.png',
   '/assets/icons/favicon.png',
   '/assets/icons/farm-bg.png',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
-  'https://fonts.googleapis.com/icon?family=Material+Icons',
-  'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js'
+  // External resources such as fonts and TensorFlow are intentionally excluded
+  // from this list to avoid installation failures on browsers that block
+  // cross-origin requests during Service Worker installation.
 ];
 
 // Data files that should be cached
@@ -36,13 +36,25 @@ self.addEventListener('install', event => {
   
   event.waitUntil(
     Promise.all([
-      // Cache static resources
-      caches.open(STATIC_CACHE_NAME).then(cache => {
+      // Cache static resources (only same-origin resources here)
+      caches.open(STATIC_CACHE_NAME).then(async cache => {
         console.log('Caching static resources');
-        return cache.addAll(STATIC_RESOURCES.map(url => new Request(url, {
-          mode: 'no-cors',
-          cache: 'reload'
-        })));
+        try {
+          // We use addAll for same-origin resources. Externals (fonts, TF) are
+          // cached by the browser or handled separately.
+          await cache.addAll(STATIC_RESOURCES);
+          console.log('Static resources cached');
+        } catch (err) {
+          console.warn('Some static resources failed to cache (continuing):', err);
+          // Try to add one-by-one so we can skip problematic items
+          for (const res of STATIC_RESOURCES) {
+            try {
+              await cache.add(res);
+            } catch (e) {
+              console.warn('Failed to cache', res, e);
+            }
+          }
+        }
       }),
       
       // Cache data resources
