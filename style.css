@@ -351,6 +351,7 @@ header.scrolled {
   .nav-logo {
     width: 40px;
     height: 40px;
+    max-width: 40px;
   }
   
   .header-actions {
@@ -415,6 +416,7 @@ header.scrolled {
   .nav-logo {
     width: 36px;
     height: 36px;
+    max-width: 36px;
   }
   
   .icon-btn {
