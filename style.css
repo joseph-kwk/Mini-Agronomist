@@ -76,6 +76,26 @@
   --tier-pro: #007bff;
   --tier-enterprise: #dc3545;
   --pro-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+
+  /* Aliases and missing tokens (stability across browsers) */
+  --leaf-green: var(--primary-light);
+  --text-dark: var(--text-primary);
+  --surface: var(--surface-primary);
+  --outline-variant: rgba(0,0,0,0.08);
+  --primary: var(--primary-green);
+  --on-surface: var(--text-primary);
+  --primary-container: var(--surface-tertiary);
+  --surface-variant: var(--surface-secondary);
+  
+  /* Auth style tokens (aliases to existing palette) */
+  --primary-color: var(--primary-green);
+  --secondary-color: var(--primary-light);
+  --surface-color: var(--surface-secondary);
+  --border-color: rgba(0,0,0,0.12);
+  --error-color: #d32f2f;
+  
+  /* Prevent browser auto-darkening; enforce light theme */
+  color-scheme: light;
 }
 
 /* Global Styles & Reset */
@@ -195,6 +215,7 @@ header {
 
 header:hover {
   box-shadow: var(--elevation-2);
+}
 /* Enhanced Header & Navigation */
 header {
   background: rgba(255, 255, 255, 0.98);
@@ -459,6 +480,41 @@ main {
   position: sticky;
   top: calc(80px + var(--space-4));
   border: 1px solid var(--outline-variant);
+}
+
+/* Crop Info Bar */
+.crop-info-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+  padding: var(--space-4);
+  margin: 0 0 var(--space-6) 0;
+  background: linear-gradient(135deg, var(--surface-tertiary), #f6fbf6);
+  border: 1px solid rgba(76, 175, 80, 0.18);
+  border-radius: var(--radius-lg);
+}
+
+.info-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-left: 4px solid var(--primary-light);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 10px rgba(76,175,80,0.06);
+  min-height: 44px;
+}
+
+.info-chip .chip-icon { font-size: 1.1rem; }
+.info-chip .chip-label { color: var(--text-secondary); font-weight: 600; font-size: 0.85rem; }
+.info-chip .chip-value { color: var(--text-primary); font-weight: 700; }
+
+.info-chip.empty { opacity: 0.75; }
+
+@media (max-width: 640px) {
+  .crop-info-bar { grid-template-columns: 1fr 1fr; }
 }
 
 .section-header {
@@ -851,14 +907,14 @@ footer {
   margin-top: var(--space-16);
 }
 
-.footer-container {
+.footer-content, .footer-container {
   max-width: 1400px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   flex-wrap: wrap;
-  gap: var(--space-4);
+  gap: var(--space-6);
 }
 
 .footer-container p {
@@ -1679,20 +1735,20 @@ input:focus-visible {
 }
 
 /* Keep buttons fixed at bottom */
-.button-group {
+.input-section .button-group {
   flex-shrink: 0;
   display: flex;
   gap: 0.5rem;
   padding-top: 0.5rem;
   margin-top: auto;
   border-top: 1px solid #eee;
-  background: white;
+  background: transparent; /* remove white background behind buttons */
 }
 
 .button-group button {
   flex: 1;
   padding: 0.5rem 0.7rem;
-  font-size: 0.85rem;
+  font-size: 0.95rem;
 }
 
 .form-row {
@@ -1802,6 +1858,9 @@ button {
   font-size: 0.95rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  -webkit-appearance: none;
+  appearance: none; /* normalize default rendering across browsers */
+  background-clip: padding-box;
 }
 
 button:hover:not(:disabled) {

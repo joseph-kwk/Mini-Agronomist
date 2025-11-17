@@ -350,11 +350,11 @@ class MiniAgronomist {
     form?.addEventListener("submit", (e) => this.handleFormSubmission(e));
 
     // Real-time validation
-    document.getElementById("rainfall")?.addEventListener("input", (e) => this.validateField('rainfall', e.target.value));
-    document.getElementById("plantingDate")?.addEventListener("change", (e) => this.validateField('plantingDate', e.target.value));
-    document.getElementById("region")?.addEventListener("change", (e) => this.handleRegionChange(e.target.value));
-    document.getElementById("crop")?.addEventListener("change", (e) => this.handleCropChange(e.target.value));
-    document.getElementById("soil")?.addEventListener("change", (e) => this.validateField('soil', e.target.value));
+    document.getElementById("rainfall")?.addEventListener("input", (e) => { this.validateField('rainfall', e.target.value); this.updateInfoBar(); });
+    document.getElementById("plantingDate")?.addEventListener("change", (e) => { this.validateField('plantingDate', e.target.value); this.updateInfoBar(); });
+    document.getElementById("region")?.addEventListener("change", (e) => { this.handleRegionChange(e.target.value); this.updateInfoBar(); });
+    document.getElementById("crop")?.addEventListener("change", (e) => { this.handleCropChange(e.target.value); this.updateInfoBar(); });
+    document.getElementById("soil")?.addEventListener("change", (e) => { this.validateField('soil', e.target.value); this.updateInfoBar(); });
 
     // Button actions
     document.getElementById("resetForm")?.addEventListener("click", () => this.resetForm());
@@ -409,6 +409,52 @@ class MiniAgronomist {
       
       lastScrollY = currentScrollY;
     });
+  }
+
+  // Crop Info Bar updater
+  updateInfoBar() {
+    try {
+      const regionKey = document.getElementById('region')?.value || '';
+      const cropKey = document.getElementById('crop')?.value || '';
+      const soilVal = document.getElementById('soil')?.value || '';
+      const rainVal = document.getElementById('rainfall')?.value || '';
+      const dateVal = document.getElementById('plantingDate')?.value || '';
+
+      const setChip = (chipId, label) => {
+        const chip = document.getElementById(chipId);
+        if (!chip) return;
+        const valueSpan = chip.querySelector('.chip-value');
+        const placeholder = valueSpan?.getAttribute('data-placeholder') || '';
+        let text = placeholder;
+        switch (chipId) {
+          case 'chip-region':
+            text = regionKey ? (this.regionData[regionKey]?.display_name || regionKey) : placeholder;
+            break;
+          case 'chip-crop':
+            text = cropKey ? (this.cropProfiles[cropKey]?.scientific_name || cropKey) : placeholder;
+            break;
+          case 'chip-soil':
+            text = soilVal || placeholder;
+            break;
+          case 'chip-rain':
+            text = rainVal ? `${rainVal} mm` : placeholder;
+            break;
+          case 'chip-date':
+            text = dateVal ? new Date(dateVal).toLocaleDateString() : placeholder;
+            break;
+        }
+        if (valueSpan) valueSpan.textContent = text;
+        chip.classList.toggle('empty', text === placeholder);
+      };
+
+      setChip('chip-region');
+      setChip('chip-crop');
+      setChip('chip-soil');
+      setChip('chip-rain');
+      setChip('chip-date');
+    } catch (_) {
+      // No-op: info bar is optional
+    }
   }
 
   // Enhanced Form Validation
@@ -633,8 +679,17 @@ class MiniAgronomist {
       // Initialize advanced prediction engine if not already done
       if (!this.advancedEngine) {
         try {
-          const { default: AdvancedPredictionEngine } = await import('./advanced_prediction_engine.js');
-          this.advancedEngine = new AdvancedPredictionEngine();
+          // Prefer global if script already loaded
+          if (window.AdvancedPredictionEngine) {
+            this.advancedEngine = new window.AdvancedPredictionEngine();
+          } else {
+            // Attempt dynamic import from js/ path (optional)
+            const module = await import('./js/advanced_prediction_engine.js');
+            const AdvancedPredictionEngine = module?.default || window.AdvancedPredictionEngine;
+            if (AdvancedPredictionEngine) {
+              this.advancedEngine = new AdvancedPredictionEngine();
+            }
+          }
         } catch (importError) {
           console.warn('Advanced prediction engine not available, using legacy method:', importError);
           return this.calculateLegacyYield(cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop);
@@ -1006,6 +1061,8 @@ class MiniAgronomist {
       console.error("❌ Error populating dropdowns:", error);
       this.showError("Failed to initialize application. Please refresh and try again.", 5000);
     }
+    // Initialize info bar after dropdowns
+    this.updateInfoBar();
   }
 
   // Initialize Pro UI elements

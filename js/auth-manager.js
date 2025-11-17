@@ -426,6 +426,7 @@ class AuthManager {
   }
 
   createAuthButton() {
+    if (document.getElementById('authButton')) return;
     const authButton = document.createElement('button');
     authButton.id = 'authButton';
     authButton.className = 'auth-button';
@@ -434,9 +435,16 @@ class AuthManager {
       <span class="auth-text">Sign In</span>
     `;
 
+    // Prefer placing inside explicit header buttons container for layout stability
+    const headerButtons = document.querySelector('.header-buttons');
     const headerActions = document.querySelector('.header-actions');
-    if (headerActions) {
+    if (headerButtons) {
+      headerButtons.appendChild(authButton);
+    } else if (headerActions) {
       headerActions.appendChild(authButton);
+    } else {
+      // Fallback: attach to body end if containers are not found
+      document.body.appendChild(authButton);
     }
 
     authButton.addEventListener('click', () => {
@@ -995,10 +1003,18 @@ class AuthManager {
 
 // Initialize authentication manager
 let authManager;
-document.addEventListener('DOMContentLoaded', () => {
+function __initAuthManager() {
+  if (window.authManager) return;
   authManager = new AuthManager();
   window.authManager = authManager;
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', __initAuthManager);
+} else {
+  // DOM already parsed (Chrome can hit this path on fast loads)
+  __initAuthManager();
+}
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {

@@ -1,9 +1,9 @@
 // Service Worker for Mini Agronomist Pro PWA
 // Provides offline functionality and caching
 
-const CACHE_NAME = 'mini-agronomist-pro-v2.0';
-const STATIC_CACHE_NAME = 'mini-agronomist-static-v2.0';
-const DATA_CACHE_NAME = 'mini-agronomist-data-v2.0';
+const CACHE_NAME = 'mini-agronomist-pro-v2.2';
+const STATIC_CACHE_NAME = 'mini-agronomist-static-v2.2';
+const DATA_CACHE_NAME = 'mini-agronomist-data-v2.2';
 
 // Resources to cache for offline use
 const STATIC_RESOURCES = [
@@ -12,15 +12,11 @@ const STATIC_RESOURCES = [
   '/ml_demo.html',
   '/style.css',
   '/app.js',
-  '/advanced_prediction_engine.js',
-  '/statistical_models.js',
+  '/js/advanced_prediction_engine.js',
+  '/js/statistical_models.js',
   '/manifest.json',
   '/assets/icons/logo.png',
-  '/assets/icons/favicon.png',
-  '/assets/icons/farm-bg.png',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap',
-  'https://fonts.googleapis.com/icon?family=Material+Icons',
-  'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js'
+  '/assets/icons/favicon.png'
 ];
 
 // Data files that should be cached
@@ -39,10 +35,7 @@ self.addEventListener('install', event => {
       // Cache static resources
       caches.open(STATIC_CACHE_NAME).then(cache => {
         console.log('Caching static resources');
-        return cache.addAll(STATIC_RESOURCES.map(url => new Request(url, {
-          mode: 'no-cors',
-          cache: 'reload'
-        })));
+        return cache.addAll(STATIC_RESOURCES);
       }),
       
       // Cache data resources
@@ -179,7 +172,7 @@ async function handleStaticRequest(request) {
     
     // Return offline fallback page
     if (request.url.includes('.html') || request.headers.get('Accept')?.includes('text/html')) {
-      return caches.match('/index_enhanced.html');
+      return caches.match('/index.html');
     }
     
     return new Response(

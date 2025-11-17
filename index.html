@@ -17,7 +17,7 @@
   <meta property="og:url" content="https://miniagronomist.com/">
   <meta property="og:title" content="Mini Agronomist - AI-Powered Agricultural Yield Prediction">
   <meta property="og:description" content="Free AI-powered farming tool that predicts crop yields for 25+ crops across 14+ global regions. Optimize your harvest with data-driven agriculture insights.">
-  <meta property="og:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  <meta property="og:image" content="https://miniagronomist.com/assets/icons/logo.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="Mini Agronomist">
@@ -27,11 +27,12 @@
   <meta property="twitter:url" content="https://miniagronomist.com/">
   <meta property="twitter:title" content="Mini Agronomist - AI-Powered Agricultural Yield Prediction">
   <meta property="twitter:description" content="Free AI-powered farming tool that predicts crop yields for 25+ crops across 14+ global regions. Optimize your harvest with data-driven insights.">
-  <meta property="twitter:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  <meta property="twitter:image" content="https://miniagronomist.com/assets/icons/logo.png">
   <meta property="twitter:image:alt" content="Mini Agronomist - Agricultural Yield Prediction Dashboard">
   
   <!-- Additional Meta Tags -->
   <meta name="theme-color" content="#2E7D32" />
+  <meta name="color-scheme" content="light">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Mini Agronomist">
@@ -85,7 +86,7 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20251117" />
   
   <!-- Icons -->
   <link rel="icon" href="assets/icons/favicon.png" type="image/x-icon" />
@@ -98,7 +99,7 @@
   <header role="banner">
     <div class="header-container">
       <a href="#" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform" onclick="location.reload(); return false;">
-        <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo">
+        <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo" width="48" height="48">
         <span>Mini Agronomist</span>
       </a>
       <div class="header-actions">
@@ -153,6 +154,35 @@
             <span class="material-icons" aria-hidden="true">agriculture</span>
             Crop Information
           </h2>
+        </div>
+
+        <!-- Crop Info Bar -->
+        <div class="crop-info-bar" aria-live="polite">
+          <div class="info-chip" id="chip-region" title="Selected Region">
+            <span class="chip-icon">🌍</span>
+            <span class="chip-label">Region</span>
+            <span class="chip-value" data-placeholder="Select region">Select region</span>
+          </div>
+          <div class="info-chip" id="chip-crop" title="Selected Crop">
+            <span class="chip-icon">🌱</span>
+            <span class="chip-label">Crop</span>
+            <span class="chip-value" data-placeholder="Select crop">Select crop</span>
+          </div>
+          <div class="info-chip" id="chip-soil" title="Selected Soil">
+            <span class="chip-icon">🧪</span>
+            <span class="chip-label">Soil</span>
+            <span class="chip-value" data-placeholder="Select soil">Select soil</span>
+          </div>
+          <div class="info-chip" id="chip-rain" title="Weekly Rainfall (mm)">
+            <span class="chip-icon">💧</span>
+            <span class="chip-label">Rain</span>
+            <span class="chip-value" data-placeholder="0 mm">0 mm</span>
+          </div>
+          <div class="info-chip" id="chip-date" title="Planting Date">
+            <span class="chip-icon">📅</span>
+            <span class="chip-label">Date</span>
+            <span class="chip-value" data-placeholder="Not set">Not set</span>
+          </div>
         </div>
 
         <form id="inputForm" novalidate aria-describedby="form-instructions">
@@ -638,7 +668,7 @@
     <div class="footer-content">
       <div class="footer-section">
         <div class="footer-brand">
-          <img src="assets/icons/logo.png" alt="Mini Agronomist" class="footer-logo">
+          <img src="assets/icons/logo.png" alt="Mini Agronomist" class="footer-logo" width="40" height="40">
           <h3>Mini Agronomist</h3>
         </div>
         <p>AI-powered agricultural intelligence for farmers worldwide 🌾</p>
@@ -701,8 +731,8 @@
 
   <!-- Core Scripts -->
   <script src="app.js"></script>
-  <script src="statistical_models.js"></script>
-  <script src="advanced_prediction_engine.js"></script>
+  <script src="js/statistical_models.js"></script>
+  <script src="js/advanced_prediction_engine.js"></script>
   
   <!-- Authentication System -->
   <script src="js/auth-manager.js"></script>
@@ -712,7 +742,7 @@
   <script src="js/python-backend-client.js"></script>
   
   <!-- TensorFlow.js for Machine Learning (optional) -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js" crossorigin="anonymous"></script>
   
   <!-- Service Worker Registration -->
   <script>
