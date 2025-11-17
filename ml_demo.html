@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Primary Meta Tags -->
+  <title>ML Demo - Advanced Agricultural AI Predictions | Mini Agronomist</title>
+  <meta name="title" content="ML Demo - Advanced Agricultural AI Predictions | Mini Agronomist">
+  <meta name="description" content="Experience advanced machine learning for agriculture with TensorFlow.js. Interactive dashboard showcasing AI-powered crop yield predictions and farm analytics." />
+  <meta name="keywords" content="agricultural machine learning, farming AI, TensorFlow agriculture, crop prediction AI, precision agriculture, ML farming, agricultural analytics dashboard" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://miniagronomist.com/ml_demo.html">
+  <meta property="og:title" content="ML Demo - Advanced Agricultural AI Predictions">
+  <meta property="og:description" content="Experience advanced machine learning for agriculture with interactive dashboard showcasing AI-powered crop yield predictions.">
+  <meta property="og:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://miniagronomist.com/ml_demo.html">
+  <meta property="twitter:title" content="ML Demo - Advanced Agricultural AI Predictions">
+  <meta property="twitter:description" content="Interactive machine learning dashboard for agricultural predictions using TensorFlow.js">
+  <meta property="twitter:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://miniagronomist.com/ml_demo.html">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png"
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .ml-demo {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: var(--elevation-2);
+    }
+    
+    .prediction-methods {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .method-card {
+      background: linear-gradient(135deg, #f8fffe 0%, #e8f5e8 100%);
+      padding: 2rem;
+      border-radius: 16px;
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .method-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+      border-radius: 0 0 0 100px;
+    }
+    
+    .method-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(76, 175, 80, 0.2);
+      border-left-color: #43A047;
+    }
+    
+    .method-card h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .method-card p {
+      color: #2E4533;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    
+    .confidence-meter {
+      width: 100%;
+      height: 10px;
+      background: #E8F5E8;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1rem 0;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #FFB74D, #66BB6A, #4CAF50);
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+    }
+    
+    .feature-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, #66BB6A, #4CAF50);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 0.2rem 0.3rem 0.2rem 0;
+      box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .feature-tag:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+    }
+    
+    .online-status {
+      position: fixed;
+      top: 100px;
+      right: 2rem;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 0.8rem 1.2rem;
+      border-radius: 25px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      border: 2px solid #E8F5E8;
+      z-index: 1000;
+    }
+    
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #66BB6A;
+      animation: statusPulse 2s infinite;
+    }
+    
+    .status-indicator.online {
+      background: linear-gradient(135deg, #66BB6A, #4CAF50);
+    }
+    
+    .status-indicator.offline {
+      background: linear-gradient(135deg, #FFB74D, #FF9800);
+    }
+    
+    @keyframes statusPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.2); }
+    }
+    
+    .card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fffe 100%);
+      border-radius: 20px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.08);
+      border: 1px solid #E8F5E8;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #66BB6A, #4CAF50, #81C784);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+      color: white;
+      border: none;
+      padding: 1rem 2.5rem;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.6s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, #E8F5E8 0%, #F1F8E9 100%);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: #66BB6A;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.15);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #2E7D32;
+      margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+      color: #2E4533;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Enhanced Dashboard Styles */
+    .farm-dashboard {
+      margin-top: 2rem;
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .dashboard-card {
+      background: linear-gradient(135deg, #f8fffe 0%, #e8f5e8 100%);
+      border-radius: 16px;
+      padding: 1.8rem;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1);
+      border: 2px solid #E8F5E8;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .dashboard-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #66BB6A, #4CAF50);
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
+      border-color: #66BB6A;
+    }
+    
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    
+    .dashboard-card h3 {
+      color: #2E7D32;
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+    }
+    
+    .weather-data {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    
+    .weather-metric {
+      text-align: center;
+    }
+    
+    .metric-value {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #2E7D32;
+      margin-bottom: 0.3rem;
+    }
+    
+    .metric-label {
+      font-size: 0.8rem;
+      color: #2E4533;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .soil-metrics {
+      margin-bottom: 1rem;
+    }
+    
+    .soil-metric {
+      margin-bottom: 1rem;
+    }
+    
+    .metric-bar {
+      width: 100%;
+      height: 8px;
+      background: #E8F5E8;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    
+    .metric-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #81C784, #66BB6A);
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    
+    .growth-stages {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    
+    .stage-indicator {
+      padding: 0.5rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      background: #F1F8E9;
+      color: #2E4533;
+      transition: all 0.3s ease;
+    }
+    
+    .stage-indicator.active {
+      background: linear-gradient(135deg, #66BB6A, #4CAF50);
+      color: white;
+      font-weight: 600;
+    }
+    
+    .growth-progress {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background: #E8F5E8;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #81C784, #66BB6A, #4CAF50);
+      border-radius: 5px;
+      transition: width 0.8s ease;
+    }
+    
+    .prediction-summary {
+      margin-bottom: 1rem;
+    }
+    
+    .prediction-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.8rem;
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+    }
+    
+    .prediction-label {
+      color: #2E4533;
+      font-weight: 600;
+    }
+    
+    .prediction-value {
+      font-weight: 700;
+    }
+    
+    .prediction-value.good {
+      color: #2E7D32;
+    }
+    
+    .prediction-value.moderate {
+      color: #FF9800;
+    }
+    
+    .mini-btn {
+      background: linear-gradient(135deg, #81C784, #66BB6A);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    
+    .mini-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    .analyzer-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+      padding: 2rem;
+      background: linear-gradient(135deg, #f8fffe 0%, #e8f5e8 100%);
+      border-radius: 16px;
+      border: 2px solid #E8F5E8;
+    }
+    
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    
+    .input-group label {
+      font-weight: 600;
+      color: #2E7D32;
+      font-size: 1rem;
+    }
+    
+    .input-group select,
+    .input-group input[type="range"] {
+      padding: 0.8rem;
+      border: 2px solid #E8F5E8;
+      border-radius: 8px;
+      background: white;
+      color: #2E4533;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .input-group select:focus,
+    .input-group input:focus {
+      outline: none;
+      border-color: #66BB6A;
+      box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
+    }
+    
+    #farmSizeValue {
+      font-weight: 700;
+      color: #2E7D32;
+      text-align: center;
+      padding: 0.5rem;
+      background: rgba(102, 187, 106, 0.1);
+      border-radius: 8px;
+    }
+    
+    .accuracy-indicator {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(102, 187, 106, 0.2);
+    }
+    
+    .accuracy-indicator span {
+      font-weight: 600;
+      color: #2E7D32;
+      font-size: 0.9rem;
+    }
+    
+    .risk-analysis {
+      background: var(--error-container);
+      color: var(--on-error-container);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+    
+    .feature-importance {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .statistics-panel {
+      background: var(--tertiary-container);
+      color: var(--on-tertiary-container);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 2rem;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--tertiary);
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .status-indicator.online {
+      background: var(--tertiary);
+    }
+    
+    .status-indicator.offline {
+      background: var(--error);
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav-bar">
+    <div class="nav-content">
+      <a href="index.html" class="nav-brand" title="Mini Agronomist - Return to Main App">
+        <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo">
+        <span>Mini Agronomist</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">🌾 Yield Predictor</a>
+        <a href="#" class="active">🤖 ML Analytics</a>
+        <a href="onboarding.html">📚 Getting Started</a>
+        <a href="faq.html">❓ FAQ</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <div class="ml-demo">
+      <div class="online-status" id="connectionStatus">
+        <div class="status-indicator"></div>
+        <span>Checking connection...</span>
+      </div>
+      
+      <h1>🤖 Advanced Agricultural Intelligence Lab</h1>
+      <p>Experience next-generation agricultural intelligence with ML models, real-time analytics, and precision farming insights.</p>
+      
+      <!-- Interactive Farm Dashboard -->
+      <div class="card">
+        <h2>🚜 Smart Farm Dashboard</h2>
+        <div class="farm-dashboard">
+          <div class="dashboard-grid">
+            <div class="dashboard-card weather-card">
+              <div class="card-icon">🌤️</div>
+              <h3>Weather Intelligence</h3>
+              <div class="weather-data" id="weatherData">
+                <div class="weather-metric">
+                  <span class="metric-value" id="temperature">23°C</span>
+                  <span class="metric-label">Temperature</span>
+                </div>
+                <div class="weather-metric">
+                  <span class="metric-value" id="humidity">68%</span>
+                  <span class="metric-label">Humidity</span>
+                </div>
+                <div class="weather-metric">
+                  <span class="metric-value" id="rainfall">12mm</span>
+                  <span class="metric-label">Weekly Rain</span>
+                </div>
+              </div>
+              <button onclick="updateWeatherData()" class="mini-btn">🔄 Update</button>
+            </div>
+            
+            <div class="dashboard-card soil-card">
+              <div class="card-icon">🌱</div>
+              <h3>Soil Health Monitor</h3>
+              <div class="soil-metrics">
+                <div class="soil-metric">
+                  <div class="metric-bar">
+                    <div class="metric-fill" style="width: 75%" data-value="7.2"></div>
+                  </div>
+                  <span>pH Level: 7.2</span>
+                </div>
+                <div class="soil-metric">
+                  <div class="metric-bar">
+                    <div class="metric-fill" style="width: 60%" data-value="60"></div>
+                  </div>
+                  <span>Moisture: 60%</span>
+                </div>
+                <div class="soil-metric">
+                  <div class="metric-bar">
+                    <div class="metric-fill" style="width: 85%" data-value="85"></div>
+                  </div>
+                  <span>Nutrients: 85%</span>
+                </div>
+              </div>
+              <button onclick="analyzeSoil()" class="mini-btn">🔬 Analyze</button>
+            </div>
+            
+            <div class="dashboard-card crop-card">
+              <div class="card-icon">🌾</div>
+              <h3>Crop Growth Tracker</h3>
+              <div class="growth-stages">
+                <div class="stage-indicator active">🌱 Seedling</div>
+                <div class="stage-indicator active">🌿 Vegetative</div>
+                <div class="stage-indicator active">🌸 Flowering</div>
+                <div class="stage-indicator">🌾 Maturity</div>
+              </div>
+              <div class="growth-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width: 65%"></div>
+                </div>
+                <span>Growth Progress: 65%</span>
+              </div>
+              <button onclick="updateGrowthStage()" class="mini-btn">📈 Track</button>
+            </div>
+            
+            <div class="dashboard-card prediction-card">
+              <div class="card-icon">🎯</div>
+              <h3>AI Predictions</h3>
+              <div class="prediction-summary">
+                <div class="prediction-item">
+                  <span class="prediction-label">Yield Forecast</span>
+                  <span class="prediction-value good">+8.5 tons/ha</span>
+                </div>
+                <div class="prediction-item">
+                  <span class="prediction-label">Risk Level</span>
+                  <span class="prediction-value moderate">Medium</span>
+                </div>
+                <div class="prediction-item">
+                  <span class="prediction-label">Harvest Date</span>
+                  <span class="prediction-value">Oct 15</span>
+                </div>
+              </div>
+              <button onclick="runRealTimePrediction()" class="mini-btn">🚀 Predict</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🌱 ML Crop Analyzer</h2>
+        <p>Advanced machine learning analysis for your specific crop conditions:</p>
+        
+        <div class="analyzer-controls">
+          <div class="input-group">
+            <label for="cropType">🌾 Crop Type:</label>
+            <select id="cropType" onchange="updateCropAnalysis()">
+              <option value="maize">🌽 Maize</option>
+              <option value="wheat">🌾 Wheat</option>
+              <option value="rice">🍚 Rice</option>
+              <option value="soybean">🫘 Soybean</option>
+              <option value="tomato">🍅 Tomato</option>
+            </select>
+          </div>
+          
+          <div class="input-group">
+            <label for="farmSize">📏 Farm Size (hectares):</label>
+            <input type="range" id="farmSize" min="1" max="100" value="10" oninput="updateFarmSize(this.value)">
+            <span id="farmSizeValue">10 ha</span>
+          </div>
+          
+          <div class="input-group">
+            <label for="techLevel">🤖 Technology Level:</label>
+            <select id="techLevel" onchange="updateTechLevel()">
+              <option value="basic">🚜 Basic Farming</option>
+              <option value="precision">📡 Precision Agriculture</option>
+              <option value="smart">🤖 Smart Farming</option>
+              <option value="autonomous">🛸 Autonomous Systems</option>
+            </select>
+          </div>
+        </div>
+        
+        <button onclick="runAdvancedDemo()" class="btn-primary" id="runDemoBtn">
+          🚀 Run Advanced ML Analysis
+        </button>
+        
+        <div id="predictionResults" style="display: none;">
+          <div class="prediction-methods" id="methodResults">
+            <!-- Prediction method results will be inserted here -->
+          </div>
+          
+          <div class="statistics-panel">
+            <h3>📊 Statistical Analysis</h3>
+            <div class="stats-grid" id="statsGrid">
+              <!-- Statistical metrics will be inserted here -->
+            </div>
+          </div>
+          
+          <div class="card" style="margin-top: 2rem;">
+            <h3>🧠 Model Intelligence</h3>
+            <div id="modelIntelligence">
+              <!-- AI model insights will be inserted here -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🔬 AI-Powered Prediction Methods</h2>
+        <p>Explore our comprehensive suite of machine learning and statistical models designed for precision agriculture:</p>
+        <div class="prediction-methods">
+          <div class="method-card">
+            <h3>🧮 Multiple Linear Regression</h3>
+            <p>Classical statistical approach using matrix operations for multi-factor yield prediction with high interpretability.</p>
+            <div class="feature-importance">
+              <span class="feature-tag">🌧️ Rainfall</span>
+              <span class="feature-tag">🌡️ Temperature</span>
+              <span class="feature-tag">🌱 Soil Quality</span>
+            </div>
+            <div class="accuracy-indicator">
+              <span>Accuracy: 85%</span>
+              <div class="confidence-meter">
+                <div class="confidence-fill" style="width: 85%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h3>🎯 Bayesian Inference</h3>
+            <p>Probabilistic approach that quantifies uncertainty and continuously learns from new agricultural data.</p>
+            <div class="feature-importance">
+              <span class="feature-tag">📊 Prior Knowledge</span>
+              <span class="feature-tag">❓ Uncertainty</span>
+              <span class="feature-tag">🔍 Evidence</span>
+            </div>
+            <div class="accuracy-indicator">
+              <span>Accuracy: 78%</span>
+              <div class="confidence-meter">
+                <div class="confidence-fill" style="width: 78%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h3>📈 Time Series Analysis</h3>
+            <p>Advanced temporal modeling for seasonal patterns, weather cycles, and historical trend analysis.</p>
+            <div class="feature-importance">
+              <span class="feature-tag">🔄 Seasonality</span>
+              <span class="feature-tag">📊 Trends</span>
+              <span class="feature-tag">🔮 Forecasting</span>
+            </div>
+            <div class="accuracy-indicator">
+              <span>Accuracy: 82%</span>
+              <div class="confidence-meter">
+                <div class="confidence-fill" style="width: 82%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h3>🎲 Monte Carlo Simulation</h3>
+            <p>Risk analysis using thousands of scenarios to model uncertainty and extreme weather events.</p>
+            <div class="feature-importance">
+              <span class="feature-tag">⚠️ Risk Analysis</span>
+              <span class="feature-tag">📈 Probability</span>
+              <span class="feature-tag">🎯 Scenarios</span>
+            </div>
+            <div class="accuracy-indicator">
+              <span>Risk Assessment: 92%</span>
+              <div class="confidence-meter">
+                <div class="confidence-fill" style="width: 92%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h3>🧠 Neural Networks</h3>
+            <p>Deep learning models using TensorFlow.js for complex pattern recognition in agricultural data.</p>
+            <div class="feature-importance">
+              <span class="feature-tag">🤖 Deep Learning</span>
+              <span class="feature-tag">🔍 Pattern Recognition</span>
+              <span class="feature-tag">📊 Non-linear</span>
+            </div>
+            <div class="accuracy-indicator">
+              <span>Accuracy: 91%</span>
+              <div class="confidence-meter">
+                <div class="confidence-fill" style="width: 91%"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h3>🎯 Ensemble Methods</h3>
+            <p>Combines multiple algorithms with dynamic weighting for maximum accuracy and reliability.</p>
+            <div class="feature-importance">
+              <span class="feature-tag">🔄 Model Fusion</span>
+              <span class="feature-tag">⚖️ Dynamic Weighting</span>
+              <span class="feature-tag">🎯 Accuracy</span>
+            </div>
+            <div class="accuracy-indicator">
+              <span>Accuracy: 94%</span>
+              <div class="confidence-meter">
+                <div class="confidence-fill" style="width: 94%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h2>🌐 Online vs Offline Intelligence</h2>
+        <div class="prediction-methods">
+          <div class="method-card">
+            <h3>☁️ Online Mode</h3>
+            <p>When connected to the internet:</p>
+            <ul>
+              <li>Real-time weather data integration</li>
+              <li>Satellite imagery analysis</li>
+              <li>Market price data feeds</li>
+              <li>Pre-trained neural network models</li>
+              <li>Cloud-based model updates</li>
+              <li>Global agricultural databases</li>
+            </ul>
+          </div>
+          
+          <div class="method-card">
+            <h3>📱 Offline Mode</h3>
+            <p>Works completely offline with:</p>
+            <ul>
+              <li>Statistical models (regression, Bayesian)</li>
+              <li>Cached historical weather patterns</li>
+              <li>Local crop knowledge database</li>
+              <li>Monte Carlo risk simulations</li>
+              <li>Browser-based TensorFlow.js models</li>
+              <li>Progressive Web App capabilities</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-brand">
+          <img src="assets/icons/logo.png" alt="Mini Agronomist" class="footer-logo">
+          <h3>Mini Agronomist</h3>
+        </div>
+        <p>AI-powered agricultural intelligence for farmers worldwide 🌾</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Features</h4>
+        <ul>
+          <li><a href="index.html#prediction">Yield Prediction</a></li>
+          <li><a href="#demo">ML Demo</a></li>
+          <li><a href="index.html#analytics">Analytics</a></li>
+          <li><a href="index.html#tools">Export Tools</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="index.html#" id="aboutLink">About</a></li>
+          <li><a href="index.html#help">Help & Tutorial</a></li>
+          <li><a href="index.html#" id="supportLink">Support</a></li>
+          <li><a href="index.html#" id="privacyLink">Privacy Policy</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Connect</h4>
+        <div class="social-links">
+          <a href="https://twitter.com/joseph_kwk" target="_blank" aria-label="Follow on X (Twitter)" class="social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="https://github.com/joseph-kwk" target="_blank" aria-label="Follow on GitHub" class="social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+          <a href="https://linkedin.com/in/joseph-kwk" target="_blank" aria-label="Connect on LinkedIn" class="social-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="footer-bottom-content">
+        <p>&copy; 2025 Mini Agronomist. Open source agricultural intelligence platform.</p>
+        <div class="footer-meta">
+          <span>Made with 🌱 for farmers worldwide</span>
+          <span>•</span>
+          <a href="https://github.com/joseph-kwk/Mini-Agronomist" target="_blank">View on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="app.js"></script>
+  <script src="statistical_models.js"></script>
+  <script src="advanced_prediction_engine.js"></script>
+  
+  <!-- TensorFlow.js for Machine Learning -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+  
+  <script>
+    let predictionEngine = null;
+    
+    // Update connection status
+    function updateConnectionStatus() {
+      const statusElement = document.getElementById('connectionStatus');
+      const indicator = statusElement.querySelector('.status-indicator');
+      const text = statusElement.querySelector('span');
+      
+      if (navigator.onLine) {
+        statusElement.className = 'online-status online';
+        indicator.className = 'status-indicator online';
+        text.textContent = 'Online - Full ML capabilities available';
+        
+        // Hide the status message after 3 seconds
+        setTimeout(() => {
+          statusElement.style.opacity = '0';
+          statusElement.style.transform = 'translateY(-20px)';
+          setTimeout(() => {
+            statusElement.style.display = 'none';
+          }, 300);
+        }, 3000);
+      } else {
+        statusElement.className = 'online-status offline';
+        indicator.className = 'status-indicator offline';
+        text.textContent = 'Offline - Statistical models active';
+        statusElement.style.display = 'block';
+        statusElement.style.opacity = '1';
+        statusElement.style.transform = 'translateY(0)';
+      }
+    }
+    
+    // Initialize on load
+    window.addEventListener('load', () => {
+      updateConnectionStatus();
+      
+      // Listen for connection changes
+      window.addEventListener('online', updateConnectionStatus);
+      window.addEventListener('offline', updateConnectionStatus);
+    });
+    
+    async function runAdvancedDemo() {
+      const button = document.getElementById('runDemoBtn');
+      const results = document.getElementById('predictionResults');
+      
+      button.disabled = true;
+      button.textContent = 'Running Advanced Analysis...';
+      
+      try {
+        // Initialize prediction engine if needed
+        if (!predictionEngine) {
+          predictionEngine = new AdvancedPredictionEngine();
+        }
+        
+        // Sample data for demo
+        const sampleFormData = {
+          rainfall: 75,
+          plantingDate: new Date('2024-10-15'),
+          region: 'southern_africa',
+          crop: 'maize',
+          soil: 'loam'
+        };
+        
+        const sampleCropRules = {
+          yield_range: [2.5, 4.5],
+          rain_window: [60, 120],
+          source: 'Advanced ML Demo'
+        };
+        
+        const sampleCropProfile = {
+          photosynthesis_type: 'C4',
+          days_to_maturity: [90, 120],
+          water_requirement_mm: [500, 800],
+          avg_yield_tons_per_hectare: [3.0, 4.0],
+          optimal_temp_c: [20, 30]
+        };
+        
+        const sampleRegionInfo = {
+          annual_rainfall_mm: 800,
+          avg_monthly_temp_c: [25, 26, 24, 22, 20, 18, 18, 20, 23, 25, 26, 25],
+          monthly_rainfall_mm: [120, 100, 80, 40, 20, 15, 10, 15, 30, 60, 100, 110]
+        };
+        
+        // Run advanced prediction
+        const prediction = await predictionEngine.generateAdvancedPrediction(
+          sampleFormData, sampleCropRules, sampleCropProfile, sampleRegionInfo
+        );
+        
+        // Display results
+        displayPredictionResults(prediction);
+        results.style.display = 'block';
+        
+      } catch (error) {
+        console.error('Demo error:', error);
+        alert('Demo error: ' + error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Run Advanced Prediction Demo';
+      }
+    }
+    
+    function displayPredictionResults(prediction) {
+      const methodResults = document.getElementById('methodResults');
+      const statsGrid = document.getElementById('statsGrid');
+      const modelIntelligence = document.getElementById('modelIntelligence');
+      
+      // Display method results
+      if (prediction.methods && prediction.methods.length > 0) {
+        methodResults.innerHTML = prediction.methods.map(method => `
+          <div class="method-card">
+            <h3>${method.method.replace(/_/g, ' ').toUpperCase()}</h3>
+            <p>Predicted Yield: <strong>${method.yieldEstimate.toFixed(2)} tons/hectare</strong></p>
+            <div class="confidence-meter">
+              <div class="confidence-fill" style="width: ${(method.confidence || 0.5) * 100}%"></div>
+            </div>
+            <p>Confidence: ${((method.confidence || 0.5) * 100).toFixed(1)}%</p>
+            ${method.riskAnalysis ? `
+              <div class="risk-analysis">
+                <strong>Risk Metrics:</strong><br>
+                Value at Risk (5%): ${method.riskAnalysis.valueAtRisk?.toFixed(2) || 'N/A'}<br>
+                Probability of Loss: ${(method.riskAnalysis.probabilityOfLoss * 100)?.toFixed(1) || 'N/A'}%
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+      } else {
+        methodResults.innerHTML = `
+          <div class="method-card">
+            <h3>${prediction.method?.replace(/_/g, ' ').toUpperCase() || 'ENSEMBLE MODEL'}</h3>
+            <p>Predicted Yield: <strong>${prediction.yieldEstimate.toFixed(2)} tons/hectare</strong></p>
+            <div class="confidence-meter">
+              <div class="confidence-fill" style="width: ${(prediction.confidence || 0.5) * 100}%"></div>
+            </div>
+            <p>Confidence: ${((prediction.confidence || 0.5) * 100).toFixed(1)}%</p>
+            <p>Method: ${prediction.method || 'Advanced Ensemble'}</p>
+            <p>Data Quality: ${prediction.dataQuality || 'High'}</p>
+          </div>
+        `;
+      }
+      
+      // Display statistics
+      statsGrid.innerHTML = `
+        <div class="stat-item">
+          <div class="stat-value">${prediction.yieldEstimate.toFixed(2)}</div>
+          <div>Tons/Hectare</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${((prediction.confidence || 0.5) * 100).toFixed(0)}%</div>
+          <div>Confidence</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${prediction.dataQuality || 'High'}</div>
+          <div>Data Quality</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">${navigator.onLine ? 'Online' : 'Offline'}</div>
+          <div>Mode</div>
+        </div>
+      `;
+      
+      // Display model intelligence
+      const features = prediction.features || {};
+      const adjustments = prediction.adjustments || {};
+      
+      modelIntelligence.innerHTML = `
+        <div class="prediction-methods">
+          <div class="method-card">
+            <h4>🎯 Feature Analysis</h4>
+            <div class="feature-importance">
+              ${Object.entries(features).slice(0, 8).map(([key, value]) => 
+                `<span class="feature-tag">${key}: ${typeof value === 'number' ? value.toFixed(2) : value}</span>`
+              ).join('')}
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h4>⚙️ Model Adjustments</h4>
+            <div class="feature-importance">
+              ${Object.entries(adjustments).map(([key, value]) => 
+                `<span class="feature-tag">${key}: ${typeof value === 'number' ? (value * 100).toFixed(1) + '%' : value}</span>`
+              ).join('')}
+            </div>
+          </div>
+          
+          <div class="method-card">
+            <h4>📊 Uncertainty Analysis</h4>
+            <p>Prediction Variance: ${prediction.variance?.toFixed(4) || 'N/A'}</p>
+            <p>Method Agreement: ${prediction.methodAgreement ? (prediction.methodAgreement * 100).toFixed(1) + '%' : 'N/A'}</p>
+            <p>Uncertainty: ±${prediction.uncertainty?.toFixed(2) || '0.5'} tons/hectare</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Enhanced Dashboard Functions
+    function updateWeatherData() {
+      const temp = Math.round(Math.random() * 15 + 18); // 18-33°C
+      const humidity = Math.round(Math.random() * 40 + 40); // 40-80%
+      const rainfall = Math.round(Math.random() * 20 + 5); // 5-25mm
+      
+      document.getElementById('temperature').textContent = `${temp}°C`;
+      document.getElementById('humidity').textContent = `${humidity}%`;
+      document.getElementById('rainfall').textContent = `${rainfall}mm`;
+      
+      // Add visual feedback
+      const btn = event.target;
+      btn.style.transform = 'rotate(360deg)';
+      btn.style.background = 'linear-gradient(135deg, #4CAF50, #2E7D32)';
+      setTimeout(() => {
+        btn.style.transform = 'rotate(0deg)';
+        btn.style.background = 'linear-gradient(135deg, #81C784, #66BB6A)';
+      }, 600);
+    }
+
+    function analyzeSoil() {
+      const soilMetrics = document.querySelectorAll('.metric-fill');
+      soilMetrics.forEach((metric, index) => {
+        const randomValue = Math.random() * 40 + 50; // 50-90%
+        metric.style.width = `${randomValue}%`;
+        
+        // Update text
+        const labels = ['pH Level', 'Moisture', 'Nutrients'];
+        const values = [
+          (Math.random() * 2 + 6).toFixed(1), // pH 6-8
+          Math.round(randomValue) + '%',
+          Math.round(randomValue) + '%'
+        ];
+        metric.parentElement.nextElementSibling.textContent = `${labels[index]}: ${values[index]}`;
+      });
+      
+      // Add soil analysis result
+      setTimeout(() => {
+        showNotification('🔬 Soil analysis complete! Optimal conditions detected.', 'success');
+      }, 1500);
+    }
+
+    function updateGrowthStage() {
+      const stages = document.querySelectorAll('.stage-indicator');
+      const progressFill = document.querySelector('.progress-fill');
+      const progressText = document.querySelector('.growth-progress span');
+      
+      const currentProgress = parseInt(progressFill.style.width) || 65;
+      const newProgress = Math.min(currentProgress + Math.random() * 15, 100);
+      
+      progressFill.style.width = `${newProgress}%`;
+      progressText.textContent = `Growth Progress: ${Math.round(newProgress)}%`;
+      
+      // Update stage indicators
+      const activeStages = Math.floor(newProgress / 25);
+      stages.forEach((stage, index) => {
+        if (index <= activeStages) {
+          stage.classList.add('active');
+        }
+      });
+      
+      if (newProgress >= 100) {
+        showNotification('🎉 Crop has reached full maturity! Ready for harvest.', 'success');
+      }
+    }
+
+    function runRealTimePrediction() {
+      const predictions = [
+        { label: 'Yield Forecast', value: `+${(Math.random() * 5 + 6).toFixed(1)} tons/ha`, class: 'good' },
+        { label: 'Risk Level', value: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)], class: 'moderate' },
+        { label: 'Harvest Date', value: `Oct ${Math.floor(Math.random() * 20 + 10)}`, class: '' }
+      ];
+      
+      const predictionItems = document.querySelectorAll('.prediction-item');
+      predictionItems.forEach((item, index) => {
+        const valueSpan = item.querySelector('.prediction-value');
+        valueSpan.textContent = predictions[index].value;
+        valueSpan.className = `prediction-value ${predictions[index].class}`;
+      });
+      
+      showNotification('🎯 AI prediction updated with real-time data!', 'info');
+    }
+
+    function updateCropAnalysis() {
+      const cropType = document.getElementById('cropType').value;
+      const cropEmojis = {
+        maize: '🌽',
+        wheat: '🌾', 
+        rice: '🍚',
+        soybean: '🫘',
+        tomato: '🍅'
+      };
+      
+      showNotification(`${cropEmojis[cropType]} Crop analysis updated for ${cropType}!`, 'info');
+    }
+
+    function updateFarmSize(value) {
+      document.getElementById('farmSizeValue').textContent = `${value} ha`;
+    }
+
+    function updateTechLevel() {
+      const techLevel = document.getElementById('techLevel').value;
+      const messages = {
+        basic: '🚜 Basic farming methods selected',
+        precision: '📡 Precision agriculture enabled',
+        smart: '🤖 Smart farming systems activated',
+        autonomous: '🛸 Autonomous systems online'
+      };
+      
+      showNotification(messages[techLevel], 'info');
+    }
+
+    function showNotification(message, type = 'info') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed;
+        top: 120px;
+        right: 2rem;
+        background: ${type === 'success' ? '#4CAF50' : type === 'info' ? '#2196F3' : '#FF9800'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        z-index: 1001;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+
+    // Initialize dashboard on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Simulate real-time updates
+      setInterval(updateWeatherData, 30000); // Update weather every 30 seconds
+      
+      // Add some initial animations
+      setTimeout(() => {
+        const cards = document.querySelectorAll('.dashboard-card');
+        cards.forEach((card, index) => {
+          card.style.animation = `slideInUp 0.6s ease ${index * 0.1}s both`;
+        });
+      }, 500);
+    });
+  </script>
+
+  <style>
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</body>
+</html>

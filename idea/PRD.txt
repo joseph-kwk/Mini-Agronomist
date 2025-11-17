@@ -1,0 +1,63 @@
+🌱 Mini Agronomist – PRD v1.1
+1. Objective
+Build a lightweight, offline web app to help small-scale farmers predict crop yield and receive actionable planting advice based on soil type, rainfall, crop selection, and planting date—without server dependency.
+
+2. Core Features
+a. User Input Interface
+Dropdowns
+
+Soil Type (e.g., Clay, Sandy, Loamy)
+
+Crop Type (e.g., Maize, Groundnuts, Sorghum)
+
+Numeric Input
+
+Rainfall Estimate (mm/week)
+
+Date Picker
+
+Planting Date
+
+(Optional) Region (for future scaling)
+
+b. Prediction Logic
+Rules-Based Engine using heuristics derived from agronomy tables
+
+E.g.: If Crop = Maize + Soil = Loam + Rainfall = 60–90mm → Yield ≈ 3.5–5 tons/ha
+
+All logic written in Vanilla JavaScript—fully client-side
+
+No external data calls; models defined in static JSON or JS objects
+
+c. Output and Visuals
+Yield Prediction (e.g. “Expected Yield: 4.2 tons/ha”)
+
+Planting Tip (e.g. “Fertilize during week 3–5 with nitrogen-rich compost.”)
+
+Risk Level Bar (SVG-based, changes color based on prediction reliability or rainfall adequacy)
+
+(Optional) Add icon cues for clarity (from Google Material Icons)
+
+d. Offline-First Deployment
+Packaged as a Progressive Web App (PWA):
+
+Installable
+
+Runs offline via browser caching
+
+No server or database needed
+
+3. Tech Stack & Tools
+Layer	Tools
+Interface	HTML + CSS
+Logic Engine	Vanilla JavaScript
+Visualization	Inline SVG (for yield bars & status cues)
+Icons	Google Material Icons (local fallback)
+Testing	Chrome DevTools, optional Python/Live Server
+Packaging	Service Workers + manifest.json for PWA
+4. Stretch Goals
+Save user preferences in localStorage
+
+Allow CSV input for soil test data (V2)
+
+Integrate a mini version of the Three Circles Algorithm for matching conditions to crop suitability

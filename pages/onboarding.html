@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Started - Mini Agronomist</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .onboarding-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .step-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--elevation-1);
+            border-left: 4px solid var(--primary);
+        }
+        .step-number {
+            background: var(--primary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .step-content {
+            color: var(--on-surface-variant);
+            line-height: 1.6;
+        }
+        .feature-highlight {
+            background: var(--primary-container);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .tip-box {
+            background: var(--secondary-container);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .tip-box::before {
+            content: "💡 ";
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="onboarding-container">
+        <header style="text-align: center; margin-bottom: 3rem;">
+            <h1>🌾 Welcome to Mini Agronomist!</h1>
+            <p style="font-size: 1.1rem; color: var(--on-surface-variant);">
+                Your intelligent farming companion for accurate yield predictions
+            </p>
+        </header>
+
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2 class="step-title">Select Your Region</h2>
+            </div>
+            <div class="step-content">
+                <p>Start by choosing your agricultural region from our comprehensive database of 14+ global regions.</p>
+                <div class="feature-highlight">
+                    <strong>🌍 Available Regions:</strong> United States, India, China, Brazil, Europe, Australia, and more!
+                    Each region includes detailed climate data and local growing conditions.
+                </div>
+                <div class="tip-box">
+                    <strong>Pro Tip:</strong> Your region selection affects all recommendations, so choose the one closest to your farm location.
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2 class="step-title">Choose Your Soil Type</h2>
+            </div>
+            <div class="step-content">
+                <p>Select the soil type that best matches your farmland. This significantly impacts yield predictions.</p>
+                <div class="feature-highlight">
+                    <strong>🏞️ Soil Types:</strong> Clay, Sandy, Loam, Silt, Rocky, Organic
+                    <br>Each soil type has different water retention, drainage, and nutrient characteristics.
+                </div>
+                <div class="tip-box">
+                    <strong>Not sure about your soil?</strong> Most agricultural extension offices provide soil testing services, or you can use our soil identification guide.
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2 class="step-title">Select Your Crop</h2>
+            </div>
+            <div class="step-content">
+                <p>Choose from our extensive crop database with scientific profiles and regional varieties.</p>
+                <div class="feature-highlight">
+                    <strong>🌱 Crop Categories:</strong>
+                    <ul>
+                        <li><strong>Cereals:</strong> Wheat, Rice, Corn, Barley</li>
+                        <li><strong>Legumes:</strong> Soybeans, Lentils, Chickpeas</li>
+                        <li><strong>Vegetables:</strong> Tomatoes, Potatoes, Onions</li>
+                        <li><strong>Cash Crops:</strong> Cotton, Sugarcane, Coffee</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">4</span>
+                <h2 class="step-title">Enter Growing Conditions</h2>
+            </div>
+            <div class="step-content">
+                <p>Provide key environmental data for accurate predictions:</p>
+                <div class="feature-highlight">
+                    <strong>📊 Required Data:</strong>
+                    <ul>
+                        <li><strong>Expected Rainfall:</strong> Total seasonal rainfall in mm</li>
+                        <li><strong>Planting Date:</strong> When you plan to plant your crop</li>
+                        <li><strong>Additional Factors:</strong> Temperature ranges, irrigation availability</li>
+                    </ul>
+                </div>
+                <div class="tip-box">
+                    <strong>Data Sources:</strong> Use local weather forecasts, historical weather data, or your farming experience for estimates.
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">5</span>
+                <h2 class="step-title">Get Your Prediction</h2>
+            </div>
+            <div class="step-content">
+                <p>Click "Predict Yield" to receive comprehensive analysis and recommendations:</p>
+                <div class="feature-highlight">
+                    <strong>📈 Your Results Include:</strong>
+                    <ul>
+                        <li><strong>Yield Estimate:</strong> Expected harvest quantity</li>
+                        <li><strong>Confidence Score:</strong> Reliability of the prediction</li>
+                        <li><strong>Risk Assessment:</strong> Potential challenges and mitigation</li>
+                        <li><strong>Recommendations:</strong> Optimal practices for your conditions</li>
+                        <li><strong>Harvest Timeline:</strong> Expected maturity dates</li>
+                        <li><strong>Market Insights:</strong> Price trends and timing advice</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-number">6</span>
+                <h2 class="step-title">Advanced Features</h2>
+            </div>
+            <div class="step-content">
+                <p>Explore powerful tools to maximize your farming success:</p>
+                <div class="feature-highlight">
+                    <strong>🔧 Pro Features:</strong>
+                    <ul>
+                        <li><strong>History Tracking:</strong> Save and compare past predictions</li>
+                        <li><strong>Export Data:</strong> Download reports for record-keeping</li>
+                        <li><strong>Print Reports:</strong> Professional farming plans</li>
+                        <li><strong>ML Demo:</strong> Advanced machine learning predictions</li>
+                        <li><strong>Comparison Tools:</strong> Analyze different scenarios</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 3rem 0;">
+            <a href="index.html" class="btn btn-primary" style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                🚀 Start Using Mini Agronomist
+            </a>
+        </div>
+
+        <div style="background: var(--surface-variant); padding: 2rem; border-radius: 12px; margin-top: 2rem;">
+            <h3>🆘 Need Help?</h3>
+            <p>
+                <strong>📧 Support:</strong> Contact us at support@miniagronomist.com<br>
+                <strong>📚 Documentation:</strong> <a href="faq.html">Frequently Asked Questions</a><br>
+                <strong>🔄 Updates:</strong> Follow us for the latest features and improvements
+            </p>
+        </div>
+    </div>
+</body>
+</html>

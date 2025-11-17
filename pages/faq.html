@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Mini Agronomist</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .faq-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .faq-section {
+            margin-bottom: 2rem;
+        }
+        .faq-category {
+            background: var(--primary-container);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .faq-category h3 {
+            margin: 0;
+            color: var(--on-primary-container);
+        }
+        .faq-item {
+            background: var(--surface);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: var(--elevation-1);
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--on-surface);
+        }
+        .faq-question:hover {
+            background: var(--surface-variant);
+        }
+        .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            color: var(--on-surface-variant);
+            line-height: 1.6;
+            display: none;
+        }
+        .faq-answer.active {
+            display: block;
+        }
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        .faq-icon.rotated {
+            transform: rotate(180deg);
+        }
+        .highlight-box {
+            background: var(--secondary-container);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .search-box {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--outline);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="faq-container">
+        <header style="text-align: center; margin-bottom: 3rem;">
+            <h1>🤔 Frequently Asked Questions</h1>
+            <p style="font-size: 1.1rem; color: var(--on-surface-variant);">
+                Everything you need to know about Mini Agronomist
+            </p>
+        </header>
+
+        <input type="text" class="search-box" placeholder="🔍 Search FAQ..." id="faqSearch">
+
+        <div class="faq-section">
+            <div class="faq-category">
+                <h3>🌱 Getting Started</h3>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    What is Mini Agronomist and how does it work?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Mini Agronomist is an intelligent agricultural yield prediction tool that uses advanced algorithms and regional data to help farmers make informed planting decisions. It combines:</p>
+                    <ul>
+                        <li><strong>Regional Climate Data:</strong> 14+ global agricultural regions with detailed weather patterns</li>
+                        <li><strong>Crop Science:</strong> Comprehensive database of crop characteristics and requirements</li>
+                        <li><strong>Soil Analysis:</strong> Different soil types and their impact on crop growth</li>
+                        <li><strong>Machine Learning:</strong> Advanced prediction models for accurate forecasting</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Best of all:</strong> It works completely offline and protects your farm data privacy!
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    How accurate are the yield predictions?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Our prediction accuracy varies by region and crop type, typically ranging from 75-90% accuracy:</p>
+                    <ul>
+                        <li><strong>High Accuracy (85-90%):</strong> Major crops in well-documented regions (corn, wheat, soybeans)</li>
+                        <li><strong>Good Accuracy (75-85%):</strong> Specialty crops and emerging agricultural areas</li>
+                        <li><strong>Confidence Scoring:</strong> Each prediction includes a confidence score to help you assess reliability</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Remember:</strong> Predictions are estimates based on historical data and should be combined with your local knowledge and experience.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Is my farm data safe and private?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Absolutely!</strong> Mini Agronomist is designed with privacy-first principles:</p>
+                    <ul>
+                        <li><strong>Local Processing:</strong> All calculations happen on your device</li>
+                        <li><strong>No Data Upload:</strong> Your farm data never leaves your computer</li>
+                        <li><strong>Offline Capable:</strong> Works without internet connection</li>
+                        <li><strong>No Registration:</strong> Use immediately without creating accounts</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Your data, your control:</strong> History is stored locally in your browser and can be cleared anytime.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <div class="faq-category">
+                <h3>🌍 Regions and Crops</h3>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Which regions and crops are supported?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Regions (14+):</strong> United States, India, China, Brazil, Europe, Australia, Canada, Argentina, Russia, Sub-Saharan Africa, Southeast Asia, Middle East, and more.</p>
+                    <p><strong>Crops (25+):</strong></p>
+                    <ul>
+                        <li><strong>Cereals:</strong> Wheat, Rice, Corn, Barley, Oats, Millet, Sorghum</li>
+                        <li><strong>Legumes:</strong> Soybeans, Lentils, Chickpeas, Black Beans, Peanuts</li>
+                        <li><strong>Vegetables:</strong> Tomatoes, Potatoes, Onions, Carrots, Cabbage</li>
+                        <li><strong>Cash Crops:</strong> Cotton, Sugarcane, Coffee, Tea, Tobacco</li>
+                        <li><strong>Fruits:</strong> Apples, Bananas, Grapes, Citrus fruits</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Expanding Coverage:</strong> We continuously add new regions and crops based on user feedback.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    What if my region or crop isn't listed?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Choose the closest available option:</p>
+                    <ul>
+                        <li><strong>Similar Climate:</strong> Select a region with similar weather patterns</li>
+                        <li><strong>Crop Families:</strong> Choose a crop from the same botanical family</li>
+                        <li><strong>Contact Us:</strong> Request new regions/crops at support@miniagronomist.com</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Pro Version:</strong> Custom regions and crops will be available in the professional version.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <div class="faq-category">
+                <h3>📊 Using Predictions</h3>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    How should I interpret the results?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p>Your prediction results include several key components:</p>
+                    <ul>
+                        <li><strong>Yield Estimate:</strong> Expected harvest quantity per unit area</li>
+                        <li><strong>Confidence Score:</strong> How reliable the prediction is (higher = better)</li>
+                        <li><strong>Risk Assessment:</strong> Potential challenges and their likelihood</li>
+                        <li><strong>Factor Analysis:</strong> Which conditions most affect your yield</li>
+                        <li><strong>Recommendations:</strong> Specific actions to optimize results</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Best Practice:</strong> Use predictions as a starting point and combine with your local experience and current conditions.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Can I save and compare different scenarios?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Yes!</strong> Mini Agronomist includes powerful comparison tools:</p>
+                    <ul>
+                        <li><strong>History Tracking:</strong> Automatically saves your last 10 predictions</li>
+                        <li><strong>Export Data:</strong> Download predictions as JSON files</li>
+                        <li><strong>Print Reports:</strong> Generate professional farming reports</li>
+                        <li><strong>Scenario Analysis:</strong> Compare different planting dates, crops, or conditions</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Tip:</strong> Try different planting dates to find the optimal timing for your crop!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <div class="faq-category">
+                <h3>🔧 Technical Support</h3>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    What browsers and devices are supported?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Supported Browsers:</strong></p>
+                    <ul>
+                        <li><strong>Desktop:</strong> Chrome 90+, Firefox 88+, Safari 14+, Edge 90+</li>
+                        <li><strong>Mobile:</strong> Chrome Mobile, Safari Mobile, Samsung Internet</li>
+                        <li><strong>Tablets:</strong> iPad Safari, Android Chrome</li>
+                    </ul>
+                    <p><strong>Progressive Web App:</strong> Install Mini Agronomist on your device for faster access and offline use!</p>
+                    <div class="highlight-box">
+                        <strong>Performance:</strong> Works best on devices with at least 2GB RAM and modern processors.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    I'm getting errors or unexpected results. What should I do?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Troubleshooting Steps:</strong></p>
+                    <ol>
+                        <li><strong>Refresh the page</strong> and try again</li>
+                        <li><strong>Check your input data</strong> for realistic values</li>
+                        <li><strong>Clear browser cache</strong> and reload</li>
+                        <li><strong>Try a different browser</strong> to isolate the issue</li>
+                        <li><strong>Check browser console</strong> for error messages (F12 key)</li>
+                    </ol>
+                    <div class="highlight-box">
+                        <strong>Still having issues?</strong> Contact support@miniagronomist.com with details about your browser, device, and the specific problem.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <div class="faq-category">
+                <h3>💰 Pricing and Future Features</h3>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    Is Mini Agronomist free to use?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Yes!</strong> The current version is completely free with no limitations:</p>
+                    <ul>
+                        <li>✅ Unlimited predictions</li>
+                        <li>✅ All crops and regions</li>
+                        <li>✅ History tracking</li>
+                        <li>✅ Export and print features</li>
+                        <li>✅ No ads or watermarks</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Future Plans:</strong> We're developing a Pro version with advanced features, but the core functionality will always remain free.
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <button class="faq-question">
+                    What's planned for the Pro version?
+                    <span class="faq-icon">▼</span>
+                </button>
+                <div class="faq-answer">
+                    <p><strong>Pro Features in Development:</strong></p>
+                    <ul>
+                        <li><strong>Real-time Weather Integration:</strong> Live weather data and forecasts</li>
+                        <li><strong>Multi-farm Management:</strong> Track multiple properties</li>
+                        <li><strong>Advanced Analytics:</strong> Profit optimization and ROI calculations</li>
+                        <li><strong>Custom Crop Varieties:</strong> Add your own crop data</li>
+                        <li><strong>API Access:</strong> Integrate with farm management software</li>
+                        <li><strong>Priority Support:</strong> Direct access to agricultural experts</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <strong>Stay Updated:</strong> Follow our development progress and be first to try new features!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 3rem 0;">
+            <div style="background: var(--primary-container); padding: 2rem; border-radius: 12px;">
+                <h3>📞 Still Have Questions?</h3>
+                <p><strong>📧 Email:</strong> support@miniagronomist.com</p>
+                <p><strong>🌐 Website:</strong> www.miniagronomist.com</p>
+                <p><strong>📱 Social:</strong> Follow @MiniAgronomist for updates</p>
+                <br>
+                <a href="index.html" class="btn btn-primary" style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600; margin-right: 1rem;">
+                    🏠 Back to App
+                </a>
+                <a href="onboarding.html" class="btn btn-secondary" style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    📚 Getting Started Guide
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FAQ Toggle Functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const icon = question.querySelector('.faq-icon');
+                
+                // Toggle answer visibility
+                answer.classList.toggle('active');
+                icon.classList.toggle('rotated');
+                
+                // Close other open FAQs (optional - remove if you want multiple open)
+                document.querySelectorAll('.faq-answer').forEach(otherAnswer => {
+                    if (otherAnswer !== answer && otherAnswer.classList.contains('active')) {
+                        otherAnswer.classList.remove('active');
+                        otherAnswer.previousElementSibling.querySelector('.faq-icon').classList.remove('rotated');
+                    }
+                });
+            });
+        });
+
+        // FAQ Search Functionality
+        document.getElementById('faqSearch').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                
+                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

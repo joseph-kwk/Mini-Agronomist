@@ -1,0 +1,356 @@
+{
+  "southern_africa": {
+    "maize": {
+      "loam": {
+        "yield_range": [4.0, 6.5],
+        "rain_window": [450, 650],
+        "tip": "Plant early October for best yields. Use PAN 67 or ZM 521 varieties for this region.",
+        "source": "SADC Agricultural Research 2023"
+      },
+      "sandy loam": {
+        "yield_range": [3.2, 5.8],
+        "rain_window": [400, 600],
+        "tip": "Add organic matter and mulch heavily. Consider drought-tolerant varieties.",
+        "source": "ICRISAT Southern Africa 2022"
+      },
+      "clay": {
+        "yield_range": [3.8, 6.2],
+        "rain_window": [500, 700],
+        "tip": "Ensure good drainage with ridges. Apply gypsum to improve soil structure.",
+        "source": "Zimbabwe Agricultural Extension 2023"
+      }
+    },
+    "groundnuts": {
+      "loam": {
+        "yield_range": [2.5, 4.2],
+        "rain_window": [350, 500],
+        "tip": "Inoculate with rhizobia. Plant Mnandi variety for better drought tolerance.",
+        "source": "ICRISAT Groundnut Manual 2022"
+      },
+      "sandy loam": {
+        "yield_range": [2.0, 3.8],
+        "rain_window": [300, 450],
+        "tip": "Use JL 24 variety. Apply gypsum during pod filling stage.",
+        "source": "Mozambique Extension Services 2023"
+      },
+      "clay": {
+        "yield_range": [2.2, 4.0],
+        "rain_window": [400, 550],
+        "tip": "Plant on raised beds. Monitor for fungal diseases in wet conditions.",
+        "source": "Malawi Agricultural Research 2022"
+      }
+    },
+    "sorghum": {
+      "loam": {
+        "yield_range": [3.5, 5.5],
+        "rain_window": [300, 500],
+        "tip": "Plant Matatan variety. Excellent drought tolerance for this region.",
+        "source": "ICRISAT Sorghum Guide 2023"
+      },
+      "sandy loam": {
+        "yield_range": [3.0, 5.0],
+        "rain_window": [250, 450],
+        "tip": "Use Meko variety for sandy soils. Mulch to conserve moisture.",
+        "source": "Botswana Agricultural College 2022"
+      },
+      "clay": {
+        "yield_range": [3.2, 5.2],
+        "rain_window": [350, 500],
+        "tip": "Avoid waterlogging. Plant on ridges for better drainage.",
+        "source": "South African Grain Information Service 2023"
+      }
+    }
+  },
+  "eastern_africa_highlands": {
+    "maize": {
+      "volcanic loam": {
+        "yield_range": [5.5, 8.0],
+        "rain_window": [600, 900],
+        "tip": "Use KH 600-1 variety. Plant during long rains (March-May).",
+        "source": "CIMMYT East Africa 2023"
+      },
+      "clay": {
+        "yield_range": [4.8, 7.5],
+        "rain_window": [650, 950],
+        "tip": "Double-row planting reduces disease. Use raised beds during heavy rains.",
+        "source": "Kenya Agricultural Research Institute 2022"
+      }
+    },
+    "groundnuts": {
+      "volcanic loam": {
+        "yield_range": [3.0, 5.0],
+        "rain_window": [400, 600],
+        "tip": "Use Manipintar variety. Benefits from highland cool temperatures.",
+        "source": "Ethiopian Agricultural Research 2023"
+      },
+      "clay": {
+        "yield_range": [2.5, 4.5],
+        "rain_window": [450, 650],
+        "tip": "Ensure excellent drainage. CG7 variety performs well here.",
+        "source": "Uganda National Agricultural Research 2022"
+      }
+    },
+    "sorghum": {
+      "volcanic loam": {
+        "yield_range": [4.0, 6.5],
+        "rain_window": [350, 550],
+        "tip": "Seredo variety adapted to highland conditions. Plant early in season.",
+        "source": "ICRISAT Highland Sorghum 2023"
+      },
+      "clay": {
+        "yield_range": [3.5, 6.0],
+        "rain_window": [400, 600],
+        "tip": "Gadam variety tolerates heavy soils. Monitor for fungal diseases.",
+        "source": "Tanzania Agricultural Research Institute 2022"
+      }
+    }
+  },
+  "northern_sahel": {
+    "maize": {
+      "sandy": {
+        "yield_range": [1.5, 3.0],
+        "rain_window": [300, 450],
+        "tip": "Use drought-resistant Simsim variety. Plant immediately after first rains.",
+        "source": "ICRISAT Sahel Program 2023"
+      },
+      "light clay": {
+        "yield_range": [2.0, 3.5],
+        "rain_window": [350, 500],
+        "tip": "SC 639 variety performs well. Use zai pits for water harvesting.",
+        "source": "Niger Agricultural Research 2022"
+      }
+    },
+    "groundnuts": {
+      "sandy": {
+        "yield_range": [1.2, 2.5],
+        "rain_window": [250, 400],
+        "tip": "Soronko variety suited for sandy Sahel soils. Mulch heavily.",
+        "source": "Mali Agricultural Extension 2023"
+      },
+      "light clay": {
+        "yield_range": [1.5, 2.8],
+        "rain_window": [300, 450],
+        "tip": "Yenyawoso variety. Use half-moon water harvesting techniques.",
+        "source": "Burkina Faso Research Institute 2022"
+      }
+    },
+    "sorghum": {
+      "sandy": {
+        "yield_range": [2.0, 4.0],
+        "rain_window": [200, 350],
+        "tip": "Dabaru variety excellent for low rainfall. Plant early June.",
+        "source": "ICRISAT Dryland Research 2023"
+      },
+      "light clay": {
+        "yield_range": [2.5, 4.5],
+        "rain_window": [250, 400],
+        "tip": "Tiŋan variety adapted to Sahel conditions. Rotate with millet.",
+        "source": "Chad Agricultural Development 2022"
+      }
+    }
+  },
+  "north_america_midwest": {
+    "maize": {
+      "silt loam": {
+        "yield_range": [8.0, 12.0],
+        "rain_window": [500, 750],
+        "tip": "Pioneer P1151 performs excellently. Plant when soil reaches 10°C.",
+        "source": "Iowa State University Extension 2023"
+      },
+      "clay loam": {
+        "yield_range": [7.5, 11.5],
+        "rain_window": [550, 800],
+        "tip": "DKC61-42 hybrid recommended. Ensure good drainage in spring.",
+        "source": "University of Illinois Agriculture 2023"
+      }
+    },
+    "soybeans": {
+      "silt loam": {
+        "yield_range": [3.5, 5.0],
+        "rain_window": [450, 650],
+        "tip": "Asgrow AG2433 variety. Rotate with corn for best yields.",
+        "source": "Minnesota Agricultural Extension 2023"
+      },
+      "clay loam": {
+        "yield_range": [3.2, 4.8],
+        "rain_window": [500, 700],
+        "tip": "Pioneer P22T41. Use cover crops to improve soil structure.",
+        "source": "Purdue University Agriculture 2022"
+      }
+    }
+  },
+  "north_america_pacific_coast": {
+    "maize": {
+      "sandy loam": {
+        "yield_range": [6.0, 9.0],
+        "rain_window": [400, 600],
+        "tip": "Cal Ex 30Y89 adapted to Mediterranean climate. Irrigate during dry summer.",
+        "source": "UC Davis Agriculture 2023"
+      },
+      "loam": {
+        "yield_range": [6.5, 9.5],
+        "rain_window": [450, 650],
+        "tip": "N2004 variety. Use drip irrigation to conserve water.",
+        "source": "Oregon State University 2022"
+      }
+    },
+    "tomatoes": {
+      "sandy loam": {
+        "yield_range": [60, 90],
+        "rain_window": [400, 600],
+        "tip": "Early Girl variety for coastal conditions. Mulch heavily.",
+        "source": "California Tomato Research Institute 2023"
+      },
+      "loam": {
+        "yield_range": [70, 100],
+        "rain_window": [450, 650],
+        "tip": "Beefsteak variety. Use drip systems to avoid leaf diseases.",
+        "source": "Washington State University 2022"
+      }
+    }
+  },
+  "south_america_cerrado": {
+    "maize": {
+      "Oxisol": {
+        "yield_range": [7.0, 10.5],
+        "rain_window": [600, 900],
+        "tip": "DMR90 variety adapted to Cerrado. Apply lime to correct pH.",
+        "source": "EMBRAPA Cerrados 2023"
+      }
+    },
+    "soybeans": {
+      "Oxisol": {
+        "yield_range": [3.0, 4.5],
+        "rain_window": [500, 750],
+        "tip": "BRS Guan xian variety. Use no-till system to preserve soil.",
+        "source": "Brazilian Agricultural Research 2023"
+      }
+    }
+  },
+  "western_europe": {
+    "maize": {
+      "silty loam": {
+        "yield_range": [7.5, 10.0],
+        "rain_window": [500, 700],
+        "tip": "DK Cuba variety suited for European conditions. Plant after soil warming.",
+        "source": "European Corn Committee 2023"
+      }
+    },
+    "barley": {
+      "silty loam": {
+        "yield_range": [5.0, 7.5],
+        "rain_window": [350, 500],
+        "tip": "Concerto variety. Monitor for slug damage in wet conditions.",
+        "source": "UK Agriculture and Horticulture Board 2023"
+      }
+    }
+  },
+  "south_asia": {
+    "maize": {
+      "alluvial loam": {
+        "yield_range": [4.5, 7.0],
+        "rain_window": [500, 800],
+        "tip": "HQPM 1 variety with improved protein. Time planting with monsoon.",
+        "source": "Indian Agricultural Research Institute 2023"
+      }
+    },
+    "rice": {
+      "alluvial loam": {
+        "yield_range": [4.0, 6.5],
+        "rain_window": [1000, 1500],
+        "tip": "IR 64 variety. Use SRI methods for water conservation.",
+        "source": "International Rice Research Institute 2023"
+      }
+    }
+  },
+  "southeast_asia": {
+    "rice": {
+      "ultisol": {
+        "yield_range": [3.5, 5.5],
+        "rain_window": [1200, 1800],
+        "tip": "Jasmine 85 variety. Use raised beds to improve drainage.",
+        "source": "Thailand Rice Research Institute 2023"
+      }
+    },
+    "maize": {
+      "ultisol": {
+        "yield_range": [3.0, 5.0],
+        "rain_window": [600, 900],
+        "tip": "Khao Dawk Mali variety adapted to tropical conditions.",
+        "source": "Vietnam Agricultural Research 2022"
+      }
+    }
+  },
+  "australia_coastal": {
+    "maize": {
+      "sandy loam": {
+        "yield_range": [6.5, 9.0],
+        "rain_window": [450, 650],
+        "tip": "Pioneer P1197 variety. Time planting with autumn rains.",
+        "source": "Australian Grain Research 2023"
+      }
+    },
+    "barley": {
+      "sandy loam": {
+        "yield_range": [3.5, 5.5],
+        "rain_window": [300, 450],
+        "tip": "Clipper variety. Use no-till to conserve moisture.",
+        "source": "South Australian Research Institute 2023"
+      }
+    }
+  },
+  "central_america": {
+    "maize": {
+      "volcanic loam": {
+        "yield_range": [4.0, 6.5],
+        "rain_window": [600, 900],
+        "tip": "HTA 552 variety. Plant during first rains of wet season.",
+        "source": "CIMMYT Central America 2023"
+      }
+    },
+    "beans": {
+      "volcanic loam": {
+        "yield_range": [1.5, 2.8],
+        "rain_window": [400, 600],
+        "tip": "BAT 477 variety. Intercrop with maize for better land use.",
+        "source": "CIAT Bean Research 2023"
+      }
+    }
+  },
+  "the_caribbean": {
+    "maize": {
+      "sandy loam": {
+        "yield_range": [3.5, 5.5],
+        "rain_window": [600, 900],
+        "tip": "JOS 13 variety hurricane-resistant. Avoid planting during hurricane season.",
+        "source": "Caribbean Agricultural Research 2023"
+      }
+    },
+    "sweet_potato": {
+      "sandy loam": {
+        "yield_range": [15, 25],
+        "rain_window": [500, 750],
+        "tip": "Beauregard variety. Use raised ridges to prevent waterlogging.",
+        "source": "Jamaica Agricultural Society 2022"
+      }
+    }
+  },
+  "new_zealand": {
+    "maize": {
+      "silt loam": {
+        "yield_range": [8.0, 11.0],
+        "rain_window": [500, 750],
+        "tip": "Pioneer P0703 variety. Protect from frost in early plantings.",
+        "source": "Plant & Food Research New Zealand 2023"
+      }
+    },
+    "barley": {
+      "silt loam": {
+        "yield_range": [6.0, 8.5],
+        "rain_window": [350, 500],
+        "tip": "Decanter variety. Monitor for slug damage in spring.",
+        "source": "Foundation for Arable Research 2023"
+      }
+    }
+  }
+}

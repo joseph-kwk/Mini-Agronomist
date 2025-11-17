@@ -1,0 +1,59 @@
+<!-- Google Analytics Configuration -->
+<!-- 
+  Privacy-Friendly Analytics Setup
+  This configuration respects user privacy while providing basic insights
+  You can replace GA_MEASUREMENT_ID with your actual Google Analytics 4 ID
+-->
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  // Privacy-friendly configuration
+  gtag('config', 'GA_MEASUREMENT_ID', {
+    // Anonymize IP addresses
+    'anonymize_ip': true,
+    
+    // Disable advertising features
+    'allow_google_signals': false,
+    'allow_ad_personalization_signals': false,
+    
+    // Respect user privacy
+    'cookie_flags': 'SameSite=None;Secure',
+    
+    // Custom configuration for agricultural app
+    'custom_map': {
+      'custom_parameter_1': 'crop_type',
+      'custom_parameter_2': 'region'
+    }
+  });
+
+  // Optional: Track key farming events (anonymously)
+  function trackFarmingEvent(eventName, parameters = {}) {
+    gtag('event', eventName, {
+      'event_category': 'farming',
+      'event_label': parameters.label || '',
+      'value': parameters.value || 0,
+      // Don't track sensitive farm data
+      'non_interaction': true
+    });
+  }
+
+  // Example usage (add to your app.js where appropriate):
+  // trackFarmingEvent('yield_prediction_generated', { label: 'wheat', value: 1 });
+  // trackFarmingEvent('export_data', { label: 'json_export' });
+</script>
+
+<!-- Alternative: Plausible Analytics (Privacy-focused alternative) -->
+<!-- 
+<script defer data-domain="miniagronomist.com" src="https://plausible.io/js/script.js"></script>
+-->
+
+<!-- Alternative: Simple Analytics (GDPR compliant) -->
+<!--
+<script async defer src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+<noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif" alt="" referrerpolicy="no-referrer-when-downgrade" /></noscript>
+-->

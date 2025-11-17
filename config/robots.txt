@@ -1,0 +1,31 @@
+# Mini Agronomist - Robots.txt
+# Agricultural Yield Prediction Tool
+
+User-agent: *
+Allow: /
+
+# Main application pages
+Allow: /index.html
+Allow: /ml_demo.html
+Allow: /onboarding.html
+Allow: /faq.html
+Allow: /terms-of-service.html
+Allow: /privacy-policy.html
+
+# Static assets
+Allow: /assets/
+Allow: /data/
+Allow: /style.css
+Allow: /app.js
+Allow: /statistical_models.js
+Allow: /advanced_prediction_engine.js
+Allow: /manifest.json
+Allow: /sw.js
+
+# Block test files in production
+Disallow: /test-suite.html
+Disallow: /TESTING_GUIDE.md
+Disallow: /analytics.html
+
+# Sitemap location
+Sitemap: https://miniagronomist.com/sitemap.xml

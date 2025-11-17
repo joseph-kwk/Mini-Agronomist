@@ -1,0 +1,35 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Mini Agronomist Server",
+			"type": "shell",
+			"command": "python -m http.server 8000",
+			"group": "build",
+			"isBackground": true,
+			"problemMatcher": []
+		},
+		{
+			"label": "Open Mini Agronomist App",
+			"type": "shell",
+			"command": "start",
+			"args": ["http://localhost:8000"],
+			"group": "test",
+			"windows": {
+				"command": "start",
+				"args": ["http://localhost:8000"]
+			}
+		},
+		{
+			"label": "Open ML Demo",
+			"type": "shell",
+			"command": "start",
+			"args": ["http://localhost:8000/ml_demo.html"],
+			"group": "test",
+			"windows": {
+				"command": "start",
+				"args": ["http://localhost:8000/ml_demo.html"]
+			}
+		}
+	]
+}
