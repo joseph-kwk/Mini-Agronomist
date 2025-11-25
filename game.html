@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  
+  <title>Farm Genius - Educational 3D Farming Game | Mini Agronomist</title>
+  <meta name="description" content="Learn real agricultural science through engaging 3D gameplay. Manage crops, soil, water, and seasons in this educational farming simulation.">
+  <meta name="theme-color" content="#2E7D32" />
+  <meta name="color-scheme" content="light">
+  
+  <!-- Icons -->
+  <link rel="icon" href="assets/icons/favicon.png" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="assets/icons/logo.png" />
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="game.css" />
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  
+  <style>
+    /* Game-specific quick styles */
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    
+    #gameCanvas:active {
+      cursor: grabbing;
+    }
+    
+    .game-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 120px);
+      background: linear-gradient(to bottom, #87CEEB 0%, #E0F7FA 100%);
+      overflow: hidden;
+    }
+    
+    .game-hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 1rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      pointer-events: none;
+    }
+    
+    .game-hud > * {
+      pointer-events: all;
+    }
+    
+    .hud-stats {
+      display: flex;
+      gap: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .hud-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    .game-controls {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 100;
+    }
+    
+    .game-btn {
+      background: var(--primary-green);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4);
+      transition: all 0.3s ease;
+    }
+    
+    .game-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(46, 125, 50, 0.6);
+    }
+    
+    .game-btn:active {
+      transform: translateY(0);
+    }
+    
+    .game-btn.secondary {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+    }
+    
+    .info-panel {
+      position: absolute;
+      right: 1rem;
+      top: 5rem;
+      width: 300px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: var(--elevation-3);
+      z-index: 100;
+      max-height: calc(100vh - 200px);
+      overflow-y: auto;
+    }
+    
+    .info-panel h3 {
+      margin: 0 0 1rem 0;
+      color: var(--primary-green);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .loading-game {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      z-index: 1000;
+    }
+    
+    .loading-game .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .tutorial-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: var(--elevation-4);
+      max-width: 500px;
+      z-index: 1000;
+      text-align: center;
+    }
+    
+    .tutorial-overlay.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header role="banner">
+    <div class="header-container">
+      <a href="index.html" class="nav-brand" title="Back to Mini Agronomist">
+        <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo" width="48" height="48">
+        <span>Farm Genius</span>
+      </a>
+      <div class="header-actions">
+        <nav class="nav-links" role="navigation">
+          <a href="index.html" role="button" tabindex="0">🌾 Yield Predictor</a>
+          <a href="#" class="active" role="button" tabindex="0">🎮 Play Game</a>
+          <a href="ml_demo.html" role="button" tabindex="0">🤖 ML Analytics</a>
+        </nav>
+        <div class="header-buttons">
+          <button id="gameHelpBtn" class="icon-btn" aria-label="Game help" title="How to Play">
+            <span class="material-icons">help_outline</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main role="main">
+    <!-- Game Container -->
+    <div class="game-container" id="gameContainer">
+      <!-- Loading Screen -->
+      <div id="loadingScreen" class="loading-game">
+        <div class="spinner"></div>
+        <h2>🌱 Loading Farm Genius...</h2>
+        <p id="loadingStatus">Preparing your farm...</p>
+      </div>
+      
+      <!-- HUD -->
+      <div class="game-hud">
+        <div class="hud-stats">
+          <div class="hud-stat">
+            <span class="material-icons">event</span>
+            <span id="gameDate">Day 1 | Spring</span>
+          </div>
+          <div class="hud-stat">
+            <span class="material-icons">attach_money</span>
+            <span id="gameMoney">$1,000</span>
+          </div>
+          <div class="hud-stat">
+            <span class="material-icons">water_drop</span>
+            <span id="gameRainfall">0mm</span>
+          </div>
+          <div class="hud-stat">
+            <span class="material-icons">thermostat</span>
+            <span id="gameTemp">24°C</span>
+          </div>
+        </div>
+        <button id="nextDayBtn" class="game-btn">
+          <span class="material-icons">fast_forward</span>
+          Next Day
+        </button>
+      </div>
+      
+      <!-- 3D Canvas -->
+      <canvas id="gameCanvas"></canvas>
+      
+      <!-- Info Panel -->
+      <div id="infoPanel" class="info-panel" style="display: none;">
+        <h3>
+          <span class="material-icons">info</span>
+          Plot Information
+        </h3>
+        <div id="plotInfo">
+          <p>Click on a plot to see details</p>
+        </div>
+      </div>
+      
+      <!-- Game Controls -->
+      <div class="game-controls">
+        <button id="plantBtn" class="game-btn">
+          <span class="material-icons">eco</span>
+          Plant Crop
+        </button>
+        <button id="waterBtn" class="game-btn secondary">
+          <span class="material-icons">water_drop</span>
+          Water
+        </button>
+        <button id="harvestBtn" class="game-btn secondary">
+          <span class="material-icons">agriculture</span>
+          Harvest
+        </button>
+      </div>
+      
+      <!-- Tutorial Overlay -->
+      <div id="tutorialOverlay" class="tutorial-overlay">
+        <h2>🌱 Welcome to Farm Genius!</h2>
+        <p>Learn real agricultural science through engaging gameplay.</p>
+        <br>
+        <div style="text-align: left; margin: 1rem 0;">
+          <p><strong>📐 Controls:</strong></p>
+          <ul style="padding-left: 1.5rem;">
+            <li>🖱️ <strong>Drag</strong> to rotate camera</li>
+            <li>🔍 <strong>Scroll</strong> to zoom in/out</li>
+            <li>👆 <strong>Click</strong> plots to interact</li>
+            <li>⌨️ <strong>WASD</strong> or arrows to pan</li>
+          </ul>
+          <br>
+          <p><strong>🎯 Your Mission:</strong></p>
+          <p>Grow crops successfully by managing soil, water, and timing. Learn real agricultural science as you play!</p>
+        </div>
+        <button id="startGameBtn" class="game-btn" style="margin-top: 1rem;">
+          <span class="material-icons">play_arrow</span>
+          Start Farming!
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-brand">
+          <img src="assets/icons/logo.png" alt="Mini Agronomist" class="footer-logo" width="40" height="40">
+          <h3>Farm Genius</h3>
+        </div>
+        <p>Educational 3D farming simulation 🎮</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Game Info</h4>
+        <ul>
+          <li><a href="#" onclick="document.getElementById('gameHelpBtn').click(); return false;">How to Play</a></li>
+          <li><a href="index.html">Yield Predictor</a></li>
+          <li><a href="docs/GAME_DESIGN_DOCUMENT.md" target="_blank">Game Design</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="index.html#help">Help Center</a></li>
+          <li><a href="privacy-policy.html" target="_blank">Privacy</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Connect</h4>
+        <div class="social-links">
+          <a href="https://twitter.com/joseph_kwk" target="_blank" aria-label="Follow on X">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="https://github.com/joseph-kwk/Mini-Agronomist" target="_blank" aria-label="View on GitHub">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="footer-bottom-content">
+        <p>&copy; 2025 Mini Agronomist. Educational gaming for agriculture.</p>
+        <div class="footer-meta">
+          <span>Made with 🌱 for farmers worldwide</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Three.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  
+  <!-- Enhanced Game Engine -->
+  <script src="js/game/enhanced-game-engine.js"></script>
+  
+  <!-- Game Initialization -->
+  <script>
+    let game;
+    let isGameStarted = false;
+    
+    // Initialize game when Three.js and engine load
+    function initGame() {
+      console.log('🎮 Initializing Farm Genius - Immersive Edition...');
+      
+      try {
+        const canvas = document.getElementById('gameCanvas');
+        const container = document.getElementById('gameContainer');
+        
+        if (!canvas || !container) {
+          throw new Error('Canvas or container element not found');
+        }
+        
+        // Create enhanced game instance
+        game = new FarmGameEngine(canvas, container);
+        
+        // Hide loading, show tutorial
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('tutorialOverlay').style.display = 'block';
+        
+        // Update HUD with initial values
+        updateHUD();
+        
+        console.log('✅ Enhanced game initialized!');
+      } catch (error) {
+        console.error('❌ Failed to initialize game:', error);
+        document.getElementById('loadingStatus').textContent = 'Error loading game. Please refresh.';
+      }
+    }
+    
+    function updateHUD() {
+      if (game) {
+        document.getElementById('gameMoney').textContent = `$${game.playerStats.money}`;
+        document.getElementById('gameDate').textContent = `Day ${game.gameTime.day} | ${game.gameTime.season.charAt(0).toUpperCase() + game.gameTime.season.slice(1)}`;
+        document.getElementById('gameRainfall').textContent = `${game.weather.rainfall}mm`;
+        document.getElementById('gameTemp').textContent = `${game.weather.temperature}°C`;
+      }
+    }
+    
+    // Update HUD every second
+    setInterval(() => {
+      if (game && isGameStarted) {
+        updateHUD();
+      }
+    }, 1000);
+    
+    // Event listeners
+    document.getElementById('startGameBtn').addEventListener('click', () => {
+      document.getElementById('tutorialOverlay').style.display = 'none';
+      isGameStarted = true;
+      if (game) {
+        game.start();
+      }
+    });
+    
+    document.getElementById('nextDayBtn').addEventListener('click', () => {
+      if (game) {
+        game.gameTime.day++;
+        game.onNewDay();
+        updateHUD();
+        console.log(`📅 Advanced to day ${game.gameTime.day}`);
+      }
+    });
+    
+    document.getElementById('plantBtn').addEventListener('click', () => {
+      alert('🚜 Drive your tractor near a plot and press O to sow seeds!\n\nControls:\nW - Forward\nS - Reverse\nA/D - Turn\nP - Plow plot\nO - Sow seeds\nI - Water\nH - Harvest');
+    });
+    
+    document.getElementById('waterBtn').addEventListener('click', () => {
+      alert('💧 Drive near crops and press I to water them!');
+    });
+    
+    document.getElementById('harvestBtn').addEventListener('click', () => {
+      alert('🌾 Drive near golden crops and press H to harvest!');
+    });
+    
+    document.getElementById('gameHelpBtn').addEventListener('click', () => {
+      const helpText = `
+🎮 FARM GENIUS - CONTROLS
+
+🚜 TRACTOR CONTROLS:
+W - Drive forward
+S - Reverse  
+A - Turn left
+D - Turn right
+
+🌾 FARMING ACTIONS:
+P - Plow soil (prepare plot)
+O - Sow seeds (plant crops)
+I - Water crops
+H - Harvest (when golden)
+
+📋 TIPS:
+• Drive near plots to interact
+• Click plots for info
+• Watch crops grow over 90 days
+• Manage water and soil
+• Learn real farming!
+      `;
+      alert(helpText);
+    });
+    
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (game) {
+        game.onWindowResize();
+      }
+    });
+    
+    // Initialize when page loads
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initGame);
+    } else {
+      initGame();
+    }
+  </script>
+  
+  <!-- Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('✅ SW registered for game'))
+        .catch(err => console.log('❌ SW registration failed', err));
+    }
+  </script>
+</body>
+</html>
