@@ -276,6 +276,7 @@ header.scrolled {
   align-items: center;
   justify-content: space-between;
   min-height: 72px;
+  gap: var(--space-4);
 }
 
 .nav-brand {
@@ -334,11 +335,11 @@ header.scrolled {
 .nav-links a {
   color: var(--text-secondary);
   text-decoration: none;
-  padding: var(--space-3) var(--space-4);
+  padding: 0.5rem 0.75rem;
   border-radius: var(--radius-lg);
   transition: all 0.2s ease;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   border: 2px solid transparent;
   position: relative;
   white-space: nowrap;
@@ -1872,13 +1873,14 @@ input:focus-visible {
 
 .form-group input,
 .form-group select {
-  padding: 0.5rem;
-  font-size: 0.85rem;
+  padding: 0.6rem;
+  font-size: 0.95rem;
   border-radius: 8px;
   border: 2px solid #ddd;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  background: #fafafa;
+  background: #ffffff !important; /* Force white background */
+  color: #1a1a1a !important; /* Force dark text */
 }
 
 .form-group input:focus,
@@ -1886,7 +1888,7 @@ input:focus-visible {
   outline: none;
   border-color: var(--leaf-green);
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
-  background: white;
+  background: #ffffff !important;
 }
 
 .button-group {
@@ -2921,12 +2923,16 @@ input:focus, select:focus {
   color: white;
   margin-bottom: var(--space-4);
   font-weight: 600;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .footer-section p {
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: var(--space-4);
   line-height: 1.6;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .footer-brand {
@@ -2934,6 +2940,8 @@ input:focus, select:focus {
   align-items: center;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .footer-logo {
@@ -2947,10 +2955,14 @@ input:focus, select:focus {
   list-style: none;
   padding: 0;
   margin: 0;
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .footer-section ul li {
   margin-bottom: var(--space-2);
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .footer-section ul li a {
@@ -2973,7 +2985,9 @@ input:focus, select:focus {
 .social-links {
   display: flex;
   gap: var(--space-4);
-  margin-top: var(--space-4);
+  margin-top: 0; /* Removed extra margin to align with lists */
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .social-link {
@@ -4333,16 +4347,18 @@ input:focus, select:focus {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.4rem 0.8rem;
   background: transparent;
   border: 2px solid var(--primary-color);
-  border-radius: 25px;
+  border-radius: 20px;
   color: var(--primary-color);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  font-size: 0.9rem;
+  height: 36px;
 }
 
 .auth-button:hover {
@@ -4365,6 +4381,44 @@ input:focus, select:focus {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
 }
+
+.voice-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  height: 36px;
+  font-size: 0.9rem;
+}
+
+.voice-button:hover {
+  background: var(--surface-tertiary);
+  color: var(--primary-green);
+  border-color: var(--primary-green);
+}
+
+.voice-button .material-icons {
+  font-size: 18px;
+}
+
+.voice-button .voice-status {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .voice-button .voice-status {
+    display: inline;
+  }
+}
+
 
 .user-avatar {
   width: 40px;
@@ -5342,3 +5396,20 @@ input:focus, select:focus {
   }
 }
 
+
+/* Fix for Auth Modal Dark Inputs */
+.auth-modal input,
+.auth-modal select,
+.auth-modal textarea {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border: 1px solid #ccc !important;
+}
+
+.auth-modal input:focus,
+.auth-modal select:focus {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  border-color: var(--primary-green) !important;
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2) !important;
+}

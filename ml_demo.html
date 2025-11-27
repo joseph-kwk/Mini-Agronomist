@@ -29,7 +29,7 @@
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/icons/favicon.png">
-  <link rel="stylesheet" href="style.css?v=20251117">
+  <link rel="stylesheet" href="style.css?v=20251127b">
   
   <!-- Internationalization -->
   <script src="js/i18n-data.js"></script>
@@ -559,24 +559,32 @@
   </style>
 </head>
 <body>
-  <nav class="nav-bar">
-    <div class="nav-content">
-      <a href="index.html" class="nav-brand" title="Mini Agronomist - Return to Main App">
+  <header role="banner">
+    <div class="header-container">
+      <a href="index.html" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform">
         <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo" width="48" height="48">
         <span>Mini Agronomist</span>
       </a>
-      <div class="nav-links">
-        <a href="index.html" data-i18n="nav.yield">🌾 Yield Predictor</a>
-        <a href="#" class="active" data-i18n="nav.ml">🤖 ML Analytics</a>
-        <a href="onboarding.html" data-i18n="nav.guide">📚 Getting Started</a>
-        <a href="faq.html" data-i18n="nav.faq">❓ FAQ</a>
-      </div>
       <div class="header-actions">
-        <!-- Language selector will be injected here by i18n-manager.js -->
-        <div class="header-buttons"></div>
+        <nav class="nav-links" role="navigation">
+          <a href="index.html" role="button" tabindex="0" data-i18n="nav.yield">🌾 Yield Predictor</a>
+          <a href="game.html" role="button" tabindex="0" data-i18n="nav.game">🎮 Play Game</a>
+          <a href="#" class="active" role="button" tabindex="0" data-i18n="nav.ml">🤖 ML Analytics</a>
+        </nav>
+        <div class="header-buttons">
+          <button id="helpBtn" class="icon-btn" aria-label="Show app tutorial and help guide" title="📖 Help & Tutorial - Learn how to use Mini Agronomist effectively" data-i18n-title="btn.help">
+            <span class="material-icons">help_outline</span>
+          </button>
+          <button id="settingsBtn" class="icon-btn" aria-label="Open app settings and preferences" title="⚙️ Settings - Customize your experience and preferences" data-i18n-title="btn.settings">
+            <span class="material-icons">settings</span>
+          </button>
+          <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Toggle mobile navigation menu" title="🔽 Menu">
+            <span class="material-icons">menu</span>
+          </button>
+        </div>
       </div>
     </div>
-  </nav>
+  </header>
 
   <main class="main-content">
     <div class="ml-demo">
