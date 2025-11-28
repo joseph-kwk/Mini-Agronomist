@@ -328,10 +328,6 @@ header.scrolled {
   gap: var(--space-2);
 }
 
-.mobile-menu-btn {
-  display: none;
-}
-
 .nav-links a {
   color: var(--text-secondary);
   text-decoration: none;
@@ -396,6 +392,10 @@ header.scrolled {
 
 .icon-btn .material-icons {
   font-size: 20px;
+}
+
+.mobile-menu-btn {
+  display: none;
 }
 
 /* Responsive Navigation */
