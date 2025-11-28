@@ -1,20 +1,31 @@
 // Enhanced Mini Agronomist Application
-// Version 2.0 - Comprehensive agricultural yield prediction system
+// Version 2.0 Pro - Comprehensive agricultural yield prediction system with Pro features
 
 class MiniAgronomist {
   constructor() {
     this.cropData = {};
     this.cropProfiles = {};
     this.regionData = {};
+    this.proCropData = {}; // Pro specialty crops
     this.currentPrediction = null;
     this.predictionHistory = [];
     this.isLoading = false;
+    
+    // Pro feature managers
+    this.proFeatureManager = null;
+    this.fieldManager = null;
+    this.advancedAnalytics = null;
+    this.authManager = null; // Will be set by AuthManager when initialized
+    this.pythonIntegration = null; // Will be set when Python loads
     
     this.init();
   }
 
   async init() {
     try {
+      // Initialize Pro features first
+      await this.initializeProFeatures();
+      
       await this.loadData();
       this.setupEventListeners();
       this.setupFormValidation();
@@ -25,25 +36,336 @@ class MiniAgronomist {
     }
   }
 
-  // Enhanced Data Loading with better error handling
+  // Initialize Pro Features
+  async initializeProFeatures() {
+    // Initialize Pro Feature Manager
+    if (window.ProFeatureManager) {
+      this.proFeatureManager = new ProFeatureManager();
+      
+      // Initialize Field Manager if Pro features available
+      if (this.proFeatureManager.hasFeature('fieldManagement') && window.FieldManager) {
+        this.fieldManager = new FieldManager(this.proFeatureManager);
+      }
+      
+      // Initialize Advanced Analytics if available
+      if (this.proFeatureManager.hasFeature('advancedAnalytics') && window.AdvancedAnalytics) {
+        this.advancedAnalytics = new AdvancedAnalytics(this.proFeatureManager, this.fieldManager);
+      }
+    }
+  }
+
+  // Authentication Integration
+  setAuthManager(authManager) {
+    this.authManager = authManager;
+    
+    // Link AuthManager to ProFeatureManager for bi-directional sync
+    if (this.authManager && this.proFeatureManager) {
+      this.authManager.linkProFeatureManager(this.proFeatureManager);
+    }
+    
+    // Update ProFeatureManager with authentication status
+    if (this.proFeatureManager) {
+      this.proFeatureManager.userTier = authManager.getUserTier();
+      this.proFeatureManager.isAuthenticated = authManager.isAuthenticated();
+      this.proFeatureManager.currentUser = authManager.currentUser;
+      
+      // Reinitialize features based on authenticated tier
+      this.proFeatureManager.features = this.proFeatureManager.initializeFeatures();
+      this.proFeatureManager.limits = this.proFeatureManager.getUserLimits();
+    }
+    
+    // Update UI based on authentication status
+    this.updateUIForAuth();
+  }
+
+  updateUIForAuth() {
+    if (!this.authManager) return;
+    
+    const userTier = this.authManager.getUserTier();
+    const isAuthenticated = this.authManager.isAuthenticated();
+    
+    // Update Pro features visibility
+    if (this.proFeatureManager) {
+      // Rebuild Pro feature buttons with current tier
+      this.updateProFeatureButtons();
+      
+      if (this.proFeatureManager.updateUIVisibility) {
+        this.proFeatureManager.updateUIVisibility();
+      }
+    }
+    
+    // Show welcome message for new authenticated users
+    if (isAuthenticated && this.authManager.currentUser) {
+      const user = this.authManager.currentUser;
+      console.log(`🌾 Welcome ${user.name}! You have ${userTier.toUpperCase()} access.`);
+      this.showMessage(`Welcome, ${user.name}! Pro features for ${userTier.toUpperCase()} tier are now available.`, 'success');
+    } else if (!isAuthenticated) {
+      console.log('🌾 Logged out - Free tier features available.');
+      this.showMessage('You have been signed out. Basic features are still available.', 'info');
+    }
+  }
+
+  updateProFeatureButtons() {
+    // Regenerate Pro feature buttons with updated tier
+    const proSection = document.querySelector('.pro-features-section');
+    if (proSection) {
+      const gridContainer = proSection.querySelector('.pro-features-grid');
+      if (gridContainer) {
+        gridContainer.innerHTML = this.generateProFeatureButtons();
+        this.attachProFeatureListeners();
+      }
+    }
+  }
+
+  attachProFeatureListeners() {
+    // Attach click handlers to newly generated Pro feature buttons
+    document.querySelectorAll('.pro-feature-card .feature-btn').forEach(btn => {
+      const featureCard = btn.closest('.pro-feature-card');
+      const featureId = featureCard?.getAttribute('data-feature-id');
+      if (featureId) {
+        btn.removeEventListener('click', () => {});
+        btn.addEventListener('click', () => this.handleProFeature(featureId));
+      }
+    });
+  }
+
+  // Check access before showing Pro features
+  requireProAccess(feature, action) {
+    if (!this.authManager) {
+      this.showUpgradePrompt('pro', feature);
+      return false;
+    }
+    
+    if (!this.authManager.requireAccess('pro', feature)) {
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Python Integration Callback
+  onPythonReady() {
+    console.log('🐍 Python scientific computing is now available!');
+    this.pythonIntegration = window.pythonIntegration;
+    
+    // Update UI to show Python-enhanced features
+    this.updatePythonFeatureUI();
+    
+    // Show notification
+    this.showMessage('🧮 Advanced scientific computing enabled! Enhanced predictions now available.', 'success');
+  }
+
+  updatePythonFeatureUI() {
+    // Add Python badges to enhanced features
+    const enhancedSections = document.querySelectorAll('.analytics-section, .pro-feature');
+    enhancedSections.forEach(section => {
+      if (!section.querySelector('.python-feature-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'python-feature-badge';
+        badge.textContent = 'Scientific';
+        section.appendChild(badge);
+      }
+    });
+    
+    // Enable advanced prediction options
+    this.enableAdvancedPredictions();
+  }
+
+  enableAdvancedPredictions() {
+    // Add advanced prediction toggle to existing predictions
+    const predictionContainer = document.getElementById('predictionResult');
+    if (predictionContainer && !document.getElementById('pythonEnhancedToggle')) {
+      const advancedToggle = document.createElement('div');
+      advancedToggle.innerHTML = `
+        <div class="advanced-section python-available">
+          <div class="advanced-section-header">
+            <div class="advanced-section-title">
+              🔬 Scientific Analysis
+            </div>
+            <button class="advanced-toggle" id="pythonEnhancedToggle">
+              Enable Enhanced Predictions
+            </button>
+          </div>
+          <div class="advanced-content" id="pythonEnhancedContent">
+            <p>Get scientific-grade predictions using advanced algorithms:</p>
+            <ul>
+              <li>Growing Degree Day calculations</li>
+              <li>Evapotranspiration modeling</li>
+              <li>Water balance analysis</li>
+              <li>Machine learning predictions</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      predictionContainer.appendChild(advancedToggle);
+      
+      // Add event listener
+      document.getElementById('pythonEnhancedToggle').addEventListener('click', this.togglePythonPredictions.bind(this));
+    }
+  }
+
+  async togglePythonPredictions() {
+    const toggle = document.getElementById('pythonEnhancedToggle');
+    const content = document.getElementById('pythonEnhancedContent');
+    
+    if (toggle.classList.contains('active')) {
+      // Disable enhanced predictions
+      toggle.classList.remove('active');
+      content.classList.remove('visible');
+      toggle.textContent = 'Enable Enhanced Predictions';
+    } else {
+      // Enable enhanced predictions
+      toggle.classList.add('active');
+      content.classList.add('visible');
+      toggle.textContent = 'Enhanced Mode Active';
+      
+      // Re-run current prediction with Python enhancement
+      if (this.currentPrediction) {
+        await this.runPythonEnhancedPrediction();
+      }
+    }
+  }
+
+  async runPythonEnhancedPrediction() {
+    if (!this.pythonIntegration?.isReady() || !this.currentPrediction) {
+      return;
+    }
+    
+    try {
+      this.showLoadingOverlay('Running scientific analysis...');
+      
+      // Get current prediction data
+      const currentData = this.currentPrediction;
+      
+      // Prepare data for Python analysis
+      const predictionData = {
+        temperature: {
+          min: parseFloat(document.getElementById('tempMin')?.value || 20),
+          max: parseFloat(document.getElementById('tempMax')?.value || 30),
+          avg: (parseFloat(document.getElementById('tempMin')?.value || 20) + parseFloat(document.getElementById('tempMax')?.value || 30)) / 2
+        },
+        rainfall: parseFloat(document.getElementById('rainfall')?.value || 500),
+        soilType: {
+          ph: 7 // This would come from soil selection in a real implementation
+        },
+        cropData: currentData.crop || {},
+        regionData: currentData.region || {}
+      };
+      
+      // Run enhanced prediction
+      const enhancedResults = await this.pythonIntegration.enhancedPrediction(predictionData);
+      
+      // Display enhanced results
+      this.displayPythonResults(enhancedResults);
+      
+      this.hideLoadingOverlay();
+      
+    } catch (error) {
+      console.error('Enhanced prediction error:', error);
+      this.hideLoadingOverlay();
+      this.showMessage('Enhanced prediction failed. Using standard prediction.', 'warning');
+    }
+  }
+
+  displayPythonResults(results) {
+    const content = document.getElementById('pythonEnhancedContent');
+    if (!content) return;
+    
+    // Create enhanced results display
+    const resultsHTML = `
+      <div class="python-computation-result">
+        <div class="computation-title">Growing Degree Days Analysis</div>
+        <div class="computation-details">
+          <div class="computation-metric">
+            <span class="metric-value">${results.gdd?.toFixed(1) || 'N/A'}</span>
+            <span class="metric-label">Daily GDD</span>
+          </div>
+        </div>
+      </div>
+      
+      ${results.waterBalance ? `
+      <div class="python-computation-result">
+        <div class="computation-title">Water Balance Analysis</div>
+        <div class="computation-details">
+          <div class="computation-metric">
+            <span class="metric-value">${results.waterBalance.soil_moisture?.toFixed(1) || 'N/A'}%</span>
+            <span class="metric-label">Soil Moisture</span>
+          </div>
+          <div class="computation-metric">
+            <span class="metric-value">${(results.waterBalance.water_stress * 100)?.toFixed(1) || 'N/A'}%</span>
+            <span class="metric-label">Water Stress</span>
+          </div>
+          <div class="computation-metric">
+            <span class="metric-value">${results.waterBalance.deficit?.toFixed(1) || 'N/A'}mm</span>
+            <span class="metric-label">Water Deficit</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      ${results.mlPrediction ? `
+      <div class="python-computation-result">
+        <div class="computation-title">Machine Learning Prediction</div>
+        <div class="computation-details">
+          <div class="computation-metric">
+            <span class="metric-value">${results.mlPrediction.predicted_yield?.toFixed(2) || 'N/A'}</span>
+            <span class="metric-label">Predicted Yield</span>
+          </div>
+          <div class="computation-metric">
+            <span class="metric-value">${(results.mlPrediction.confidence * 100)?.toFixed(1) || 'N/A'}%</span>
+            <span class="metric-label">Confidence</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(55, 118, 171, 0.1); border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary);">
+        <strong>🐍 Powered by Python Scientific Computing</strong><br>
+        Advanced calculations using NumPy, SciPy, and Scikit-learn
+      </div>
+    `;
+    
+    // Replace existing content with enhanced results
+    content.innerHTML = resultsHTML;
+  }
+
+  // Enhanced Data Loading with Pro features
   async loadData() {
     this.showLoadingOverlay('Loading agricultural data...');
     
     try {
-      const [rules, profiles, regions] = await Promise.all([
+      const loadPromises = [
         this.fetchJSON("data/crop_rules.json"),
         this.fetchJSON("data/crop_profiles.json"),
         this.fetchJSON("data/regions.json")
-      ]);
+      ];
 
-      this.cropData = rules;
-      this.cropProfiles = profiles;
-      this.regionData = regions;
+      // Load Pro data if available
+      if (this.proFeatureManager?.hasFeature('advancedCrops')) {
+        loadPromises.push(this.fetchJSON("data/pro-crop-data.json"));
+      }
+
+      const results = await Promise.all(loadPromises);
+      
+      this.cropData = results[0];
+      this.cropProfiles = results[1];
+      this.regionData = results[2];
+      
+      // Load Pro crop data if available
+      if (results[3]) {
+        this.proCropData = results[3];
+        // Merge specialty crops into main crop profiles
+        if (this.proCropData.specialty_crops) {
+          this.cropProfiles = { ...this.cropProfiles, ...this.proCropData.specialty_crops };
+        }
+      }
 
       console.log("✅ Data loaded successfully:", {
         regions: Object.keys(this.regionData).length,
         crops: Object.keys(this.cropProfiles).length,
-        rules: Object.keys(this.cropData).length
+        rules: Object.keys(this.cropData).length,
+        pro_features: this.proFeatureManager?.userTier || 'free'
       });
 
       this.validateDataIntegrity();
@@ -71,11 +393,11 @@ class MiniAgronomist {
     form?.addEventListener("submit", (e) => this.handleFormSubmission(e));
 
     // Real-time validation
-    document.getElementById("rainfall")?.addEventListener("input", (e) => this.validateField('rainfall', e.target.value));
-    document.getElementById("plantingDate")?.addEventListener("change", (e) => this.validateField('plantingDate', e.target.value));
-    document.getElementById("region")?.addEventListener("change", (e) => this.handleRegionChange(e.target.value));
-    document.getElementById("crop")?.addEventListener("change", (e) => this.handleCropChange(e.target.value));
-    document.getElementById("soil")?.addEventListener("change", (e) => this.validateField('soil', e.target.value));
+    document.getElementById("rainfall")?.addEventListener("input", (e) => { this.validateField('rainfall', e.target.value); this.updateInfoBar(); });
+    document.getElementById("plantingDate")?.addEventListener("change", (e) => { this.validateField('plantingDate', e.target.value); this.updateInfoBar(); });
+    document.getElementById("region")?.addEventListener("change", (e) => { this.handleRegionChange(e.target.value); this.updateInfoBar(); });
+    document.getElementById("crop")?.addEventListener("change", (e) => { this.handleCropChange(e.target.value); this.updateInfoBar(); });
+    document.getElementById("soil")?.addEventListener("change", (e) => { this.validateField('soil', e.target.value); this.updateInfoBar(); });
 
     // Button actions
     document.getElementById("resetForm")?.addEventListener("click", () => this.resetForm());
@@ -130,6 +452,52 @@ class MiniAgronomist {
       
       lastScrollY = currentScrollY;
     });
+  }
+
+  // Crop Info Bar updater
+  updateInfoBar() {
+    try {
+      const regionKey = document.getElementById('region')?.value || '';
+      const cropKey = document.getElementById('crop')?.value || '';
+      const soilVal = document.getElementById('soil')?.value || '';
+      const rainVal = document.getElementById('rainfall')?.value || '';
+      const dateVal = document.getElementById('plantingDate')?.value || '';
+
+      const setChip = (chipId, label) => {
+        const chip = document.getElementById(chipId);
+        if (!chip) return;
+        const valueSpan = chip.querySelector('.chip-value');
+        const placeholder = valueSpan?.getAttribute('data-placeholder') || '';
+        let text = placeholder;
+        switch (chipId) {
+          case 'chip-region':
+            text = regionKey ? (this.regionData[regionKey]?.display_name || regionKey) : placeholder;
+            break;
+          case 'chip-crop':
+            text = cropKey ? (this.cropProfiles[cropKey]?.scientific_name || cropKey) : placeholder;
+            break;
+          case 'chip-soil':
+            text = soilVal || placeholder;
+            break;
+          case 'chip-rain':
+            text = rainVal ? `${rainVal} mm` : placeholder;
+            break;
+          case 'chip-date':
+            text = dateVal ? new Date(dateVal).toLocaleDateString() : placeholder;
+            break;
+        }
+        if (valueSpan) valueSpan.textContent = text;
+        chip.classList.toggle('empty', text === placeholder);
+      };
+
+      setChip('chip-region');
+      setChip('chip-crop');
+      setChip('chip-soil');
+      setChip('chip-rain');
+      setChip('chip-date');
+    } catch (_) {
+      // No-op: info bar is optional
+    }
   }
 
   // Enhanced Form Validation
@@ -354,9 +722,17 @@ class MiniAgronomist {
       // Initialize advanced prediction engine if not already done
       if (!this.advancedEngine) {
         try {
-          // Import advanced engine as ES module from `js` directory
-          const { default: AdvancedPredictionEngine } = await import('./js/advanced_prediction_engine.js');
-          this.advancedEngine = new AdvancedPredictionEngine();
+          // Prefer global if script already loaded
+          if (window.AdvancedPredictionEngine) {
+            this.advancedEngine = new window.AdvancedPredictionEngine();
+          } else {
+            // Attempt dynamic import from js/ path (optional)
+            const module = await import('./js/advanced_prediction_engine.js');
+            const AdvancedPredictionEngine = module?.default || window.AdvancedPredictionEngine;
+            if (AdvancedPredictionEngine) {
+              this.advancedEngine = new AdvancedPredictionEngine();
+            }
+          }
         } catch (importError) {
           console.warn('Advanced prediction engine not available, using legacy method:', importError);
           return this.calculateLegacyYield(cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop);
@@ -712,10 +1088,1015 @@ class MiniAgronomist {
     this.showErrorMessage(`❌ ${context}: ${error.message}`);
   }
 
-  // Enhanced dropdown population
+  // Enhanced dropdown population with Pro features
   populateDropdowns() {
-    this.populateRegionDropdown();
-    this.populateCropDropdown();
+    try {
+      this.populateRegionDropdown();
+      this.populateCropDropdown();
+      
+      // Initialize Pro features if available
+      if (this.proFeatureManager) {
+        this.initializeProUI();
+      }
+      
+      console.log("✅ Dropdowns populated successfully");
+    } catch (error) {
+      console.error("❌ Error populating dropdowns:", error);
+      this.showError("Failed to initialize application. Please refresh and try again.", 5000);
+    }
+    // Initialize info bar after dropdowns
+    this.updateInfoBar();
+  }
+
+  // Initialize Pro UI elements
+  initializeProUI() {
+    try {
+      // Add Pro indicators to specialty crops
+      const cropSelect = document.getElementById("crop");
+      if (cropSelect && this.proCropData?.specialty_crops) {
+        for (const [cropId, cropData] of Object.entries(this.proCropData.specialty_crops)) {
+          const option = cropSelect.querySelector(`option[value="${cropId}"]`);
+          if (option) {
+            option.textContent += " 🌟 Pro";
+            option.classList.add("pro-crop");
+          }
+        }
+      }
+
+      // Add Pro features to UI
+      this.addProFeatureButtons();
+      this.updateUIForTier();
+      
+      console.log("✅ Pro UI initialized for tier:", this.proFeatureManager.userTier);
+    } catch (error) {
+      console.error("❌ Error initializing Pro UI:", error);
+    }
+  }
+
+  // Add Pro feature buttons to interface
+  addProFeatureButtons() {
+    const container = document.querySelector('.container');
+    if (!container) return;
+
+    // Create Pro features section
+    const proSection = document.createElement('div');
+    proSection.className = 'pro-features-section';
+    proSection.innerHTML = `
+      <div class="pro-features-header">
+        <h3>🌟 Professional Features</h3>
+        <span class="tier-badge tier-${this.proFeatureManager.userTier}">${this.proFeatureManager.userTier.toUpperCase()}</span>
+      </div>
+      <div class="pro-features-grid">
+        ${this.generateProFeatureButtons()}
+      </div>
+    `;
+
+    // Insert after prediction form
+    const form = document.querySelector('.prediction-form');
+    if (form) {
+      form.after(proSection);
+    }
+  }
+
+  // Generate Pro feature buttons based on user tier
+  generateProFeatureButtons() {
+    const isAuthenticated = this.authManager?.isAuthenticated() ?? false;
+    const userTier = this.authManager?.getUserTier() ?? 'free';
+
+    const features = [
+      {
+        id: 'field-manager',
+        title: 'Field Manager',
+        description: 'Track and manage multiple fields',
+        icon: '🏞️',
+        feature: 'fieldManagement',
+        tier: 'pro'
+      },
+      {
+        id: 'advanced-analytics',
+        title: 'Advanced Analytics',
+        description: 'Yield prediction and profitability analysis',
+        icon: '📊',
+        feature: 'advancedAnalytics',
+        tier: 'enterprise'
+      },
+      {
+        id: 'specialty-crops',
+        title: 'Specialty Crops',
+        description: 'Access to high-value crop varieties',
+        icon: '🌿',
+        feature: 'advancedCrops',
+        tier: 'pro'
+      },
+      {
+        id: 'export-data',
+        title: 'Data Export',
+        description: 'Export reports and predictions',
+        icon: '📈',
+        feature: 'dataExport',
+        tier: 'pro'
+      }
+    ];
+
+    return features.map(feature => {
+      let hasAccess = false;
+      let buttonText = '🔒 Sign In';
+      let buttonClass = 'locked';
+      let isDisabled = true;
+
+      if (!isAuthenticated) {
+        hasAccess = false;
+        buttonText = '🔒 Sign In';
+      } else if (this.proFeatureManager?.hasFeature(feature.feature)) {
+        hasAccess = true;
+        buttonText = 'Open';
+        buttonClass = 'primary';
+        isDisabled = false;
+      } else if (userTier === 'pro' && feature.tier === 'enterprise') {
+        hasAccess = false;
+        buttonText = '⭐ Enterprise';
+      } else {
+        hasAccess = false;
+        buttonText = `🔒 ${feature.tier.toUpperCase()}`;
+      }
+
+      return `
+        <div class="pro-feature-card ${hasAccess ? 'available' : 'locked'}" data-feature-id="${feature.id}">
+          <div class="feature-icon">${feature.icon}</div>
+          <h4>${feature.title}</h4>
+          <p>${feature.description}</p>
+          <button 
+            class="feature-btn ${buttonClass}" 
+            onclick="miniAgronomist.handleProFeature('${feature.id}')"
+            ${isDisabled ? 'disabled' : ''}
+          >
+            ${buttonText}
+          </button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Handle Pro feature activation with gating
+  handleProFeature(featureId) {
+    try {
+      // Check if user is authenticated and has Pro tier
+      if (!this.authManager?.isAuthenticated()) {
+        this.showAuthRequired('Sign in to access Pro features');
+        return;
+      }
+
+      const userTier = this.authManager.getUserTier();
+      if (userTier === 'free') {
+        this.showUpgradePrompt('pro', featureId);
+        return;
+      }
+
+      switch (featureId) {
+        case 'field-manager':
+          if (this.proFeatureManager.hasFeature('fieldManagement')) {
+            this.openFieldManager();
+          } else {
+            this.showUpgradePrompt('enterprise', 'fieldManagement');
+          }
+          break;
+        case 'advanced-analytics':
+          if (this.proFeatureManager.hasFeature('advancedAnalytics')) {
+            this.openAdvancedAnalytics();
+          } else {
+            this.showUpgradePrompt('enterprise', 'advancedAnalytics');
+          }
+          break;
+        case 'specialty-crops':
+          if (this.proFeatureManager.hasFeature('advancedCrops')) {
+            this.showSpecialtyCrops();
+          } else {
+            this.showUpgradePrompt('pro', 'specialtyCrops');
+          }
+          break;
+        case 'export-data':
+          if (this.proFeatureManager.hasFeature('dataExport')) {
+            this.exportData();
+          } else {
+            this.showUpgradePrompt('pro', 'dataExport');
+          }
+          break;
+        default:
+          console.warn('Unknown Pro feature:', featureId);
+      }
+    } catch (error) {
+      console.error('Error handling Pro feature:', error);
+      this.showError('Failed to access Pro feature. Please try again.');
+    }
+  }
+
+  showAuthRequired(message) {
+    this.showMessage(message, 'warning');
+    if (this.authManager) {
+      this.authManager.showAuthModal();
+    }
+  }
+
+  // Update UI based on user tier
+  updateUIForTier() {
+    const tier = this.proFeatureManager.userTier;
+    document.body.classList.add(`tier-${tier}`);
+    
+    // Update UI elements based on tier
+    if (tier === 'free') {
+      this.showUpgradePrompts();
+    }
+  }
+
+  // Show upgrade prompts for free tier users
+  showUpgradePrompts() {
+    // Add subtle upgrade prompts in the UI
+    const upgradeHints = document.querySelectorAll('.upgrade-hint');
+    upgradeHints.forEach(hint => {
+      hint.style.display = 'block';
+    });
+  }
+
+  // Pro Feature Methods
+  openFieldManager() {
+    if (!this.proFeatureManager.hasFeature('fieldManagement')) {
+      this.showUpgradeModal('Field Management');
+      return;
+    }
+
+    // Create field manager modal
+    const modal = this.createModal('Field Manager', this.generateFieldManagerHTML());
+    document.body.appendChild(modal);
+    this.initializeFieldManagerEvents();
+  }
+
+  openAdvancedAnalytics() {
+    if (!this.proFeatureManager.hasFeature('advancedAnalytics')) {
+      this.showUpgradeModal('Advanced Analytics');
+      return;
+    }
+
+    // Create analytics modal
+    const modal = this.createModal('Advanced Analytics', this.generateAnalyticsHTML());
+    document.body.appendChild(modal);
+    this.initializeAnalyticsEvents();
+  }
+
+  showSpecialtyCrops() {
+    if (!this.proFeatureManager.hasFeature('advancedCrops')) {
+      this.showUpgradeModal('Specialty Crops');
+      return;
+    }
+
+    // Highlight specialty crops in dropdown
+    this.highlightSpecialtyCrops();
+    this.showMessage('🌟 Specialty crops are now highlighted in the crop selection!', 'success');
+  }
+
+  exportData() {
+    if (!this.proFeatureManager.hasFeature('dataExport')) {
+      this.showUpgradeModal('Data Export');
+      return;
+    }
+
+    this.generateDataExport();
+  }
+
+  // Create modal for Pro features
+  createModal(title, content) {
+    const modal = document.createElement('div');
+    modal.className = 'pro-modal';
+    modal.innerHTML = `
+      <div class="modal-overlay" onclick="this.parentElement.remove()"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>${title}</h3>
+          <button class="modal-close" onclick="this.closest('.pro-modal').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          ${content}
+        </div>
+      </div>
+    `;
+    return modal;
+  }
+
+  // Generate Field Manager HTML
+  generateFieldManagerHTML() {
+    return `
+      <div class="field-manager">
+        <div class="field-manager-toolbar">
+          <button class="btn primary" onclick="miniAgronomist.addNewField()">
+            + Add New Field
+          </button>
+          <button class="btn secondary" onclick="miniAgronomist.importFields()">
+            📁 Import Fields
+          </button>
+        </div>
+        <div class="fields-list" id="fieldsList">
+          ${this.generateFieldsList()}
+        </div>
+      </div>
+    `;
+  }
+
+  // Generate Analytics HTML
+  generateAnalyticsHTML() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="analytics-tabs">
+          <button class="tab-btn active" data-tab="yield">Yield Analysis</button>
+          <button class="tab-btn" data-tab="profit">Profitability</button>
+          <button class="tab-btn" data-tab="risk">Risk Assessment</button>
+          <button class="tab-btn" data-tab="sustainability">Sustainability</button>
+        </div>
+        <div class="analytics-content">
+          <div class="tab-panel active" id="yield-panel">
+            <div class="analytics-placeholder">
+              📊 Advanced yield predictions and historical analysis will appear here
+            </div>
+          </div>
+          <div class="tab-panel" id="profit-panel">
+            <div class="analytics-placeholder">
+              💰 Profitability analysis and market insights will appear here
+            </div>
+          </div>
+          <div class="tab-panel" id="risk-panel">
+            <div class="analytics-placeholder">
+              ⚠️ Risk assessment and mitigation strategies will appear here
+            </div>
+          </div>
+          <div class="tab-panel" id="sustainability-panel">
+            <div class="analytics-placeholder">
+              🌱 Sustainability metrics and recommendations will appear here
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Show upgrade modal for locked features with tier-specific messaging
+  showUpgradePrompt(requiredTier, featureName) {
+    const tierMessages = {
+      pro: {
+        title: 'Upgrade to Pro',
+        subtitle: 'Unlock Professional Features',
+        benefits: [
+          '✓ 100 predictions per day (vs 10 free)',
+          '✓ Manage up to 25 fields',
+          '✓ All crop varieties included',
+          '✓ Advanced analytics & insights',
+          '✓ Data export in multiple formats',
+          '✓ Priority support'
+        ],
+        price: '$9.99/month or $99/year',
+        cta: 'Upgrade to Pro'
+      },
+      enterprise: {
+        title: 'Enterprise Plan',
+        subtitle: 'Unlock Enterprise Features',
+        benefits: [
+          '✓ Unlimited predictions',
+          '✓ Unlimited fields & custom crops',
+          '✓ Advanced analytics dashboard',
+          '✓ REST API access',
+          '✓ White-label deployment',
+          '✓ Dedicated support team'
+        ],
+        price: 'Contact sales for pricing',
+        cta: 'Contact Sales'
+      }
+    };
+
+    const tierInfo = tierMessages[requiredTier] || tierMessages.pro;
+    const featureDisplay = featureName?.replace(/([A-Z])/g, ' $1').trim() || 'this feature';
+
+    const modal = this.createModal('Upgrade Required', `
+      <div class="upgrade-modal">
+        <div class="upgrade-icon">🌟</div>
+        <h3>${tierInfo.title}</h3>
+        <p class="upgrade-subtitle">${tierInfo.subtitle}</p>
+        <p class="upgrade-feature">Unlock <strong>${featureDisplay}</strong> and more.</p>
+        <div class="upgrade-benefits">
+          <ul>
+            ${tierInfo.benefits.map(b => `<li>${b}</li>`).join('')}
+          </ul>
+        </div>
+        <div class="upgrade-price"><strong>${tierInfo.price}</strong></div>
+        <div class="upgrade-actions">
+          <button class="btn primary" onclick="miniAgronomist.simulateUpgrade('${requiredTier}')">
+            ${tierInfo.cta}
+          </button>
+          <button class="btn secondary" onclick="this.closest('.pro-modal').remove()">
+            Maybe Later
+          </button>
+        </div>
+      </div>
+    `);
+    document.body.appendChild(modal);
+  }
+
+  // Simulate upgrade for demo purposes
+  simulateUpgrade(tier = 'pro') {
+    this.proFeatureManager.userTier = tier;
+    localStorage.setItem('miniAgronomist-pro-status', 'active');
+    localStorage.setItem('miniAgronomist_tier', tier);
+    
+    // Close any open modals
+    document.querySelectorAll('.pro-modal').forEach(modal => modal.remove());
+    
+    // Refresh Pro features
+    if (this.proFeatureManager) {
+      this.proFeatureManager.userTier = tier;
+      this.proFeatureManager.features = this.proFeatureManager.initializeFeatures();
+      this.proFeatureManager.limits = this.proFeatureManager.getUserLimits();
+      this.proFeatureManager.updateUIVisibility();
+    }
+
+    // Update UI
+    this.updateUIForTier();
+    this.showMessage(`🎉 ${tier.toUpperCase()} features activated! You now have access to all premium features.`, 'success', 5000);
+    
+    // Refresh the page to show new features
+    setTimeout(() => location.reload(), 2000);
+  }
+
+  // Additional Pro feature helper methods
+  generateFieldsList() {
+    const fields = this.fieldManager?.getFields() || [];
+    
+    if (fields.length === 0) {
+      return `
+        <div class="empty-state">
+          <div class="empty-icon">🏞️</div>
+          <h4>No fields yet</h4>
+          <p>Start by adding your first field to track crop performance and analytics.</p>
+        </div>
+      `;
+    }
+
+    return fields.map(field => `
+      <div class="field-card">
+        <div class="field-header">
+          <h4>${field.name}</h4>
+          <span class="field-size">${field.size} ${field.sizeUnit}</span>
+        </div>
+        <div class="field-details">
+          <p><strong>Location:</strong> ${field.location}</p>
+          <p><strong>Soil Type:</strong> ${field.soilType}</p>
+          <p><strong>Current Crop:</strong> ${field.currentCrop || 'None'}</p>
+        </div>
+        <div class="field-actions">
+          <button class="btn secondary" onclick="miniAgronomist.editField('${field.id}')">
+            Edit
+          </button>
+          <button class="btn secondary" onclick="miniAgronomist.viewFieldAnalytics('${field.id}')">
+            Analytics
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  highlightSpecialtyCrops() {
+    const cropSelect = document.getElementById("crop");
+    if (!cropSelect) return;
+
+    // Remove existing highlights
+    cropSelect.querySelectorAll('option').forEach(option => {
+      option.classList.remove('specialty-highlight');
+    });
+
+    // Add highlights to specialty crops
+    if (this.proCropData?.specialty_crops) {
+      Object.keys(this.proCropData.specialty_crops).forEach(cropId => {
+        const option = cropSelect.querySelector(`option[value="${cropId}"]`);
+        if (option) {
+          option.classList.add('specialty-highlight');
+          option.style.background = 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)';
+          option.style.color = '#333';
+          option.style.fontWeight = '600';
+        }
+      });
+    }
+
+    // Animate the dropdown to draw attention
+    cropSelect.style.animation = 'pulse 1.5s ease-in-out 3';
+  }
+
+  generateDataExport() {
+    const exportData = {
+      timestamp: new Date().toISOString(),
+      user_tier: this.proFeatureManager.userTier,
+      predictions: this.lastPrediction || null,
+      fields: this.fieldManager?.getFields() || [],
+      analytics: this.advancedAnalytics?.getLastAnalysis() || null,
+      usage_stats: this.proFeatureManager.getUsageStats()
+    };
+
+    // Create and download JSON file
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
+      type: 'application/json' 
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mini-agronomist-export-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    this.showMessage('📊 Data exported successfully!', 'success');
+  }
+
+  initializeFieldManagerEvents() {
+    const modal = document.querySelector('.pro-modal');
+    if (!modal) return;
+
+    // Tab switching for analytics
+    const tabBtns = modal.querySelectorAll('.tab-btn');
+    const tabPanels = modal.querySelectorAll('.tab-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.dataset.tab;
+        
+        // Update active states
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        
+        btn.classList.add('active');
+        const targetPanel = document.getElementById(`${targetTab}-panel`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+        }
+      });
+    });
+  }
+
+  initializeAnalyticsEvents() {
+    const modal = document.querySelector('.pro-modal');
+    if (!modal) return;
+
+    // Tab switching functionality
+    const tabBtns = modal.querySelectorAll('.tab-btn');
+    const tabPanels = modal.querySelectorAll('.tab-panel');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const targetTab = btn.dataset.tab;
+        
+        // Update active states
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabPanels.forEach(p => p.classList.remove('active'));
+        
+        btn.classList.add('active');
+        const targetPanel = document.getElementById(`${targetTab}-panel`);
+        if (targetPanel) {
+          targetPanel.classList.add('active');
+          
+          // Load analytics data for the selected tab
+          await this.loadAnalyticsData(targetTab, targetPanel);
+        }
+      });
+    });
+
+    // Load initial analytics data
+    this.loadAnalyticsData('yield', document.getElementById('yield-panel'));
+  }
+
+  async loadAnalyticsData(tabType, panel) {
+    if (!panel || !this.advancedAnalytics) return;
+
+    // Show loading state
+    panel.innerHTML = '<div class="analytics-loading">📊 Loading analytics...</div>';
+
+    try {
+      let analyticsHTML = '';
+      
+      switch (tabType) {
+        case 'yield':
+          analyticsHTML = await this.generateYieldAnalytics();
+          break;
+        case 'profit':
+          analyticsHTML = await this.generateProfitabilityAnalytics();
+          break;
+        case 'risk':
+          analyticsHTML = await this.generateRiskAnalytics();
+          break;
+        case 'sustainability':
+          analyticsHTML = await this.generateSustainabilityAnalytics();
+          break;
+      }
+
+      panel.innerHTML = analyticsHTML;
+    } catch (error) {
+      panel.innerHTML = `
+        <div class="analytics-error">
+          <span class="material-icons">error</span>
+          <p>Unable to load analytics data</p>
+        </div>
+      `;
+    }
+  }
+
+  async generateYieldAnalytics() {
+    const fields = this.fieldManager?.getFields() || [];
+    const predictions = this.loadPredictionHistory();
+
+    return `
+      <div class="analytics-dashboard">
+        <div class="analytics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">trending_up</span>
+              <h4>Average Yield Prediction</h4>
+            </div>
+            <div class="metric-value">${this.calculateAverageYield(predictions)} tons/ha</div>
+            <div class="metric-trend positive">+12% vs last season</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">agriculture</span>
+              <h4>Total Managed Area</h4>
+            </div>
+            <div class="metric-value">${this.calculateTotalArea(fields)} ha</div>
+            <div class="metric-trend neutral">No change</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">eco</span>
+              <h4>Best Performing Crop</h4>
+            </div>
+            <div class="metric-value">${this.getBestCrop(predictions)}</div>
+            <div class="metric-trend positive">High confidence</div>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <h4>Yield Predictions by Crop Type</h4>
+          ${this.generateYieldChart(predictions)}
+        </div>
+        
+        <div class="recommendations">
+          <h4>🎯 Yield Optimization Recommendations</h4>
+          <ul>
+            <li>Consider switching 20% of corn fields to soybeans for nitrogen fixation</li>
+            <li>Optimal planting window: March 15-30 based on current weather patterns</li>
+            <li>Apply precision fertilization to boost yield by 8-15%</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  async generateProfitabilityAnalytics() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="analytics-grid">
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">attach_money</span>
+              <h4>Projected Revenue</h4>
+            </div>
+            <div class="metric-value">$24,580</div>
+            <div class="metric-trend positive">+18% projected</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">account_balance</span>
+              <h4>Cost per Hectare</h4>
+            </div>
+            <div class="metric-value">$1,250</div>
+            <div class="metric-trend negative">+5% vs last year</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-header">
+              <span class="material-icons">trending_up</span>
+              <h4>ROI Estimate</h4>
+            </div>
+            <div class="metric-value">165%</div>
+            <div class="metric-trend positive">Excellent</div>
+          </div>
+        </div>
+        
+        <div class="profit-analysis">
+          <h4>💰 Profitability Breakdown</h4>
+          <div class="profit-chart">
+            <div class="profit-item">
+              <span>Revenue</span>
+              <div class="profit-bar revenue" style="width: 100%"></div>
+              <span>$24,580</span>
+            </div>
+            <div class="profit-item">
+              <span>Costs</span>
+              <div class="profit-bar costs" style="width: 60%"></div>
+              <span>$14,750</span>
+            </div>
+            <div class="profit-item">
+              <span>Profit</span>
+              <div class="profit-bar profit" style="width: 40%"></div>
+              <span>$9,830</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async generateRiskAnalytics() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="risk-matrix">
+          <h4>⚠️ Risk Assessment Matrix</h4>
+          <div class="risk-grid">
+            <div class="risk-category low">
+              <span class="material-icons">check_circle</span>
+              <h5>Weather Risk</h5>
+              <p>Low - Favorable conditions expected</p>
+            </div>
+            <div class="risk-category medium">
+              <span class="material-icons">warning</span>
+              <h5>Market Risk</h5>
+              <p>Medium - Price volatility expected</p>
+            </div>
+            <div class="risk-category low">
+              <span class="material-icons">bug_report</span>
+              <h5>Pest Risk</h5>
+              <p>Low - Minimal pest pressure</p>
+            </div>
+            <div class="risk-category high">
+              <span class="material-icons">opacity</span>
+              <h5>Drought Risk</h5>
+              <p>High - Below average rainfall predicted</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mitigation-strategies">
+          <h4>🛡️ Risk Mitigation Strategies</h4>
+          <div class="strategy-list">
+            <div class="strategy-item">
+              <span class="material-icons">water_drop</span>
+              <div>
+                <h5>Drought Mitigation</h5>
+                <p>Install drip irrigation system, select drought-resistant varieties</p>
+              </div>
+            </div>
+            <div class="strategy-item">
+              <span class="material-icons">trending_down</span>
+              <div>
+                <h5>Market Risk</h5>
+                <p>Consider futures contracts, diversify crop portfolio</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async generateSustainabilityAnalytics() {
+    return `
+      <div class="analytics-dashboard">
+        <div class="sustainability-score">
+          <h4>🌱 Sustainability Score</h4>
+          <div class="score-circle">
+            <div class="score-value">82</div>
+            <div class="score-label">out of 100</div>
+          </div>
+        </div>
+        
+        <div class="sustainability-metrics">
+          <div class="metric-item">
+            <span class="material-icons">co2</span>
+            <div>
+              <h5>Carbon Footprint</h5>
+              <p>2.1 tons CO₂/ha (15% below average)</p>
+            </div>
+          </div>
+          <div class="metric-item">
+            <span class="material-icons">water_drop</span>
+            <div>
+              <h5>Water Efficiency</h5>
+              <p>350L/kg yield (12% more efficient)</p>
+            </div>
+          </div>
+          <div class="metric-item">
+            <span class="material-icons">eco</span>
+            <div>
+              <h5>Soil Health</h5>
+              <p>Good - Improving with rotation</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="sustainability-recommendations">
+          <h4>🌿 Sustainability Improvements</h4>
+          <ul>
+            <li>Implement cover crops to improve soil organic matter</li>
+            <li>Reduce synthetic nitrogen by 20% using legume rotation</li>
+            <li>Install precision application equipment to reduce chemical use</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  // Helper methods for analytics calculations
+  calculateAverageYield(predictions) {
+    if (!predictions || predictions.length === 0) return '3.2';
+    const total = predictions.reduce((sum, pred) => sum + (pred.yieldEstimate || 0), 0);
+    return (total / predictions.length).toFixed(1);
+  }
+
+  calculateTotalArea(fields) {
+    if (!fields || fields.length === 0) return '12.5';
+    return fields.reduce((total, field) => total + (field.size || 0), 0).toFixed(1);
+  }
+
+  getBestCrop(predictions) {
+    if (!predictions || predictions.length === 0) return 'Soybeans';
+    // Simple implementation - could be more sophisticated
+    return 'Soybeans';
+  }
+
+  generateYieldChart(predictions) {
+    // Simple text-based chart - could be enhanced with actual charting library
+    return `
+      <div class="simple-chart">
+        <div class="chart-bar">
+          <span>Corn</span>
+          <div class="bar" style="width: 80%; background: #4CAF50;"></div>
+          <span>4.2 t/ha</span>
+        </div>
+        <div class="chart-bar">
+          <span>Soybeans</span>
+          <div class="bar" style="width: 65%; background: #2196F3;"></div>
+          <span>3.1 t/ha</span>
+        </div>
+        <div class="chart-bar">
+          <span>Wheat</span>
+          <div class="bar" style="width: 90%; background: #FF9800;"></div>
+          <span>5.8 t/ha</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // Enhanced field management implementation
+  addNewField() {
+    const modal = this.createModal('Add New Field', this.generateAddFieldHTML());
+    document.body.appendChild(modal);
+    this.initializeAddFieldEvents(modal);
+  }
+
+  generateAddFieldHTML() {
+    return `
+      <div class="field-form">
+        <form id="addFieldForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="fieldName">Field Name *</label>
+              <input type="text" id="fieldName" name="fieldName" required 
+                     placeholder="e.g., North Field, Corn Plot A">
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldLocation">Location</label>
+              <input type="text" id="fieldLocation" name="fieldLocation" 
+                     placeholder="Farm address or coordinates">
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldSize">Field Size *</label>
+              <input type="number" id="fieldSize" name="fieldSize" required 
+                     min="0.1" step="0.1" placeholder="5.5">
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldSizeUnit">Size Unit</label>
+              <select id="fieldSizeUnit" name="fieldSizeUnit">
+                <option value="acres">Acres</option>
+                <option value="hectares">Hectares</option>
+                <option value="sqm">Square Meters</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldSoilType">Primary Soil Type *</label>
+              <select id="fieldSoilType" name="fieldSoilType" required>
+                <option value="">Select soil type...</option>
+                <option value="loam">Loam</option>
+                <option value="clay">Clay</option>
+                <option value="sand">Sandy</option>
+                <option value="silt">Silt</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="fieldCurrentCrop">Current Crop</label>
+              <select id="fieldCurrentCrop" name="fieldCurrentCrop">
+                <option value="">None/Fallow</option>
+                ${this.generateCropOptions()}
+              </select>
+            </div>
+            
+            <div class="form-group full-width">
+              <label for="fieldNotes">Notes</label>
+              <textarea id="fieldNotes" name="fieldNotes" rows="3" 
+                        placeholder="Additional field information..."></textarea>
+            </div>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn secondary" onclick="this.closest('.pro-modal').remove()">
+              Cancel
+            </button>
+            <button type="submit" class="btn primary">
+              <span class="material-icons">add</span>
+              Add Field
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+  }
+
+  generateCropOptions() {
+    if (!this.cropProfiles) return '';
+    
+    return Object.entries(this.cropProfiles).map(([key, crop]) => 
+      `<option value="${key}">${crop.scientific_name || key}</option>`
+    ).join('');
+  }
+
+  initializeAddFieldEvents(modal) {
+    const form = modal.querySelector('#addFieldForm');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      this.handleAddField(form);
+    });
+  }
+
+  handleAddField(form) {
+    const formData = new FormData(form);
+    const fieldData = {
+      id: `field_${Date.now()}`,
+      name: formData.get('fieldName'),
+      location: formData.get('fieldLocation'),
+      size: parseFloat(formData.get('fieldSize')),
+      sizeUnit: formData.get('fieldSizeUnit'),
+      soilType: formData.get('fieldSoilType'),
+      currentCrop: formData.get('fieldCurrentCrop'),
+      notes: formData.get('fieldNotes'),
+      createdAt: new Date().toISOString(),
+      history: []
+    };
+
+    // Validate required fields
+    if (!fieldData.name || !fieldData.size || !fieldData.soilType) {
+      this.showMessage('Please fill in all required fields', 'error');
+      return;
+    }
+
+    // Add to field manager
+    if (this.fieldManager) {
+      this.fieldManager.createField(fieldData);
+      this.showMessage(`✅ Field "${fieldData.name}" added successfully!`, 'success');
+      
+      // Close modal and refresh field list
+      form.closest('.pro-modal').remove();
+      
+      // Refresh field manager if open
+      const fieldManagerModal = document.querySelector('.pro-modal .field-manager');
+      if (fieldManagerModal) {
+        const fieldsList = fieldManagerModal.querySelector('#fieldsList');
+        if (fieldsList) {
+          fieldsList.innerHTML = this.generateFieldsList();
+        }
+      }
+    }
+  }
+
+  importFields() {
+    this.showMessage('🚧 Field import functionality coming soon!', 'info');
+  }
+
+  editField(fieldId) {
+    this.showMessage(`🚧 Editing field ${fieldId} - coming soon!`, 'info');
+  }
+
+  viewFieldAnalytics(fieldId) {
+    this.showMessage(`🚧 Field analytics for ${fieldId} - coming soon!`, 'info');
   }
 
   populateRegionDropdown() {
@@ -1027,11 +2408,11 @@ class MiniAgronomist {
           
           <div class="settings-section">
             <h3>💾 Data Management</h3>
-            <button type="button" class="tool-btn" onclick="window.miniAgronomist.clearPredictionHistory()">
+            <button type="button" class="tool-btn" onclick="this.clearHistory()">
               <span class="material-icons">delete</span>
               Clear All Data
             </button>
-            <button type="button" class="tool-btn" onclick="window.miniAgronomist.exportResults()">
+            <button type="button" class="tool-btn" onclick="this.exportSettings()">
               <span class="material-icons">download</span>
               Export Settings
             </button>

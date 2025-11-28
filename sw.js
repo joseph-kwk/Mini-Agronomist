@@ -1,26 +1,35 @@
 // Service Worker for Mini Agronomist Pro PWA
 // Provides offline functionality and caching
 
-const CACHE_NAME = 'mini-agronomist-pro-v2.0';
-const STATIC_CACHE_NAME = 'mini-agronomist-static-v2.0';
-const DATA_CACHE_NAME = 'mini-agronomist-data-v2.0';
+const CACHE_NAME = 'mini-agronomist-pro-v2.8';
+const STATIC_CACHE_NAME = 'mini-agronomist-static-v2.8';
+const DATA_CACHE_NAME = 'mini-agronomist-data-v2.8';
 
-// Resources to cache for offline use (only same-origin resources are cached here)
+// Resources to cache for offline use
 const STATIC_RESOURCES = [
   '/',
   '/index.html',
   '/ml_demo.html',
+  '/game.html',
   '/style.css',
+  '/game.css',
   '/app.js',
-  '/advanced_prediction_engine.js',
-  '/statistical_models.js',
+  '/js/advanced_prediction_engine.js',
+  '/js/statistical_models.js',
+  '/js/pro-features.js',
+  '/js/field-manager.js',
+  '/js/advanced-analytics.js',
+  '/js/notification-manager.js',
+  '/js/voice-interface.js',
+  '/js/auth-manager.js',
+  '/js/i18n-data.js',
+  '/js/i18n-manager.js',
+  '/js/python-integration.js',
+  '/js/python-backend-client.js',
+  '/js/game/enhanced-game-engine.js',
   '/manifest.json',
   '/assets/icons/logo.png',
-  '/assets/icons/favicon.png',
-  '/assets/icons/farm-bg.png',
-  // External resources such as fonts and TensorFlow are intentionally excluded
-  // from this list to avoid installation failures on browsers that block
-  // cross-origin requests during Service Worker installation.
+  '/assets/icons/favicon.png'
 ];
 
 // Data files that should be cached
@@ -36,25 +45,10 @@ self.addEventListener('install', event => {
   
   event.waitUntil(
     Promise.all([
-      // Cache static resources (only same-origin resources here)
-      caches.open(STATIC_CACHE_NAME).then(async cache => {
+      // Cache static resources
+      caches.open(STATIC_CACHE_NAME).then(cache => {
         console.log('Caching static resources');
-        try {
-          // We use addAll for same-origin resources. Externals (fonts, TF) are
-          // cached by the browser or handled separately.
-          await cache.addAll(STATIC_RESOURCES);
-          console.log('Static resources cached');
-        } catch (err) {
-          console.warn('Some static resources failed to cache (continuing):', err);
-          // Try to add one-by-one so we can skip problematic items
-          for (const res of STATIC_RESOURCES) {
-            try {
-              await cache.add(res);
-            } catch (e) {
-              console.warn('Failed to cache', res, e);
-            }
-          }
-        }
+        return cache.addAll(STATIC_RESOURCES);
       }),
       
       // Cache data resources
@@ -190,7 +184,7 @@ async function handleStaticRequest(request) {
     console.error('Static request failed:', error);
     
     // Return offline fallback page
-        if (request.url.includes('.html') || request.headers.get('Accept')?.includes('text/html')) {
+    if (request.url.includes('.html') || request.headers.get('Accept')?.includes('text/html')) {
       return caches.match('/index.html');
     }
     

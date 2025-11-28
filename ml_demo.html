@@ -15,21 +15,26 @@
   <meta property="og:url" content="https://miniagronomist.com/ml_demo.html">
   <meta property="og:title" content="ML Demo - Advanced Agricultural AI Predictions">
   <meta property="og:description" content="Experience advanced machine learning for agriculture with interactive dashboard showcasing AI-powered crop yield predictions.">
-  <meta property="og:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  <meta property="og:image" content="https://miniagronomist.com/assets/icons/logo.png">
   
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://miniagronomist.com/ml_demo.html">
   <meta property="twitter:title" content="ML Demo - Advanced Agricultural AI Predictions">
   <meta property="twitter:description" content="Interactive machine learning dashboard for agricultural predictions using TensorFlow.js">
-  <meta property="twitter:image" content="https://miniagronomist.com/assets/icons/farm-bg.png">
+  <meta property="twitter:image" content="https://miniagronomist.com/assets/icons/logo.png">
   
   <!-- Canonical URL -->
   <link rel="canonical" href="https://miniagronomist.com/ml_demo.html">
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/icons/favicon.png"
-  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+  <link rel="stylesheet" href="style.css?v=20251127b">
+  
+  <!-- Internationalization -->
+  <script src="js/i18n-data.js"></script>
+  <script src="js/i18n-manager.js"></script>
+  
   <style>
     .ml-demo {
       max-width: 1200px;
@@ -554,34 +559,46 @@
   </style>
 </head>
 <body>
-  <nav class="nav-bar">
-    <div class="nav-content">
-      <a href="index.html" class="nav-brand" title="Mini Agronomist - Return to Main App">
+  <header role="banner">
+    <div class="header-container">
+      <a href="index.html" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform">
         <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo" width="48" height="48">
         <span>Mini Agronomist</span>
       </a>
-      <div class="nav-links">
-        <a href="index.html">🌾 Yield Predictor</a>
-        <a href="#" class="active">🤖 ML Analytics</a>
-        <a href="onboarding.html">📚 Getting Started</a>
-        <a href="faq.html">❓ FAQ</a>
+      <div class="header-actions">
+        <nav class="nav-links" role="navigation">
+          <a href="index.html" role="button" tabindex="0" data-i18n="nav.yield">🌾 Yield Predictor</a>
+          <a href="game.html" target="_blank" rel="noopener noreferrer" role="button" tabindex="0" data-i18n="nav.game">🎮 Play Game</a>
+          <a href="#" class="active" role="button" tabindex="0" data-i18n="nav.ml">🤖 ML Analytics</a>
+        </nav>
+        <div class="header-buttons">
+          <button id="helpBtn" class="icon-btn" aria-label="Show app tutorial and help guide" title="📖 Help & Tutorial - Learn how to use Mini Agronomist effectively" data-i18n-title="btn.help">
+            <span class="material-icons">help_outline</span>
+          </button>
+          <button id="settingsBtn" class="icon-btn" aria-label="Open app settings and preferences" title="⚙️ Settings - Customize your experience and preferences" data-i18n-title="btn.settings">
+            <span class="material-icons">settings</span>
+          </button>
+          <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Toggle mobile navigation menu" title="🔽 Menu">
+            <span class="material-icons">menu</span>
+          </button>
+        </div>
       </div>
     </div>
-  </nav>
+  </header>
 
   <main class="main-content">
     <div class="ml-demo">
       <div class="online-status" id="connectionStatus">
         <div class="status-indicator"></div>
-        <span>Checking connection...</span>
+        <span data-i18n="ml.status.checking">Checking connection...</span>
       </div>
       
-      <h1>🤖 Advanced Agricultural Intelligence Lab</h1>
-      <p>Experience next-generation agricultural intelligence with ML models, real-time analytics, and precision farming insights.</p>
+      <h1 data-i18n="ml.title">🤖 Advanced Agricultural Intelligence Lab</h1>
+      <p data-i18n="ml.desc">Experience next-generation agricultural intelligence with ML models, real-time analytics, and precision farming insights.</p>
       
       <!-- Interactive Farm Dashboard -->
       <div class="card">
-        <h2>🚜 Smart Farm Dashboard</h2>
+        <h2 data-i18n="ml.dashboard.title">🚜 Smart Farm Dashboard</h2>
         <div class="farm-dashboard">
           <div class="dashboard-grid">
             <div class="dashboard-card weather-card">
@@ -931,30 +948,11 @@
 
   <!-- Core Scripts -->
   <script src="app.js"></script>
-
-  <!-- TensorFlow.js for Machine Learning (make sure TF is available before creating models) -->
-
-  <!-- Load TF.js with crossorigin to reduce blocking; if blocked, fall back to statistical models -->
+  <script src="js/statistical_models.js"></script>
+  <script src="js/advanced_prediction_engine.js"></script>
+  
+  <!-- TensorFlow.js for Machine Learning -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js" crossorigin="anonymous"></script>
-
-  <!-- Advanced ML Engine as ES module -->
-  <script type="module">
-    import AdvancedPredictionEngine from './js/advanced_prediction_engine.js';
-
-    // Expose the class to the page so non-module scripts can instantiate it
-    window.AdvancedPredictionEngine = AdvancedPredictionEngine;
-    
-    // Check if TFJS loaded — browsers with Tracking Prevention may block it.
-    if (typeof tf === 'undefined') {
-      // Show a notice to the user.
-      setTimeout(() => {
-        showNotification('TensorFlow.js appears to be blocked by your browser. Machine learning features will be disabled. Use statistical models or allow the CDN.', 'warning');
-      }, 700);
-    } else {
-      // TF loaded, we can log a success (not critical for users).
-      console.log('TensorFlow.js loaded');
-    }
-  </script>
   
   <script>
     let predictionEngine = null;
