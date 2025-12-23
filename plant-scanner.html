@@ -24,6 +24,35 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             -webkit-font-smoothing: antialiased;
             touch-action: manipulation;
+            transition: background 0.3s ease;
+        }
+
+        /* Dark Theme for Scanner */
+        body.dark-theme {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        body.dark-theme .scanner-card {
+            background: #2d2d2d;
+            color: #e8e8e8;
+        }
+
+        body.dark-theme .section-title {
+            color: #e8e8e8;
+        }
+
+        body.dark-theme .btn-secondary {
+            background: #3d3d3d;
+            color: #e8e8e8;
+        }
+
+        body.dark-theme .result-card {
+            background: #2d2d2d;
+            color: #e8e8e8;
+        }
+
+        body.dark-theme #themeBtn:hover {
+            background: rgba(255,255,255,0.3);
         }
 
         /* Device Banner */
@@ -117,6 +146,13 @@
             display: block;
             filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
             animation: logoFloat 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scanner-logo:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 6px 16px rgba(0,0,0,0.3));
         }
 
         @keyframes logoFloat {
@@ -130,6 +166,12 @@
             opacity: 0.95;
             margin-bottom: 12px;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .site-name:hover {
+            opacity: 1;
         }
 
         h1 {
@@ -654,8 +696,13 @@
 
     <div class="container" id="mainContainer">
         <header>
-            <img src="assets/icons/logo.png" alt="Mini Agronomist" class="scanner-logo">
-            <div class="site-name">🌾 Mini Agronomist</div>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 12px; position: relative;">
+                <button id="themeBtn" onclick="toggleTheme()" style="position: absolute; right: 10px; top: 10px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; transition: all 0.3s; backdrop-filter: blur(10px);" title="Toggle Theme">
+                    🌙
+                </button>
+            </div>
+            <img src="assets/icons/logo.png" alt="Mini Agronomist" class="scanner-logo" onclick="window.location.href='index.html'">
+            <div class="site-name" onclick="window.location.href='index.html'">🌾 Mini Agronomist</div>
             <h1>🌱 Plant Disease Scanner</h1>
             <p>AI-Powered Plant Health Analysis</p>
             <div class="device-info" id="deviceInfo">Loading...</div>
@@ -715,6 +762,50 @@
 
     <script type="module">
         import { PlantScanner } from './js/plant-scanner.js';
+
+        // ===== THEME TOGGLE =====
+        window.toggleTheme = function() {
+            const body = document.body;
+            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            if (newTheme === 'dark') {
+                body.classList.add('dark-theme');
+            } else {
+                body.classList.remove('dark-theme');
+            }
+            
+            const themeBtn = document.getElementById('themeBtn');
+            if (themeBtn) {
+                themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            }
+            
+            localStorage.setItem('theme', newTheme);
+        };
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            const themeBtn = document.getElementById('themeBtn');
+            if (themeBtn) themeBtn.textContent = '☀️';
+        }
+        
+        // Listen for theme changes from other tabs
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'theme') {
+                const newTheme = e.newValue;
+                if (newTheme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                    const themeBtn = document.getElementById('themeBtn');
+                    if (themeBtn) themeBtn.textContent = '☀️';
+                } else {
+                    document.body.classList.remove('dark-theme');
+                    const themeBtn = document.getElementById('themeBtn');
+                    if (themeBtn) themeBtn.textContent = '🌙';
+                }
+            }
+        });
 
         let scanner;
         let stream;

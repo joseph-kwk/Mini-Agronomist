@@ -1,10 +1,10 @@
 // Service Worker for Mini Agronomist Pro PWA
 // Provides offline functionality and caching
 
-const CACHE_NAME = 'mini-agronomist-pro-v4.0';
-const STATIC_CACHE_NAME = 'mini-agronomist-static-v4.0';
-const DATA_CACHE_NAME = 'mini-agronomist-data-v4.0';
-const AI_MODEL_CACHE = 'mini-agronomist-models-v4.0';
+const CACHE_NAME = 'mini-agronomist-pro-v4.2';
+const STATIC_CACHE_NAME = 'mini-agronomist-static-v4.2';
+const DATA_CACHE_NAME = 'mini-agronomist-data-v4.2';
+const AI_MODEL_CACHE = 'mini-agronomist-models-v4.2';
 
 // Resources to cache for offline use
 const STATIC_RESOURCES = [

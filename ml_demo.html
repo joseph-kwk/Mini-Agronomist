@@ -30,7 +30,71 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/icons/favicon.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=20251223j">
+<link rel="stylesheet" href="style.css?v=20251223P">
+  
+  <!-- Theme Toggle Script - Load Early -->
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      if (newTheme === 'dark') {
+        body.classList.add('dark-theme');
+      } else {
+        body.classList.remove('dark-theme');
+      }
+      
+      const themeBtn = document.getElementById('themeBtn');
+      if (themeBtn) {
+        const icon = themeBtn.querySelector('.material-icons');
+        if (icon) {
+          icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
+        }
+      }
+      
+      localStorage.setItem('theme', newTheme);
+      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }));
+    }
+
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-theme');
+        document.body.classList.add('dark-theme');
+      }
+    })();
+    
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'theme') {
+        const newTheme = e.newValue;
+        if (newTheme === 'dark') {
+          document.body.classList.add('dark-theme');
+        } else {
+          document.body.classList.remove('dark-theme');
+        }
+        
+        const themeBtn = document.getElementById('themeBtn');
+        if (themeBtn) {
+          const icon = themeBtn.querySelector('.material-icons');
+          if (icon) {
+            icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
+          }
+        }
+      }
+    });
+    
+    window.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeBtn = document.getElementById('themeBtn');
+      if (themeBtn) {
+        const icon = themeBtn.querySelector('.material-icons');
+        if (icon) {
+          icon.textContent = savedTheme === 'dark' ? 'light_mode' : 'dark_mode';
+        }
+      }
+    });
+  </script>
   
   <!-- Internationalization -->
   <script src="js/i18n-data.js"></script>
@@ -576,6 +640,9 @@
           <a href="#" class="active" role="button" tabindex="0" data-i18n="nav.ml">🤖 ML Analytics</a>
         </nav>
         <div class="header-buttons">
+          <button id="themeBtn" class="icon-btn" aria-label="Toggle dark mode" title="🌙 Toggle Theme - Switch between light and dark mode" onclick="toggleTheme()">
+            <span class="material-icons">dark_mode</span>
+          </button>
           <button id="helpBtn" class="icon-btn" aria-label="Show app tutorial and help guide" title="📖 Help & Tutorial - Learn how to use Mini Agronomist effectively" data-i18n-title="btn.help">
             <span class="material-icons">help_outline</span>
           </button>

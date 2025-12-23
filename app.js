@@ -304,11 +304,11 @@ class MiniAgronomist {
     form?.addEventListener("submit", (e) => this.handleFormSubmission(e));
 
     // Real-time validation
-    document.getElementById("rainfall")?.addEventListener("input", (e) => { this.validateField('rainfall', e.target.value); this.updateInfoBar(); });
-    document.getElementById("plantingDate")?.addEventListener("change", (e) => { this.validateField('plantingDate', e.target.value); this.updateInfoBar(); });
-    document.getElementById("region")?.addEventListener("change", (e) => { this.handleRegionChange(e.target.value); this.updateInfoBar(); });
-    document.getElementById("crop")?.addEventListener("change", (e) => { this.handleCropChange(e.target.value); this.updateInfoBar(); });
-    document.getElementById("soil")?.addEventListener("change", (e) => { this.validateField('soil', e.target.value); this.updateInfoBar(); });
+    document.getElementById("rainfall")?.addEventListener("input", (e) => { this.validateField('rainfall', e.target.value); });
+    document.getElementById("plantingDate")?.addEventListener("change", (e) => { this.validateField('plantingDate', e.target.value); });
+    document.getElementById("region")?.addEventListener("change", (e) => { this.handleRegionChange(e.target.value); });
+    document.getElementById("crop")?.addEventListener("change", (e) => { this.handleCropChange(e.target.value); });
+    document.getElementById("soil")?.addEventListener("change", (e) => { this.validateField('soil', e.target.value); });
 
     // Button actions
     document.getElementById("resetForm")?.addEventListener("click", () => this.resetForm());
@@ -363,52 +363,6 @@ class MiniAgronomist {
       
       lastScrollY = currentScrollY;
     });
-  }
-
-  // Crop Info Bar updater
-  updateInfoBar() {
-    try {
-      const regionKey = document.getElementById('region')?.value || '';
-      const cropKey = document.getElementById('crop')?.value || '';
-      const soilVal = document.getElementById('soil')?.value || '';
-      const rainVal = document.getElementById('rainfall')?.value || '';
-      const dateVal = document.getElementById('plantingDate')?.value || '';
-
-      const setChip = (chipId, label) => {
-        const chip = document.getElementById(chipId);
-        if (!chip) return;
-        const valueSpan = chip.querySelector('.chip-value');
-        const placeholder = valueSpan?.getAttribute('data-placeholder') || '';
-        let text = placeholder;
-        switch (chipId) {
-          case 'chip-region':
-            text = regionKey ? (this.regionData[regionKey]?.display_name || regionKey) : placeholder;
-            break;
-          case 'chip-crop':
-            text = cropKey ? (this.cropProfiles[cropKey]?.scientific_name || cropKey) : placeholder;
-            break;
-          case 'chip-soil':
-            text = soilVal || placeholder;
-            break;
-          case 'chip-rain':
-            text = rainVal ? `${rainVal} mm` : placeholder;
-            break;
-          case 'chip-date':
-            text = dateVal ? new Date(dateVal).toLocaleDateString() : placeholder;
-            break;
-        }
-        if (valueSpan) valueSpan.textContent = text;
-        chip.classList.toggle('empty', text === placeholder);
-      };
-
-      setChip('chip-region');
-      setChip('chip-crop');
-      setChip('chip-soil');
-      setChip('chip-rain');
-      setChip('chip-date');
-    } catch (_) {
-      // No-op: info bar is optional
-    }
   }
 
   // Enhanced Form Validation
@@ -1015,8 +969,6 @@ class MiniAgronomist {
       console.error("❌ Error populating dropdowns:", error);
       this.showError("Failed to initialize application. Please refresh and try again.", 5000);
     }
-    // Initialize info bar after dropdowns
-    this.updateInfoBar();
   }
 
   // Initialize Pro UI elements
@@ -2540,7 +2492,65 @@ class MiniAgronomist {
   }
 }
 
+// ========================================
+// THEME TOGGLE
+// ========================================
+function toggleTheme() {
+  const body = document.body;
+  const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  
+  // Toggle theme class
+  if (newTheme === 'dark') {
+    body.classList.add('dark-theme');
+  } else {
+    body.classList.remove('dark-theme');
+  }
+  
+  // Update theme button icon
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) {
+    const icon = themeBtn.querySelector('.material-icons');
+    if (icon) {
+      icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
+    } else {
+      // For plant-scanner.html (emoji icon)
+      themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    }
+  }
+  
+  // Save preference
+  localStorage.setItem('theme', newTheme);
+  
+  // Show toast notification
+  const themeName = newTheme === 'dark' ? 'Dark' : 'Light';
+  console.log(`🎨 Switched to ${themeName} Mode`);
+}
+
+// Load saved theme on page load
+function loadSavedTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    
+    // Update button icon
+    const themeBtn = document.getElementById('themeBtn');
+    if (themeBtn) {
+      const icon = themeBtn.querySelector('.material-icons');
+      if (icon) {
+        icon.textContent = 'light_mode';
+      } else {
+        themeBtn.textContent = '☀️';
+      }
+    }
+  }
+}
+
+// Load theme immediately (before DOM ready to avoid flash)
+loadSavedTheme();
+
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.miniAgronomist = new MiniAgronomist();
-});
+  loadSavedTheme(); // Ensure theme is applied after DOM loads
