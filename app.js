@@ -54,95 +54,6 @@ class MiniAgronomist {
     }
   }
 
-  // Authentication Integration
-  setAuthManager(authManager) {
-    this.authManager = authManager;
-    
-    // Link AuthManager to ProFeatureManager for bi-directional sync
-    if (this.authManager && this.proFeatureManager) {
-      this.authManager.linkProFeatureManager(this.proFeatureManager);
-    }
-    
-    // Update ProFeatureManager with authentication status
-    if (this.proFeatureManager) {
-      this.proFeatureManager.userTier = authManager.getUserTier();
-      this.proFeatureManager.isAuthenticated = authManager.isAuthenticated();
-      this.proFeatureManager.currentUser = authManager.currentUser;
-      
-      // Reinitialize features based on authenticated tier
-      this.proFeatureManager.features = this.proFeatureManager.initializeFeatures();
-      this.proFeatureManager.limits = this.proFeatureManager.getUserLimits();
-    }
-    
-    // Update UI based on authentication status
-    this.updateUIForAuth();
-  }
-
-  updateUIForAuth() {
-    if (!this.authManager) return;
-    
-    const userTier = this.authManager.getUserTier();
-    const isAuthenticated = this.authManager.isAuthenticated();
-    
-    // Update Pro features visibility
-    if (this.proFeatureManager) {
-      // Rebuild Pro feature buttons with current tier
-      this.updateProFeatureButtons();
-      
-      if (this.proFeatureManager.updateUIVisibility) {
-        this.proFeatureManager.updateUIVisibility();
-      }
-    }
-    
-    // Show welcome message for new authenticated users
-    if (isAuthenticated && this.authManager.currentUser) {
-      const user = this.authManager.currentUser;
-      console.log(`🌾 Welcome ${user.name}! You have ${userTier.toUpperCase()} access.`);
-      this.showMessage(`Welcome, ${user.name}! Pro features for ${userTier.toUpperCase()} tier are now available.`, 'success');
-    } else if (!isAuthenticated) {
-      console.log('🌾 Logged out - Free tier features available.');
-      this.showMessage('You have been signed out. Basic features are still available.', 'info');
-    }
-  }
-
-  updateProFeatureButtons() {
-    // Regenerate Pro feature buttons with updated tier
-    const proSection = document.querySelector('.pro-features-section');
-    if (proSection) {
-      const gridContainer = proSection.querySelector('.pro-features-grid');
-      if (gridContainer) {
-        gridContainer.innerHTML = this.generateProFeatureButtons();
-        this.attachProFeatureListeners();
-      }
-    }
-  }
-
-  attachProFeatureListeners() {
-    // Attach click handlers to newly generated Pro feature buttons
-    document.querySelectorAll('.pro-feature-card .feature-btn').forEach(btn => {
-      const featureCard = btn.closest('.pro-feature-card');
-      const featureId = featureCard?.getAttribute('data-feature-id');
-      if (featureId) {
-        btn.removeEventListener('click', () => {});
-        btn.addEventListener('click', () => this.handleProFeature(featureId));
-      }
-    });
-  }
-
-  // Check access before showing Pro features
-  requireProAccess(feature, action) {
-    if (!this.authManager) {
-      this.showUpgradePrompt('pro', feature);
-      return false;
-    }
-    
-    if (!this.authManager.requireAccess('pro', feature)) {
-      return false;
-    }
-    
-    return true;
-  }
-
   // Python Integration Callback
   onPythonReady() {
     console.log('🐍 Python scientific computing is now available!');
@@ -1160,8 +1071,7 @@ class MiniAgronomist {
 
   // Generate Pro feature buttons based on user tier
   generateProFeatureButtons() {
-    const isAuthenticated = this.authManager?.isAuthenticated() ?? false;
-    const userTier = this.authManager?.getUserTier() ?? 'free';
+    const userTier = 'free'; // Default tier when auth is disabled
 
     const features = [
       {
@@ -1240,45 +1150,36 @@ class MiniAgronomist {
   // Handle Pro feature activation with gating
   handleProFeature(featureId) {
     try {
-      // Check if user is authenticated and has Pro tier
-      if (!this.authManager?.isAuthenticated()) {
-        this.showAuthRequired('Sign in to access Pro features');
-        return;
-      }
-
-      const userTier = this.authManager.getUserTier();
-      if (userTier === 'free') {
-        this.showUpgradePrompt('pro', featureId);
-        return;
-      }
-
+      // Pro features are available for now (auth disabled)
+      // Will be gated when authentication is re-enabled
+      
       switch (featureId) {
         case 'field-manager':
-          if (this.proFeatureManager.hasFeature('fieldManagement')) {
+          if (this.proFeatureManager?.hasFeature('fieldManagement')) {
             this.openFieldManager();
           } else {
-            this.showUpgradePrompt('enterprise', 'fieldManagement');
+            this.showMessage('Field Manager feature coming soon!', 'info');
           }
           break;
         case 'advanced-analytics':
-          if (this.proFeatureManager.hasFeature('advancedAnalytics')) {
+          if (this.proFeatureManager?.hasFeature('advancedAnalytics')) {
             this.openAdvancedAnalytics();
           } else {
-            this.showUpgradePrompt('enterprise', 'advancedAnalytics');
+            this.showMessage('Advanced Analytics feature coming soon!', 'info');
           }
           break;
         case 'specialty-crops':
-          if (this.proFeatureManager.hasFeature('advancedCrops')) {
+          if (this.proFeatureManager?.hasFeature('advancedCrops')) {
             this.showSpecialtyCrops();
           } else {
-            this.showUpgradePrompt('pro', 'specialtyCrops');
+            this.showMessage('Specialty Crops feature coming soon!', 'info');
           }
           break;
         case 'export-data':
-          if (this.proFeatureManager.hasFeature('dataExport')) {
+          if (this.proFeatureManager?.hasFeature('dataExport')) {
             this.exportData();
           } else {
-            this.showUpgradePrompt('pro', 'dataExport');
+            this.showMessage('Export Data feature coming soon!', 'info');
           }
           break;
         default:
@@ -1287,13 +1188,6 @@ class MiniAgronomist {
     } catch (error) {
       console.error('Error handling Pro feature:', error);
       this.showError('Failed to access Pro feature. Please try again.');
-    }
-  }
-
-  showAuthRequired(message) {
-    this.showMessage(message, 'warning');
-    if (this.authManager) {
-      this.authManager.showAuthModal();
     }
   }
 
@@ -2375,7 +2269,7 @@ class MiniAgronomist {
     modal.setAttribute('aria-modal', 'true');
     
     modal.innerHTML = `
-      <div class="modal-content">
+      <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
           <h2 id="settings-title">⚙️ App Settings</h2>
           <button class="modal-close" aria-label="Close settings dialog">

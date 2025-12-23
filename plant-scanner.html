@@ -19,7 +19,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
             min-height: 100vh;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             -webkit-font-smoothing: antialiased;
@@ -108,6 +108,28 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
+        }
+
+        .scanner-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 16px;
+            display: block;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .site-name {
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.95;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
         }
 
         h1 {
@@ -632,6 +654,8 @@
 
     <div class="container" id="mainContainer">
         <header>
+            <img src="assets/icons/logo.png" alt="Mini Agronomist" class="scanner-logo">
+            <div class="site-name">🌾 Mini Agronomist</div>
             <h1>🌱 Plant Disease Scanner</h1>
             <p>AI-Powered Plant Health Analysis</p>
             <div class="device-info" id="deviceInfo">Loading...</div>

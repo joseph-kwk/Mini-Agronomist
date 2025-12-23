@@ -29,7 +29,8 @@
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="assets/icons/favicon.png">
-  <link rel="stylesheet" href="style.css?v=20251127b">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=20251223i">
   
   <!-- Internationalization -->
   <script src="js/i18n-data.js"></script>
@@ -568,7 +569,10 @@
       <div class="header-actions">
         <nav class="nav-links" role="navigation">
           <a href="index.html" role="button" tabindex="0" data-i18n="nav.yield">🌾 Yield Predictor</a>
-          <a href="game.html" target="_blank" rel="noopener noreferrer" role="button" tabindex="0" data-i18n="nav.game">🎮 Play Game</a>
+          <a href="plant-scanner.html" role="button" tabindex="0" class="new-feature">
+            📸 Plant Scanner
+            <span class="nav-badge">NEW</span>
+          </a>
           <a href="#" class="active" role="button" tabindex="0" data-i18n="nav.ml">🤖 ML Analytics</a>
         </nav>
         <div class="header-buttons">
@@ -881,75 +885,250 @@
     </div>
   </main>
 
+  <!-- Help Modal -->
+  <div id="helpModal" class="modal hidden" role="dialog" aria-labelledby="help-title" aria-modal="true" onclick="if(event.target === this) this.classList.add('hidden')">
+    <div class="modal-content large-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="help-title">
+          <span data-i18n="help.title">🤔 Help & FAQ</span>
+        </h2>
+        <button class="modal-close" aria-label="Close help dialog">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- FAQ Navigation Tabs -->
+        <div class="faq-tabs">
+          <button class="faq-tab active" data-tab="quickstart" data-i18n="help.tab.quickstart">🚀 Quick Start</button>
+          <button class="faq-tab" data-tab="features" data-i18n="help.tab.features">⚙️ Features</button>
+          <button class="faq-tab" data-tab="troubleshooting" data-i18n="help.tab.troubleshooting">🔧 Troubleshooting</button>
+          <button class="faq-tab" data-tab="about" data-i18n="help.tab.about">ℹ️ About</button>
+        </div>
+
+        <!-- FAQ Search -->
+        <input type="text" class="faq-search" placeholder="🔍 Search FAQ..." id="faqModalSearch">
+
+        <!-- Quick Start Tab -->
+        <div class="faq-content active" id="quickstart">
+          <div class="help-section">
+            <h3 data-i18n="help.quickstart.title">🌱 Getting Started in 4 Steps</h3>
+            <div class="help-step">
+              <span class="step-number">1</span>
+              <div>
+                <h4 data-i18n="help.step1.title">Select Your Region</h4>
+                <p data-i18n="help.step1.desc">Choose from 14+ global agricultural regions. This affects climate data, growing seasons, and local crop varieties.</p>
+                <div class="help-tip"><span data-i18n="help.tip">💡 Tip:</span> <span data-i18n="help.step1.tip">Choose the region closest to your farm location for best results.</span></div>
+              </div>
+            </div>
+            <div class="help-step">
+              <span class="step-number">2</span>
+              <div>
+                <h4 data-i18n="help.step2.title">Choose Soil & Crop</h4>
+                <p data-i18n="help.step2.desc">Select your soil type (clay, sandy, loam, etc.) and crop from our database of 25+ varieties.</p>
+                <div class="help-tip"><span data-i18n="help.tip">💡 Tip:</span> <span data-i18n="help.step2.tip">Most farms have loam or clay-loam soil.</span></div>
+              </div>
+            </div>
+            <div class="help-step">
+              <span class="step-number">3</span>
+              <div>
+                <h4 data-i18n="help.step3.title">Enter Growing Conditions</h4>
+                <p data-i18n="help.step3.desc">Provide expected rainfall (mm) and planting date. Use local weather forecasts or historical data.</p>
+                <div class="help-tip"><span data-i18n="help.tip">💡 Tip:</span> <span data-i18n="help.step3.tip">Check your local weather service for seasonal forecasts.</span></div>
+              </div>
+            </div>
+            <div class="help-step">
+              <span class="step-number">4</span>
+              <div>
+                <h4 data-i18n="help.step4.title">Get Your Prediction</h4>
+                <p data-i18n="help.step4.desc">Review yield estimate, confidence score, risk assessment, and personalized recommendations.</p>
+                <div class="help-tip"><span data-i18n="help.proTip">✨ Pro tip:</span> <span data-i18n="help.step4.tip">Try different planting dates to optimize your timing!</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features Tab -->
+        <div class="faq-content" id="features">
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q1">What crops and regions are supported?</div>
+            <div class="faq-answer">
+              <p><strong data-i18n="help.faq.regions">Regions:</strong> <span data-i18n="help.faq.a1.regions">United States, India, China, Brazil, Europe, Australia, Canada, Argentina, and more.</span></p>
+              <p><strong data-i18n="help.faq.crops">Crops:</strong> <span data-i18n="help.faq.a1.crops">Wheat, Rice, Corn, Soybeans, Cotton, Potatoes, Tomatoes, and 18+ others.</span></p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q2">How accurate are the predictions?</div>
+            <div class="faq-answer">
+              <p data-i18n="help.faq.a2.p1">Typically 75-90% accuracy depending on crop and region. Each prediction includes a confidence score.</p>
+              <p><strong data-i18n="help.faq.remember">Remember:</strong> <span data-i18n="help.faq.a2.p2">These are estimates - combine with your local knowledge!</span></p>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q3">Can I save and export my predictions?</div>
+            <div class="faq-answer">
+              <p data-i18n="help.faq.a3.p1">Yes! Your last 10 predictions are automatically saved locally. You can also:</p>
+              <ul>
+                <li data-i18n="help.faq.a3.li1">📊 Export as JSON files</li>
+                <li data-i18n="help.faq.a3.li2">🖨️ Print professional reports</li>
+                <li data-i18n="help.faq.a3.li3">📈 Compare different scenarios</li>
+              </ul>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q4">Is my farm data private and secure?</div>
+            <div class="faq-answer">
+              <p><strong data-i18n="help.faq.private">100% Private!</strong> <span data-i18n="help.faq.a4.p1">Mini Agronomist runs entirely on your device:</span></p>
+              <ul>
+                <li data-i18n="help.faq.a4.li1">🔒 No data sent to servers</li>
+                <li data-i18n="help.faq.a4.li2">💻 All processing done locally</li>
+                <li data-i18n="help.faq.a4.li3">🏠 Data stored only on your device</li>
+                <li data-i18n="help.faq.a4.li4">✨ Works completely offline</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Troubleshooting Tab -->
+        <div class="faq-content" id="troubleshooting">
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q5">The app isn't loading or is showing errors</div>
+            <div class="faq-answer">
+              <p><strong data-i18n="help.faq.trySteps">Try these steps:</strong></p>
+              <ol>
+                <li data-i18n="help.faq.a5.li1">Refresh the page (Ctrl+F5 or Cmd+Shift+R)</li>
+                <li data-i18n="help.faq.a5.li2">Clear your browser cache</li>
+                <li data-i18n="help.faq.a5.li3">Check your internet connection</li>
+                <li data-i18n="help.faq.a5.li4">Try a different browser</li>
+              </ol>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q6">Predictions seem unrealistic or wrong</div>
+            <div class="faq-answer">
+              <p><strong data-i18n="help.faq.checkInputs">Check your inputs:</strong></p>
+              <ul>
+                <li data-i18n="help.faq.a6.li1">Verify region matches your location</li>
+                <li data-i18n="help.faq.a6.li2">Confirm soil type is correct</li>
+                <li data-i18n="help.faq.a6.li3">Check rainfall amounts are reasonable</li>
+                <li data-i18n="help.faq.a6.li4">Ensure planting date is appropriate for your crop</li>
+              </ul>
+            </div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-question" data-i18n="help.faq.q7">My region or crop isn't listed</div>
+            <div class="faq-answer">
+              <p data-i18n="help.faq.a7.p1">Choose the closest available option:</p>
+              <ul>
+                <li data-i18n="help.faq.a7.li1">🌍 Pick a region with similar climate</li>
+                <li data-i18n="help.faq.a7.li2">🌱 Select a crop from the same family</li>
+                <li data-i18n="help.faq.a7.li3">📧 Contact us to request additions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- About Tab -->
+        <div class="faq-content" id="about">
+          <div class="about-section">
+            <h3 data-i18n="help.about.title">🌾 About Mini Agronomist</h3>
+            <p data-i18n="help.about.desc">Mini Agronomist is a free, privacy-first agricultural intelligence tool designed to help farmers worldwide make informed planting decisions.</p>
+            
+            <h4 data-i18n="help.about.how">🔬 How It Works</h4>
+            <ul>
+              <li><strong data-i18n="help.about.models">Statistical Models:</strong> <span data-i18n="help.about.models.desc">Based on historical agricultural data</span></li>
+              <li><strong data-i18n="help.about.ml">Machine Learning:</strong> <span data-i18n="help.about.ml.desc">Advanced AI predictions using TensorFlow.js</span></li>
+              <li><strong data-i18n="help.about.data">Regional Data:</strong> <span data-i18n="help.about.data.desc">Climate and soil profiles for accurate estimates</span></li>
+            </ul>
+
+            <h4 data-i18n="help.about.mission">🎯 Our Mission</h4>
+            <p data-i18n="help.about.mission.desc">To democratize agricultural intelligence and help farmers optimize their yields through data-driven insights, while keeping their data completely private.</p>
+
+            <h4 data-i18n="help.about.contact">📞 Need More Help?</h4>
+            <div class="contact-info">
+              <p><strong data-i18n="help.contact.support">📧 Support:</strong> support@miniagronomist.com</p>
+              <p><strong data-i18n="help.contact.website">🌐 Website:</strong> www.miniagronomist.com</p>
+              <p><strong data-i18n="help.contact.guide">📚 Full Guide:</strong> <a href="pages/onboarding.html" target="_blank" data-i18n="help.contact.tutorial">Complete Tutorial</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close" data-i18n="btn.close">Close</button>
+        <button class="btn btn-primary" onclick="window.open('pages/onboarding.html', '_blank')" data-i18n="btn.fullTutorial">📚 Full Tutorial</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
-      <div class="footer-section">
+      <!-- Brand Section -->
+      <div class="footer-section footer-brand-section">
         <div class="footer-brand">
           <img src="assets/icons/logo.png" alt="Mini Agronomist" class="footer-logo" width="40" height="40">
           <h3>Mini Agronomist</h3>
         </div>
-        <p>AI-powered agricultural intelligence for farmers worldwide 🌾</p>
-      </div>
-      
-      <div class="footer-section">
-        <h4>Features</h4>
-        <ul>
-          <li><a href="index.html#prediction">Yield Prediction</a></li>
-          <li><a href="#demo">ML Demo</a></li>
-          <li><a href="index.html#analytics">Analytics</a></li>
-          <li><a href="index.html#tools">Export Tools</a></li>
-        </ul>
-      </div>
-      
-      <div class="footer-section">
-        <h4>Resources</h4>
-        <ul>
-          <li><a href="index.html#" id="aboutLink">About</a></li>
-          <li><a href="index.html#help">Help & Tutorial</a></li>
-          <li><a href="index.html#" id="supportLink">Support</a></li>
-          <li><a href="index.html#" id="privacyLink">Privacy Policy</a></li>
-        </ul>
-      </div>
-      
-      <div class="footer-section">
-        <h4>Connect</h4>
-        <div class="social-links">
-          <a href="https://twitter.com/joseph_kwk" target="_blank" aria-label="Follow on X (Twitter)" class="social-link">
+        <p class="footer-tagline">AI-powered agricultural intelligence for farmers worldwide 🌾</p>
+        <div class="footer-social">
+          <a href="https://twitter.com/joseph_kwk" target="_blank" aria-label="Follow on X" class="social-link">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
           </a>
-          <a href="https://github.com/joseph-kwk" target="_blank" aria-label="Follow on GitHub" class="social-link">
+          <a href="https://github.com/joseph-kwk" target="_blank" aria-label="GitHub" class="social-link">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
             </svg>
           </a>
-          <a href="https://linkedin.com/in/joseph-kwk" target="_blank" aria-label="Connect on LinkedIn" class="social-link">
+          <a href="https://linkedin.com/in/joseph-kwk" target="_blank" aria-label="LinkedIn" class="social-link">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
             </svg>
           </a>
         </div>
       </div>
+      
+      <!-- Features -->
+      <div class="footer-section">
+        <h4>Features</h4>
+        <ul class="footer-links">
+          <li><a href="index.html#prediction">🌾 Yield Prediction</a></li>
+          <li><a href="plant-scanner.html">📸 Plant Scanner</a></li>
+          <li><a href="ml_demo.html">🤖 ML Analytics</a></li>
+        </ul>
+      </div>
+      
+      <!-- Resources -->
+      <div class="footer-section">
+        <h4>Resources</h4>
+        <ul class="footer-links">
+          <li><a href="index.html" onclick="setTimeout(() => document.getElementById('helpBtn')?.click(), 100); return true;">📚 Help Center</a></li>
+          <li><a href="pages/onboarding.html" target="_blank">🎯 Tutorial</a></li>
+          <li><a href="pages/faq.html" target="_blank">❓ FAQ</a></li>
+        </ul>
+      </div>
+      
+      <!-- Legal -->
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="pages/privacy-policy.html" target="_blank">🔒 Privacy</a></li>
+          <li><a href="pages/terms-of-service.html" target="_blank">📋 Terms</a></li>
+        </ul>
+      </div>
     </div>
     
     <div class="footer-bottom">
-      <div class="footer-bottom-content">
-        <p>&copy; 2025 Mini Agronomist. Open source agricultural intelligence platform.</p>
-        <div class="footer-meta">
-          <span>Made with 🌱 for farmers worldwide</span>
-          <span>•</span>
-          <a href="https://github.com/joseph-kwk/Mini-Agronomist" target="_blank">View on GitHub</a>
-        </div>
-      </div>
+      <p>&copy; 2025 Mini Agronomist. Made with 🌱 for farmers worldwide.</p>
+      <a href="https://github.com/joseph-kwk/Mini-Agronomist" target="_blank">View on GitHub →</a>
     </div>
   </footer>
 
   <!-- Core Scripts -->
   <script src="app.js"></script>
-  <script src="js/statistical_models.js"></script>
-  <script src="js/advanced_prediction_engine.js"></script>
+  <script type="module" src="js/statistical_models.js"></script>
+  <script type="module" src="js/advanced_prediction_engine.js"></script>
   
   <!-- TensorFlow.js for Machine Learning -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js" crossorigin="anonymous"></script>

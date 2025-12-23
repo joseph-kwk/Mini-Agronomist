@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - Mini Agronomist</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <style>
         .legal-container {
             max-width: 800px;
@@ -40,6 +41,34 @@
     </style>
 </head>
 <body>
+    <header role="banner">
+        <div class="header-container">
+            <a href="../index.html" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform">
+                <img src="../assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo" width="48" height="48">
+                <span>Mini Agronomist</span>
+            </a>
+            <div class="header-actions">
+                <nav class="nav-links" role="navigation">
+                    <a href="../index.html" role="button" tabindex="0">🌾 Yield Predictor</a>
+                    <a href="../plant-scanner.html" role="button" tabindex="0" class="new-feature">
+                        📸 Plant Scanner
+                        <span class="nav-badge">NEW</span>
+                    </a>
+                    <a href="../ml_demo.html" role="button" tabindex="0">🤖 ML Analytics</a>
+                </nav>
+                <div class="header-buttons">
+                    <button class="icon-btn" onclick="window.location.href='../index.html'" aria-label="Back to home" title="🏠 Home">
+                        <span class="material-icons">home</span>
+                    </button>
+                    <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Toggle mobile navigation menu" title="🔽 Menu">
+                        <span class="material-icons">menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main style="margin-top: 80px;">
     <div class="legal-container">
         <header style="text-align: center; margin-bottom: 3rem;">
             <h1>📋 Terms of Service</h1>
@@ -195,5 +224,6 @@
             </a>
         </div>
     </div>
+    </main>
 </body>
 </html>
