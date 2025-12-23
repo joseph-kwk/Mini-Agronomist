@@ -1,6 +1,9 @@
-# 🌾 Mini Agronomist v3.0 - Enhanced Agricultural Intelligence
+# 🌾 Mini Agronomist v4.2 - Enhanced Agricultural Intelligence
 
 **Mini Agronomist** is a sophisticated, offline-first progressive web application designed to assist farmers worldwide with comprehensive yield predictions, region-specific planting advice, and AI-powered plant disease detection. This enhanced version features modern UI design, improved prediction algorithms, advanced analytics capabilities, and real-time plant health scanning.
+
+**Lead Developer:** Joseph Kasongo (Southwestern College)  
+**Repository:** [github.com/joseph-kwk/Mini-Agronomist](https://github.com/joseph-kwk/Mini-Agronomist)
 
 ---
 
@@ -496,10 +499,19 @@ MIT License - Free to use, modify, and distribute for agricultural and education
 
 ## 🧑‍🌾 Credits & Acknowledgments
 
-**Built with passion for sustainable agriculture by:**
-- **Joseph Kweku** - Lead Developer & Agricultural Technologist
-- **Contributors** - Community developers and agricultural experts
-- **Data Sources** - FAO, CGIAR, and agricultural research institutions worldwide
+**Lead Developer:**
+- **Joseph Kasongo** - Lead Developer & Agricultural Technologist
+  - Southwestern College
+  - [GitHub](https://github.com/joseph-kwk) | [LinkedIn](https://linkedin.com/in/joseph-kwk)
+
+**Built with passion for sustainable agriculture**
+
+**Contributors:**
+- Community developers and agricultural experts
+- Agricultural extension officers worldwide
+
+**Data Sources:**
+- FAO, CGIAR, and agricultural research institutions worldwide
 
 **Special Thanks:**
 - Agricultural extension officers worldwide
@@ -513,7 +525,8 @@ MIT License - Free to use, modify, and distribute for agricultural and education
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/joseph-kwk/Mini-Agronomist/issues)
 - **Discussions**: [Join community discussions](https://github.com/joseph-kwk/Mini-Agronomist/discussions)
-- **Email**: [Contact the developer](mailto:joseph@example.com)
+- **Developer Email**: joseph.kasongo@sckans.edu
+- **Support Email**: contact@miniagronomist.com
 - **Documentation**: [Full API documentation](https://github.com/joseph-kwk/Mini-Agronomist/wiki)
 
 ---

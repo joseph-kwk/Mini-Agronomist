@@ -15,6 +15,17 @@ const SITE_CONFIG = {
   description: "Get accurate crop yield predictions for 25+ crops across 14+ global regions. Free AI-powered farming tool with offline capability.",
   version: "4.2",
   
+  // Developer & Author Information
+  author: {
+    name: "Joseph Kasongo",
+    title: "Lead Developer & Agricultural Technologist",
+    affiliation: "Southwestern College",
+    email: "joseph.kasongo@sckans.edu",
+    github: "joseph-kwk",
+    linkedin: "joseph-kwk",
+    twitter: "joseph_kwk"
+  },
+  
   // Copyright & Legal
   copyright: {
     year: 2025,
