@@ -4,70 +4,171 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Getting Started - Mini Agronomist</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css?v=20251223j">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <style>
+        body {
+            background: linear-gradient(135deg, #f8fffe 0%, #e8f5e8 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
         .onboarding-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             padding: 2rem;
         }
         .step-card {
-            background: var(--surface);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--elevation-1);
-            border-left: 4px solid var(--primary);
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.1);
+            border-left: 5px solid #4CAF50;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.05) 0%, transparent 70%);
+            border-radius: 0 0 0 100%;
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.2);
+            border-left-color: #66BB6A;
         }
         .step-number {
-            background: var(--primary);
+            background: linear-gradient(135deg, #66BB6A, #4CAF50);
             color: white;
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             margin-right: 1rem;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
         }
         .step-header {
             display: flex;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
         }
         .step-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--on-surface);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #2E7D32;
         }
         .step-content {
-            color: var(--on-surface-variant);
-            line-height: 1.6;
+            color: #2c3e50;
+            line-height: 1.8;
+            font-size: 1rem;
         }
         .feature-highlight {
-            background: var(--primary-container);
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
+            background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 2px solid #C8E6C9;
+            position: relative;
+        }
+        .feature-highlight strong {
+            color: #2E7D32;
+            display: block;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        .feature-highlight ul {
+            margin: 0.5rem 0 0 1.5rem;
+            color: #2c3e50;
+        }
+        .feature-highlight li {
+            margin: 0.5rem 0;
         }
         .tip-box {
-            background: var(--secondary-container);
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
+            background: linear-gradient(135deg, #FFF9C4 0%, #FFF59D 100%);
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border: 2px solid #FDD835;
+            box-shadow: 0 2px 8px rgba(253, 216, 53, 0.2);
         }
         .tip-box::before {
             content: "💡 ";
-            font-size: 1.2rem;
+            font-size: 1.4rem;
+            margin-right: 0.5rem;
+        }
+        .tip-box strong {
+            color: #F57F17;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #66BB6A, #4CAF50) !important;
+            color: white !important;
+            padding: 1.2rem 3rem !important;
+            border-radius: 30px !important;
+            font-size: 1.2rem !important;
+            text-decoration: none !important;
+            display: inline-block !important;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3) !important;
+            transition: all 0.3s ease !important;
+            font-weight: 700 !important;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 30px rgba(76, 175, 80, 0.4) !important;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            background: white;
+            padding: 3rem 2rem;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.15);
+        }
+        header h1 {
+            color: #2E7D32;
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+        }
+        .help-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.1);
+            border: 2px solid #E8F5E9;
+        }
+        .help-section h3 {
+            color: #2E7D32;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .help-section a {
+            color: #4CAF50;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .help-section a:hover {
+            color: #66BB6A;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="onboarding-container">
-        <header style="text-align: center; margin-bottom: 3rem;">
+        <header>
             <h1>🌾 Welcome to Mini Agronomist!</h1>
-            <p style="font-size: 1.1rem; color: var(--on-surface-variant);">
+            <p style="font-size: 1.2rem; color: #2c3e50; margin-bottom: 0;">
                 Your intelligent farming companion for accurate yield predictions
             </p>
         </header>
@@ -188,16 +289,18 @@
         </div>
 
         <div style="text-align: center; margin: 3rem 0;">
-            <a href="index.html" class="btn btn-primary" style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            <a href="/index.html" class="btn btn-primary">
                 🚀 Start Using Mini Agronomist
             </a>
         </div>
 
-        <div style="background: var(--surface-variant); padding: 2rem; border-radius: 12px; margin-top: 2rem;">
+        <div class="help-section">
             <h3>🆘 Need Help?</h3>
-            <p>
+            <p style="color: #2c3e50; line-height: 1.8;">
                 <strong>📧 Support:</strong> Contact us at support@miniagronomist.com<br>
-                <strong>📚 Documentation:</strong> <a href="faq.html">Frequently Asked Questions</a><br>
+                <strong>📚 Documentation:</strong> <a href="/pages/faq.html">Frequently Asked Questions</a><br>
+                <strong>🏠 Main App:</strong> <a href="/index.html">Go to Mini Agronomist</a><br>
+                <strong>🤖 ML Demo:</strong> <a href="/ml_demo.html">Try Advanced Analytics</a><br>
                 <strong>🔄 Updates:</strong> Follow us for the latest features and improvements
             </p>
         </div>
