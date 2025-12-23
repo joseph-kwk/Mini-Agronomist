@@ -9,6 +9,12 @@
     <meta name="theme-color" content="#667eea">
     <title>Plant Disease Scanner - Mini Agronomist</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/icons/favicon.png">
+    <link rel="shortcut icon" href="assets/icons/favicon.png">
+    
+    <!-- AI/ML Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -713,21 +719,36 @@
             <h2 class="section-title">📷 Scan Plant</h2>
             
             <div class="video-wrapper" id="videoWrapper">
-                <video id="video" autoplay playsinline></video>
-                <div class="camera-overlay"></div>
-                <div class="camera-guide" id="cameraGuide">Position plant in frame</div>
+                <video id="video" autoplay playsinline 
+                       aria-label="Camera feed for plant scanning"
+                       aria-describedby="cameraGuide"
+                       role="img"></video>
+                <div class="camera-overlay" aria-hidden="true"></div>
+                <div class="camera-guide" id="cameraGuide" 
+                     role="status" aria-live="polite" aria-atomic="true">
+                    Position plant in frame
+                </div>
             </div>
-            <canvas id="canvas"></canvas>
+            <canvas id="canvas" style="display: none;" 
+                    aria-hidden="true" role="presentation"></canvas>
 
             <div class="controls">
                 <div class="btn-group">
-                    <button class="btn btn-primary" id="startBtn" onclick="startCamera()">
+                    <button class="btn btn-primary" id="startBtn" onclick="startCamera()" 
+                            aria-label="Start camera to begin plant scanning"
+                            role="button" tabindex="0">
                         📸 Start Camera
                     </button>
-                    <button class="btn btn-success" id="captureBtn" onclick="captureAndAnalyze()" style="display: none;">
+                    <button class="btn btn-success" id="captureBtn" onclick="captureAndAnalyze()" 
+                            style="display: none;"
+                            aria-label="Capture photo and analyze plant health"
+                            role="button" tabindex="0">
                         ✓ Capture & Analyze
                     </button>
-                    <button class="btn btn-danger" id="stopBtn" onclick="stopCamera()" style="display: none;">
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopCamera()" 
+                            style="display: none;"
+                            aria-label="Stop camera and return to start"
+                            role="button" tabindex="0">
                         ⏹ Stop Camera
                     </button>
                 </div>
@@ -762,6 +783,20 @@
 
     <script type="module">
         import { PlantScanner } from './js/plant-scanner.js';
+        
+        // Global scanner instance
+        let plantScanner = null;
+        
+        // Initialize scanner when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                plantScanner = new PlantScanner();
+                console.log('✅ Plant Scanner initialized');
+            } catch (error) {
+                console.error('❌ Failed to initialize scanner:', error);
+                showError('Failed to initialize plant scanner. Please refresh the page.');
+            }
+        });
 
         // ===== THEME TOGGLE =====
         window.toggleTheme = function() {
@@ -894,36 +929,62 @@
 
         // ===== CAMERA FUNCTIONS =====
         window.startCamera = async function() {
+            const video = document.getElementById('video');
+            const startBtn = document.getElementById('startBtn');
+            const captureBtn = document.getElementById('captureBtn');
+            const stopBtn = document.getElementById('stopBtn');
             const device = detectDevice();
             
             if (!device.hasCamera) {
-                alert('❌ Camera not available\n\n' +
-                      '📤 Please use "Upload Image" instead\n\n' +
-                      '💡 Tip: For live scanning:\n' +
-                      '   • On Desktop: Connect a webcam\n' +
-                      '   • Recommended: Use a smartphone or tablet');
+                showError('Camera not available. Please connect a webcam or use a smartphone/tablet for scanning.');
                 return;
             }
 
             try {
-                // Device-optimized camera constraints
+                startBtn.disabled = true;
+                startBtn.innerHTML = '⏳ Starting Camera...';
+                
+                // Enhanced constraints for PC compatibility
                 const constraints = {
                     video: {
-                        facingMode: (device.isMobile || device.isTablet) ? 'environment' : 'user',
-                        width: { ideal: device.isMobile ? 1280 : 1920 },
-                        height: { ideal: device.isMobile ? 720 : 1080 },
-                        aspectRatio: { ideal: device.isMobile ? 16/9 : 4/3 }
+                        width: { ideal: 1280, max: 1920 },
+                        height: { ideal: 720, max: 1080 },
+                        frameRate: { ideal: 30, max: 60 }
                     }
                 };
+                
+                // Add facing mode for mobile devices
+                if (device.isMobile || device.isTablet) {
+                    constraints.video.facingMode = 'environment';
+                }
 
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = stream;
-
-                // Update UI
-                document.getElementById('startBtn').style.display = 'none';
-                document.getElementById('captureBtn').style.display = 'block';
-                document.getElementById('stopBtn').style.display = 'block';
-                document.getElementById('cameraGuide').textContent = 'Position leaf clearly in frame';
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = currentStream;
+                
+                video.onloadedmetadata = () => {
+                    video.play();
+                    
+                    // Update UI
+                    if (startBtn) {
+                        startBtn.style.display = 'none';
+                    }
+                    if (captureBtn) {
+                        captureBtn.style.display = 'block';
+                    }
+                    if (stopBtn) {
+                        stopBtn.style.display = 'block';
+                    }
+                    
+                    const guide = document.getElementById('cameraGuide');
+                    if (guide) {
+                        const message = device && (device.isMobile || device.isTablet) 
+                            ? 'Position plant leaves clearly in frame'
+                            : '💻 Selfie camera active - position plant in front of screen';
+                        guide.textContent = message;
+                    }
+                    
+                    console.log('✅ Camera started successfully');
+                };
             } catch (error) {
                 console.error('Camera error:', error);
                 let errorMsg = '❌ Cannot access camera\n\n';
@@ -931,30 +992,43 @@
                 if (error.name === 'NotAllowedError') {
                     errorMsg += '📷 Camera permission denied\n\n';
                     errorMsg += 'To enable camera:\n';
-                    if (device.isIOS) {
-                        errorMsg += '• Safari: Settings > Safari > Camera\n';
-                    } else if (device.isAndroid) {
-                        errorMsg += '• Chrome: Settings > Site Settings > Camera\n';
-                    } else {
-                        errorMsg += '• Browser settings > Allow camera access\n';
-                    }
+                    errorMsg += '• Click the camera icon in your browser address bar\n';
+                    errorMsg += '• Select "Always allow" and refresh the page\n';
                 } else if (error.name === 'NotFoundError') {
                     errorMsg += '📱 No camera detected\n\n';
                     errorMsg += '• Check camera connection\n';
                     errorMsg += '• Try refreshing the page\n';
+                    errorMsg += '• Use a smartphone/tablet for best results\n';
                 } else {
                     errorMsg += `Error: ${error.message}\n`;
                 }
                 
-                errorMsg += '\n💡 You can still upload images!';
-                alert(errorMsg);
+                errorMsg += '\n💡 Alternative: Upload plant images instead!';
+                showError(errorMsg.replace(/\\n/g, '\n'));
+                
+                // Reset UI
+                if (startBtn) {
+                    startBtn.disabled = false;
+                    startBtn.innerHTML = '📸 Start Camera';
+                    startBtn.style.display = 'inline-block';
+                }
+                if (captureBtn) {
+                    captureBtn.style.display = 'none';
+                }
+                if (stopBtn) {
+                    stopBtn.style.display = 'none';
+                }
+            }
             }
         };
 
         window.stopCamera = function() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                video.srcObject = null;
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+                if (video) {
+                    video.srcObject = null;
+                }
             }
             
             document.getElementById('startBtn').style.display = 'block';
@@ -1112,18 +1186,8 @@
         async function init() {
             showDeviceGuidance();
             setupOfflineDetection();
-            
-            try {
-                scanner = new PlantScanner();
-                await scanner.initialize();
-                console.log('✓ Scanner initialized');
-                
-                // Load history
-                updateHistory();
-            } catch (error) {
-                console.error('Initialization error:', error);
-                alert('⚠️ Scanner initialization failed\n\nThe scanner may work with reduced accuracy.\nPlease refresh the page to try again.');
-            }
+        // Initialize when DOM is ready - no need for separate init function
+        // PlantScanner handles its own initialization
         }
 
         // Start on page load
