@@ -1,10 +1,21 @@
-# 🌾 Mini Agronomist v2.0 - Enhanced Agricultural Intelligence
+# 🌾 Mini Agronomist v3.0 - Enhanced Agricultural Intelligence
 
-**Mini Agronomist** is a sophisticated, offline-first progressive web application designed to assist farmers worldwide with comprehensive yield predictions and region-specific planting advice. This enhanced version features modern UI design, improved prediction algorithms, and advanced analytics capabilities.
+**Mini Agronomist** is a sophisticated, offline-first progressive web application designed to assist farmers worldwide with comprehensive yield predictions, region-specific planting advice, and AI-powered plant disease detection. This enhanced version features modern UI design, improved prediction algorithms, advanced analytics capabilities, and real-time plant health scanning.
 
 ---
 
-## ⭐ What's New in v2.0
+## ⭐ What's New in v3.0
+
+### 📱 **AI Plant Disease Scanner** (NEW!)
+- **Real-time plant scanning** using device camera
+- **AI-powered disease detection** with MobileNet computer vision
+- **Mobile-optimized interface** for phones and tablets
+- **Offline-capable** after first load (4MB AI models cached)
+- **Instant health assessment** with treatment recommendations
+- **Scan history tracking** for monitoring plant health over time
+- **Desktop support** with webcam or image upload
+- **6+ common diseases detected**: leaf spot, powdery mildew, rust, blight, yellowing, pest damage
+- **9+ crop types identified**: maize, tomato, potato, wheat, rice, soybean, and more
 
 ### 🎨 **Modern UI & UX**
 - **Material Design 3.0** inspired interface with improved visual hierarchy
@@ -12,6 +23,7 @@
 - **Responsive grid layout** optimized for all device sizes
 - **Dark mode support** and high contrast mode compatibility
 - **Smooth animations** and micro-interactions for better user experience
+- **Device-specific guidance** for optimal scanner experience
 
 ### 🧠 **Advanced Prediction Engine**
 - **Multi-factor analysis** with enhanced weighting algorithms
@@ -19,6 +31,10 @@
 - **Confidence scoring** with detailed breakdown
 - **Temperature compatibility analysis**
 - **Seasonal timing optimization**
+- **Feature Store** with 40+ engineered features
+- **Model Validation** framework with cross-validation
+- **Model Persistence** system with version management
+- **Prediction Monitor** for tracking accuracy over time
 
 ### 📊 **Comprehensive Analytics**
 - **Detailed factor breakdown** showing contribution of each element
@@ -131,7 +147,25 @@
    ```
 
 4. **Open the application**
-   - Navigate to `http://localhost:8000`
+   - **Yield Predictions**: Navigate to `http://localhost:8000` or open [index.html](index.html)
+   - **Plant Disease Scanner**: Navigate to `http://localhost:8000/plant-scanner.html` or open [plant-scanner.html](plant-scanner.html)
+   - **ML Demo**: Navigate to `http://localhost:8000/ml_demo.html`
+
+### 📱 Using the Plant Disease Scanner
+
+**Recommended Devices:**
+- ✅ **Smartphones** (Android/iPhone) - BEST experience with camera
+- ✅ **Tablets** (iPad/Android) - Great for demonstrations
+- ⚠️ **Desktop/Laptop** - Works with webcam or image upload
+
+**Quick Start Guide:**
+1. Open [plant-scanner.html](plant-scanner.html) on your mobile device
+2. Grant camera permission when prompted
+3. Point camera at plant leaf
+4. Click "Capture & Analyze"
+5. View health assessment and recommendations
+
+**See full instructions**: [SCANNER_QUICK_START.md](SCANNER_QUICK_START.md)
    - Backend API docs: `http://localhost:8001/docs` (if running)
 
 5. **Start predicting**

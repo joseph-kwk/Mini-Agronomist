@@ -1,18 +1,18 @@
 // Service Worker for Mini Agronomist Pro PWA
 // Provides offline functionality and caching
 
-const CACHE_NAME = 'mini-agronomist-pro-v2.8';
-const STATIC_CACHE_NAME = 'mini-agronomist-static-v2.8';
-const DATA_CACHE_NAME = 'mini-agronomist-data-v2.8';
+const CACHE_NAME = 'mini-agronomist-pro-v3.0';
+const STATIC_CACHE_NAME = 'mini-agronomist-static-v3.0';
+const DATA_CACHE_NAME = 'mini-agronomist-data-v3.0';
+const AI_MODEL_CACHE = 'mini-agronomist-models-v3.0';
 
 // Resources to cache for offline use
 const STATIC_RESOURCES = [
   '/',
   '/index.html',
   '/ml_demo.html',
-  '/game.html',
+  '/plant-scanner.html',
   '/style.css',
-  '/game.css',
   '/app.js',
   '/js/advanced_prediction_engine.js',
   '/js/statistical_models.js',
@@ -26,7 +26,11 @@ const STATIC_RESOURCES = [
   '/js/i18n-manager.js',
   '/js/python-integration.js',
   '/js/python-backend-client.js',
-  '/js/game/enhanced-game-engine.js',
+  '/js/plant-scanner.js',
+  '/js/feature-store.js',
+  '/js/model-validation.js',
+  '/js/model-persistence.js',
+  '/js/prediction-monitor.js',
   '/manifest.json',
   '/assets/icons/logo.png',
   '/assets/icons/favicon.png'

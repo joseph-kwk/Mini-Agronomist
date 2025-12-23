@@ -1,25 +1,51 @@
 // Advanced Prediction Engine with Machine Learning and Statistical Models
 // Mini Agronomist Pro - AI-Enhanced Agricultural Intelligence System
+// Version 2.0 - Enhanced with Feature Store, Model Validation, and Monitoring
 
 import { MultipleLinearRegression, BayesianInference, TimeSeriesAnalysis, MonteCarloSimulation, KMeansClustering } from './statistical_models.js';
+import FeatureStore from './feature-store.js';
+import ModelValidator from './model-validation.js';
+import ModelPersistence from './model-persistence.js';
+import PredictionMonitor from './prediction-monitor.js';
 
 class AdvancedPredictionEngine {
   constructor() {
+    // Core components
+    this.featureStore = new FeatureStore();
+    this.modelValidator = new ModelValidator();
+    this.modelPersistence = new ModelPersistence();
+    this.predictionMonitor = new PredictionMonitor();
+    
+    // Model registry
     this.models = {
       neuralNetwork: null,
-      randomForest: null,
-      regressionModel: null,
-      ensembleModel: null
+      ensembleModel: null,
+      standardizedInput: 18 // Unified input dimension
     };
     
+    // Statistical models
+    this.statisticalModels = null;
+    
+    // Configuration
+    this.config = {
+      standardInputSize: 18,
+      hiddenUnits: [64, 32, 16],
+      dropoutRate: 0.2,
+      learningRate: 0.001
+    };
+    
+    // State tracking
     this.historicalData = [];
     this.weatherPatterns = new Map();
     this.cropModels = new Map();
     this.statisticalCache = new Map();
+    this.isInitialized = false;
     
     this.isOnline = navigator.onLine;
     this.setupNetworkListener();
     
+    // Load saved models and initialize
+    this.modelPersistence.loadRegistry();
     this.initializeModels();
   }
 
@@ -58,78 +84,111 @@ class AdvancedPredictionEngine {
   }
 
   async initializeTensorFlowModels() {
-    // Neural Network for yield prediction
-    this.models.neuralNetwork = tf.sequential({
+    try {
+      // Try to load saved model first
+      if (this.modelPersistence.modelExists('main_neural_network')) {
+        console.log('📂 Loading saved neural network...');
+        const loaded = await this.modelPersistence.loadModel('main_neural_network');
+        this.models.neuralNetwork = loaded.model;
+        console.log('✅ Neural network loaded from storage');
+      } else {
+        // Create new standardized neural network
+        console.log('🏗️ Creating new standardized neural network...');
+        this.models.neuralNetwork = this.createStandardizedNeuralNetwork();
+        console.log('✅ Neural network created');
+      }
+      
+      // Initialize ensemble model
+      this.models.ensembleModel = await this.createStandardizedEnsemble();
+      
+    } catch (error) {
+      console.warn('⚠️ TensorFlow model initialization error:', error);
+      // Create fallback model
+      this.models.neuralNetwork = this.createStandardizedNeuralNetwork();
+    }
+  }
+  
+  createStandardizedNeuralNetwork() {
+    // Standardized architecture with consistent input size
+    const model = tf.sequential({
+      name: 'main_neural_network',
       layers: [
-        tf.layers.dense({ inputShape: [12], units: 64, activation: 'relu' }),
-        tf.layers.dropout({ rate: 0.2 }),
-        tf.layers.dense({ units: 32, activation: 'relu' }),
-        tf.layers.dropout({ rate: 0.1 }),
-        tf.layers.dense({ units: 16, activation: 'relu' }),
-        tf.layers.dense({ units: 1, activation: 'linear' })
+        tf.layers.dense({ 
+          inputShape: [this.config.standardInputSize], 
+          units: this.config.hiddenUnits[0], 
+          activation: 'relu',
+          kernelInitializer: 'heNormal',
+          name: 'dense_1'
+        }),
+        tf.layers.batchNormalization({ name: 'batch_norm_1' }),
+        tf.layers.dropout({ rate: this.config.dropoutRate, name: 'dropout_1' }),
+        
+        tf.layers.dense({ 
+          units: this.config.hiddenUnits[1], 
+          activation: 'relu',
+          kernelInitializer: 'heNormal',
+          name: 'dense_2'
+        }),
+        tf.layers.batchNormalization({ name: 'batch_norm_2' }),
+        tf.layers.dropout({ rate: this.config.dropoutRate * 0.5, name: 'dropout_2' }),
+        
+        tf.layers.dense({ 
+          units: this.config.hiddenUnits[2], 
+          activation: 'relu',
+          kernelInitializer: 'heNormal',
+          name: 'dense_3'
+        }),
+        
+        tf.layers.dense({ 
+          units: 1, 
+          activation: 'linear',
+          name: 'output'
+        })
       ]
     });
 
-    this.models.neuralNetwork.compile({
-      optimizer: tf.train.adam(0.001),
+    model.compile({
+      optimizer: tf.train.adam(this.config.learningRate),
       loss: 'meanSquaredError',
-      metrics: ['mae']
+      metrics: ['mae', 'mse']
     });
-
-    // Ensemble model combining multiple approaches
-    this.models.ensembleModel = await this.createEnsembleModel();
+    
+    return model;
   }
 
-  async createEnsembleModel() {
-    // Create multiple specialized models for ensemble
-    const models = {
-      rainfall: this.createRainfallSpecializedModel(),
-      temperature: this.createTemperatureSpecializedModel(),
-      soil: this.createSoilSpecializedModel(),
-      timing: this.createTimingSpecializedModel()
+  async createStandardizedEnsemble() {
+    // Create ensemble with consistent architecture
+    const createSubModel = (name, units) => {
+      const model = tf.sequential({
+        name: `ensemble_${name}`,
+        layers: [
+          tf.layers.dense({ 
+            inputShape: [this.config.standardInputSize], 
+            units: units[0], 
+            activation: 'relu',
+            kernelInitializer: 'heNormal'
+          }),
+          tf.layers.dropout({ rate: 0.1 }),
+          tf.layers.dense({ units: units[1], activation: 'relu' }),
+          tf.layers.dense({ units: 1, activation: 'sigmoid' })
+        ]
+      });
+      
+      model.compile({
+        optimizer: tf.train.adam(0.001),
+        loss: 'binaryCrossentropy',
+        metrics: ['accuracy']
+      });
+      
+      return model;
     };
 
-    return models;
-  }
-
-  createRainfallSpecializedModel() {
-    return tf.sequential({
-      layers: [
-        tf.layers.dense({ inputShape: [4], units: 32, activation: 'relu' }),
-        tf.layers.dense({ units: 16, activation: 'relu' }),
-        tf.layers.dense({ units: 1, activation: 'sigmoid' })
-      ]
-    });
-  }
-
-  createTemperatureSpecializedModel() {
-    return tf.sequential({
-      layers: [
-        tf.layers.dense({ inputShape: [3], units: 24, activation: 'relu' }),
-        tf.layers.dense({ units: 12, activation: 'relu' }),
-        tf.layers.dense({ units: 1, activation: 'sigmoid' })
-      ]
-    });
-  }
-
-  createSoilSpecializedModel() {
-    return tf.sequential({
-      layers: [
-        tf.layers.dense({ inputShape: [5], units: 20, activation: 'relu' }),
-        tf.layers.dense({ units: 10, activation: 'relu' }),
-        tf.layers.dense({ units: 1, activation: 'sigmoid' })
-      ]
-    });
-  }
-
-  createTimingSpecializedModel() {
-    return tf.sequential({
-      layers: [
-        tf.layers.dense({ inputShape: [6], units: 16, activation: 'relu' }),
-        tf.layers.dense({ units: 8, activation: 'relu' }),
-        tf.layers.dense({ units: 1, activation: 'sigmoid' })
-      ]
-    });
+    return {
+      rainfall: createSubModel('rainfall', [32, 16]),
+      temperature: createSubModel('temperature', [24, 12]),
+      soil: createSubModel('soil', [20, 10]),
+      timing: createSubModel('timing', [16, 8])
+    };
   }
 
   // ========================================
@@ -152,20 +211,42 @@ class AdvancedPredictionEngine {
   // ========================================
 
   async generateAdvancedPrediction(formData, cropRules, cropProfile, regionInfo) {
-    const features = this.extractFeatures(formData, cropRules, cropProfile, regionInfo);
-    
-    let prediction = null;
-    
-    if (this.isOnline) {
-      // Online: Use full ML models with real-time data
-      prediction = await this.generateOnlinePrediction(features, formData);
-    } else {
-      // Offline: Use statistical models and cached data
-      prediction = await this.generateOfflinePrediction(features, formData);
+    try {
+      console.log('🧠 Generating advanced prediction...');
+      
+      // Use Feature Store for unified feature extraction
+      const features = await this.featureStore.getFeatures(formData, cropRules, cropProfile, regionInfo);
+      
+      let prediction = null;
+      
+      if (this.isOnline) {
+        // Online: Use full ML models with real-time data
+        prediction = await this.generateOnlinePrediction(features, formData);
+      } else {
+        // Offline: Use statistical models and cached data
+        prediction = await this.generateOfflinePrediction(features, formData);
+      }
+      
+      // Apply ensemble learning for best results
+      const finalPrediction = this.applyEnsemblePrediction(prediction, features);
+      
+      // Track prediction for monitoring
+      const predictionId = this.predictionMonitor.trackPrediction(finalPrediction, {
+        inputs: formData,
+        crop: formData.crop,
+        region: formData.region,
+        season: formData.plantingDate.getMonth()
+      });
+      
+      finalPrediction.trackingId = predictionId;
+      
+      console.log('✅ Prediction generated successfully');
+      return finalPrediction;
+      
+    } catch (error) {
+      console.error('❌ Prediction generation failed:', error);
+      return this.generateFallbackPrediction(formData, cropRules, cropProfile, regionInfo, error);
     }
-    
-    // Apply ensemble learning for best results
-    return this.applyEnsemblePrediction(prediction, features);
   }
 
   async generateOnlinePrediction(features, formData) {
@@ -189,7 +270,8 @@ class AdvancedPredictionEngine {
       
       // Use neural network prediction
       if (this.models.neuralNetwork) {
-        const tensorInput = tf.tensor2d([this.featuresToArray(enhancedFeatures)]);
+        const featureArray = this.featureStore.toArray(enhancedFeatures);
+        const tensorInput = tf.tensor2d([featureArray]);
         const prediction = this.models.neuralNetwork.predict(tensorInput);
         const yieldEstimate = await prediction.data();
         
@@ -208,6 +290,40 @@ class AdvancedPredictionEngine {
     } catch (error) {
       console.warn('Online prediction failed, falling back to offline:', error);
       return this.generateOfflinePrediction(features, formData);
+    }
+  }
+  
+  generateFallbackPrediction(formData, cropRules, cropProfile, regionInfo, error) {
+    console.warn('⚠️ Using fallback prediction method');
+    
+    // Simple rule-based prediction
+    const baseYield = (cropRules.yield_range[0] + cropRules.yield_range[1]) / 2;
+    const rainfallFactor = this.calculateRainfallFactor(formData.rainfall, cropProfile);
+    
+    const yieldEstimate = baseYield * rainfallFactor;
+    
+    return {
+      yieldEstimate: Math.max(0.1, yieldEstimate),
+      confidence: 0.5,
+      method: 'fallback_rules',
+      dataQuality: 'low',
+      error: error.message,
+      warning: 'Prediction generated using fallback method due to error',
+      features: {}
+    };
+  }
+  
+  calculateRainfallFactor(rainfall, cropProfile) {
+    const minRequired = cropProfile.water_requirement_mm[0];
+    const maxRequired = cropProfile.water_requirement_mm[1];
+    const optimalRainfall = (minRequired + maxRequired) / 2;
+    
+    if (rainfall < minRequired) {
+      return Math.max(0.3, rainfall / minRequired);
+    } else if (rainfall > maxRequired * 1.5) {
+      return Math.max(0.5, 1 - (rainfall - maxRequired) / maxRequired);
+    } else {
+      return 0.9 + 0.1 * (1 - Math.abs(rainfall - optimalRainfall) / optimalRainfall);
     }
   }
 
@@ -611,8 +727,128 @@ class AdvancedPredictionEngine {
   // calls to them do not throw errors if a server integration isn't present.
   // Implement these to integrate with your backend or CDN for model sync.
   async loadPreTrainedModels() {
-    console.warn('loadPreTrainedModels() not implemented - skipping');
+    try {
+      // Try to load from model persistence
+      if (this.modelPersistence.modelExists('main_neural_network')) {
+        console.log('Loading pre-trained models from storage...');
+        const loaded = await this.modelPersistence.loadModel('main_neural_network');
+        if (loaded && loaded.model) {
+          this.models.neuralNetwork = loaded.model;
+          console.log('✅ Pre-trained model loaded');
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn('loadPreTrainedModels() - no saved models found:', error);
+    }
     return null;
+  }
+
+  // ========================================
+  // MODEL MANAGEMENT & PERSISTENCE
+  // ========================================
+  
+  async saveModels() {
+    try {
+      console.log('💾 Saving models...');
+      
+      if (this.models.neuralNetwork) {
+        await this.modelPersistence.saveModel(
+          this.models.neuralNetwork,
+          'main_neural_network',
+          {
+            inputSize: this.config.standardInputSize,
+            architecture: 'standardized',
+            createdAt: new Date()
+          }
+        );
+      }
+      
+      // Save statistical models
+      for (const [name, model] of Object.entries(this.statisticalModels)) {
+        this.modelPersistence.saveStatisticalModel(model, `statistical_${name}`, {
+          type: 'statistical',
+          modelClass: name
+        });
+      }
+      
+      console.log('✅ Models saved successfully');
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Failed to save models:', error);
+      return false;
+    }
+  }
+  
+  async validateModels(testData) {
+    try {
+      console.log('🔍 Validating models...');
+      const results = [];
+      
+      // Validate neural network
+      if (this.models.neuralNetwork) {
+        const nnResult = await this.modelValidator.validateModel(
+          this.models.neuralNetwork,
+          testData,
+          'neural_network'
+        );
+        results.push(nnResult);
+      }
+      
+      // Validate statistical models
+      if (this.statisticalModels.regression) {
+        const regResult = await this.modelValidator.validateModel(
+          this.statisticalModels.regression,
+          testData,
+          'regression'
+        );
+        results.push(regResult);
+      }
+      
+      // Generate comparison report
+      const comparison = this.modelValidator.compareModels();
+      console.log('📊 Model validation complete');
+      
+      return { results, comparison };
+      
+    } catch (error) {
+      console.error('❌ Model validation failed:', error);
+      return null;
+    }
+  }
+  
+  // ========================================
+  // MONITORING AND FEEDBACK
+  // ========================================
+  
+  recordActualYield(trackingId, actualYield, additionalData = {}) {
+    try {
+      return this.predictionMonitor.recordActualYield(trackingId, actualYield, additionalData);
+    } catch (error) {
+      console.error('❌ Failed to record actual yield:', error);
+      return null;
+    }
+  }
+  
+  getPerformanceReport() {
+    return this.predictionMonitor.generatePerformanceReport();
+  }
+  
+  getModelAccuracy(method = null) {
+    return this.predictionMonitor.getModelAccuracy(method);
+  }
+  
+  getPredictionMonitor() {
+    return this.predictionMonitor;
+  }
+  
+  getFeatureStore() {
+    return this.featureStore;
+  }
+  
+  getModelValidator() {
+    return this.modelValidator;
   }
 
   async downloadHistoricalData() {

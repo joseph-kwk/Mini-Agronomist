@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#667eea">
+    <title>Plant Disease Scanner - Mini Agronomist</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            -webkit-font-smoothing: antialiased;
+            touch-action: manipulation;
+        }
+
+        /* Device Banner */
+        .device-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #2196F3;
+            color: white;
+            padding: 14px 20px;
+            z-index: 10000;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: none;
+        }
+
+        .device-banner.show { display: block; }
+        .device-banner.success { background: #4CAF50; }
+        .device-banner.warning { background: #ff9800; }
+        .device-banner.info { background: #2196F3; }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .banner-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .banner-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .banner-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .banner-close:hover, .banner-close:active {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+            transition: padding 0.3s;
+        }
+
+        .container.with-banner {
+            padding-top: 120px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 12px;
+        }
+
+        .device-info {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Scanner Card */
+        .scanner-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Video Container */
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #video {
+            width: 100%;
+            height: auto;
+            display: block;
+            min-height: 300px;
+            object-fit: cover;
+        }
+
+        /* Mobile: mirror front camera */
+        @media (max-width: 768px) {
+            #video {
+                transform: scaleX(-1);
+            }
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 400px;
+            aspect-ratio: 1;
+            border: 3px dashed rgba(255,255,255,0.5);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .camera-guide {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            touch-action: manipulation;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e8e8e8;
+        }
+
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* File Upload */
+        .upload-label {
+            flex: 1;
+            min-width: 140px;
+            padding: 16px 24px;
+            background: #f5f5f5;
+            color: #333;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .upload-label:hover {
+            background: #e8e8e8;
+        }
+
+        #imageUpload {
+            display: none;
+        }
+
+        /* Results */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .confidence-badge {
+            padding: 6px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .health-score {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .health-bar {
+            flex: 1;
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            border-radius: 12px;
+            transition: width 0.6s ease, background 0.3s;
+        }
+
+        .health-fill.healthy {
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        }
+
+        .health-fill.warning {
+            background: linear-gradient(90deg, #ff9800, #FFC107);
+        }
+
+        .health-fill.danger {
+            background: linear-gradient(90deg, #f44336, #E91E63);
+        }
+
+        .health-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            min-width: 50px;
+        }
+
+        .disease-list {
+            list-style: none;
+            margin: 12px 0;
+        }
+
+        .disease-item {
+            padding: 12px;
+            background: white;
+            border-left: 4px solid #f44336;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .disease-name {
+            font-weight: 700;
+            color: #d32f2f;
+            margin-bottom: 4px;
+        }
+
+        .disease-confidence {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .recommendations {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .recommendations h4 {
+            color: #1976D2;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .recommendations ul {
+            margin-left: 20px;
+        }
+
+        .recommendations li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        /* History */
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .history-item:hover {
+            background: #e9ecef;
+            transform: translateX(4px);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-plant {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .history-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .history-status {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 20px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Offline Indicator */
+        .offline-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff9800;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+
+        .offline-indicator.show {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                padding: 70px 12px 12px;
+            }
+
+            .container.with-banner {
+                padding-top: 100px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            header p {
+                font-size: 14px;
+            }
+
+            .scanner-card {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+
+            .btn-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn, .upload-label {
+                width: 100%;
+                min-width: unset;
+                padding: 18px 24px;
+            }
+
+            .device-banner {
+                padding: 12px 16px;
+            }
+
+            .banner-text {
+                font-size: 13px;
+            }
+
+            #video {
+                min-height: 250px;
+            }
+        }
+
+        /* Tablet Optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                max-width: 750px;
+            }
+        }
+
+        /* Desktop Optimizations */
+        @media (min-width: 1025px) {
+            .btn-group {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .btn, .upload-label {
+                min-height: 48px; /* WCAG 2.1 touch target */
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .scanner-card {
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .container {
+                padding-top: 60px;
+            }
+            
+            #video {
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Device Detection Banner -->
+    <div class="device-banner" id="deviceBanner">
+        <div class="banner-content">
+            <span class="banner-icon" id="bannerIcon">ℹ️</span>
+            <span class="banner-text" id="bannerText"></span>
+            <button class="banner-close" onclick="closeBanner()">×</button>
+        </div>
+    </div>
+
+    <!-- Offline Indicator -->
+    <div class="offline-indicator" id="offlineIndicator">
+        📵 Offline Mode - Scanner still works!
+    </div>
+
+    <div class="container" id="mainContainer">
+        <header>
+            <h1>🌱 Plant Disease Scanner</h1>
+            <p>AI-Powered Plant Health Analysis</p>
+            <div class="device-info" id="deviceInfo">Loading...</div>
+        </header>
+
+        <!-- Scanner Section -->
+        <div class="scanner-card">
+            <h2 class="section-title">📷 Scan Plant</h2>
+            
+            <div class="video-wrapper" id="videoWrapper">
+                <video id="video" autoplay playsinline></video>
+                <div class="camera-overlay"></div>
+                <div class="camera-guide" id="cameraGuide">Position plant in frame</div>
+            </div>
+            <canvas id="canvas"></canvas>
+
+            <div class="controls">
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="startBtn" onclick="startCamera()">
+                        📸 Start Camera
+                    </button>
+                    <button class="btn btn-success" id="captureBtn" onclick="captureAndAnalyze()" style="display: none;">
+                        ✓ Capture & Analyze
+                    </button>
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopCamera()" style="display: none;">
+                        ⏹ Stop Camera
+                    </button>
+                </div>
+                <div class="btn-group">
+                    <label for="imageUpload" class="upload-label">
+                        📁 Upload Image
+                    </label>
+                    <input type="file" id="imageUpload" accept="image/*" onchange="handleImageUpload(event)">
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing plant health...</p>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="scanner-card results-section" id="results">
+            <h2 class="section-title">📊 Analysis Results</h2>
+            <div id="resultsContent"></div>
+        </div>
+
+        <!-- History Section -->
+        <div class="scanner-card">
+            <h2 class="section-title">📋 Scan History</h2>
+            <div id="history">
+                <p style="color: #999; text-align: center;">No scans yet</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { PlantScanner } from './js/plant-scanner.js';
+
+        let scanner;
+        let stream;
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // ===== DEVICE DETECTION =====
+        function detectDevice() {
+            const ua = navigator.userAgent.toLowerCase();
+            const isMobile = /android|webos|iphone|ipod|blackberry|iemobile|opera mini/i.test(ua);
+            const isTablet = /ipad|android(?!.*mobile)/i.test(ua);
+            const isIOS = /iphone|ipad|ipod/i.test(ua);
+            const isAndroid = /android/i.test(ua);
+            const hasMediaDevices = 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
+            
+            return {
+                isMobile,
+                isTablet,
+                isDesktop: !isMobile && !isTablet,
+                isIOS,
+                isAndroid,
+                hasCamera: hasMediaDevices,
+                platform: isMobile ? 'mobile' : (isTablet ? 'tablet' : 'desktop'),
+                touchEnabled: 'ontouchstart' in window || navigator.maxTouchPoints > 0
+            };
+        }
+
+        // ===== DEVICE GUIDANCE =====
+        function showDeviceGuidance() {
+            const device = detectDevice();
+            const banner = document.getElementById('deviceBanner');
+            const bannerText = document.getElementById('bannerText');
+            const bannerIcon = document.getElementById('bannerIcon');
+            const deviceInfo = document.getElementById('deviceInfo');
+            const container = document.getElementById('mainContainer');
+
+            // Update device info badge
+            const cameraStatus = device.hasCamera ? '✓ Camera Ready' : '⚠ Upload Only';
+            deviceInfo.innerHTML = `📱 ${device.platform.toUpperCase()} • ${cameraStatus}`;
+
+            // Show appropriate guidance
+            if (device.isMobile || device.isTablet) {
+                bannerIcon.textContent = '✅';
+                bannerText.textContent = `Perfect! This scanner is optimized for ${device.platform}s. Use your camera for real-time plant scanning.`;
+                banner.className = 'device-banner success show';
+            } else if (device.isDesktop && device.hasCamera) {
+                bannerIcon.textContent = '💻';
+                bannerText.textContent = 'Desktop detected with webcam. You can scan plants live or upload images. For best results, use a mobile device.';
+                banner.className = 'device-banner info show';
+            } else if (device.isDesktop && !device.hasCamera) {
+                bannerIcon.textContent = '⚠️';
+                bannerText.textContent = 'No camera detected. You can upload plant images for analysis. To use live scanning: connect a webcam or use a smartphone/tablet.';
+                banner.className = 'device-banner warning show';
+                
+                // Hide camera controls, show only upload
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('videoWrapper').style.display = 'none';
+            }
+
+            container.classList.add('with-banner');
+        }
+
+        window.closeBanner = function() {
+            const banner = document.getElementById('deviceBanner');
+            banner.classList.remove('show');
+            document.getElementById('mainContainer').classList.remove('with-banner');
+        };
+
+        // ===== OFFLINE DETECTION =====
+        function setupOfflineDetection() {
+            const indicator = document.getElementById('offlineIndicator');
+            
+            function updateOnlineStatus() {
+                if (!navigator.onLine) {
+                    indicator.classList.add('show');
+                } else {
+                    indicator.classList.remove('show');
+                }
+            }
+
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+        }
+
+        // ===== CAMERA FUNCTIONS =====
+        window.startCamera = async function() {
+            const device = detectDevice();
+            
+            if (!device.hasCamera) {
+                alert('❌ Camera not available\n\n' +
+                      '📤 Please use "Upload Image" instead\n\n' +
+                      '💡 Tip: For live scanning:\n' +
+                      '   • On Desktop: Connect a webcam\n' +
+                      '   • Recommended: Use a smartphone or tablet');
+                return;
+            }
+
+            try {
+                // Device-optimized camera constraints
+                const constraints = {
+                    video: {
+                        facingMode: (device.isMobile || device.isTablet) ? 'environment' : 'user',
+                        width: { ideal: device.isMobile ? 1280 : 1920 },
+                        height: { ideal: device.isMobile ? 720 : 1080 },
+                        aspectRatio: { ideal: device.isMobile ? 16/9 : 4/3 }
+                    }
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+
+                // Update UI
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('captureBtn').style.display = 'block';
+                document.getElementById('stopBtn').style.display = 'block';
+                document.getElementById('cameraGuide').textContent = 'Position leaf clearly in frame';
+            } catch (error) {
+                console.error('Camera error:', error);
+                let errorMsg = '❌ Cannot access camera\n\n';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMsg += '📷 Camera permission denied\n\n';
+                    errorMsg += 'To enable camera:\n';
+                    if (device.isIOS) {
+                        errorMsg += '• Safari: Settings > Safari > Camera\n';
+                    } else if (device.isAndroid) {
+                        errorMsg += '• Chrome: Settings > Site Settings > Camera\n';
+                    } else {
+                        errorMsg += '• Browser settings > Allow camera access\n';
+                    }
+                } else if (error.name === 'NotFoundError') {
+                    errorMsg += '📱 No camera detected\n\n';
+                    errorMsg += '• Check camera connection\n';
+                    errorMsg += '• Try refreshing the page\n';
+                } else {
+                    errorMsg += `Error: ${error.message}\n`;
+                }
+                
+                errorMsg += '\n💡 You can still upload images!';
+                alert(errorMsg);
+            }
+        };
+
+        window.stopCamera = function() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('captureBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'none';
+        };
+
+        window.captureAndAnalyze = async function() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg', 0.9);
+            await analyzeImage(imageData);
+        };
+
+        window.handleImageUpload = async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file
+            if (!file.type.startsWith('image/')) {
+                alert('⚠️ Please select a valid image file\n\nSupported formats: JPG, PNG, WebP');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert('⚠️ Image too large\n\nMaximum size: 10MB\nYour file: ' + (file.size / 1024 / 1024).toFixed(1) + 'MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                await analyzeImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        };
+
+        async function analyzeImage(imageData) {
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            loading.classList.add('show');
+            results.classList.remove('show');
+
+            try {
+                const result = await scanner.analyzeImage(imageData);
+                displayResults(result);
+                updateHistory(result);
+            } catch (error) {
+                console.error('Analysis error:', error);
+                alert('❌ Analysis failed\n\n' + error.message + '\n\nPlease try:\n• Better lighting\n• Clearer focus\n• Different angle');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        function displayResults(result) {
+            const resultsContent = document.getElementById('resultsContent');
+            const results = document.getElementById('results');
+            
+            let html = '';
+
+            // Plant Identification
+            html += `
+                <div class="result-card">
+                    <div class="result-header">
+                        <span class="result-title">🌿 ${result.plantInfo.name}</span>
+                        <span class="confidence-badge">${(result.plantInfo.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                    <p>${result.plantInfo.isCrop ? '✓ Agricultural Crop Detected' : 'Plant Detected'}</p>
+                </div>
+            `;
+
+            // Health Score
+            const healthPercent = (result.healthScore * 100).toFixed(0);
+            const healthClass = result.healthScore >= 0.7 ? 'healthy' : (result.healthScore >= 0.4 ? 'warning' : 'danger');
+            
+            html += `
+                <div class="result-card">
+                    <div class="result-title">❤️ Health Score</div>
+                    <div class="health-score">
+                        <div class="health-bar">
+                            <div class="health-fill ${healthClass}" style="width: ${healthPercent}%"></div>
+                        </div>
+                        <span class="health-text">${healthPercent}%</span>
+                    </div>
+                    <p><strong>Status:</strong> ${result.status}</p>
+                </div>
+            `;
+
+            // Diseases
+            if (result.diseases.length > 0) {
+                html += '<div class="result-card"><div class="result-title">🦠 Detected Issues</div><ul class="disease-list">';
+                result.diseases.forEach(disease => {
+                    html += `
+                        <li class="disease-item">
+                            <div class="disease-name">${disease.name}</div>
+                            <div class="disease-confidence">Confidence: ${(disease.confidence * 100).toFixed(0)}% • Severity: ${disease.severity}</div>
+                        </li>
+                    `;
+                });
+                html += '</ul></div>';
+            }
+
+            // Recommendations
+            if (result.recommendations.length > 0) {
+                html += `
+                    <div class="recommendations">
+                        <h4>💡 Recommended Actions</h4>
+                        <ul>
+                            ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+
+            resultsContent.innerHTML = html;
+            results.classList.add('show');
+            results.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function updateHistory(result) {
+            const history = document.getElementById('history');
+            const historyItems = scanner.getHistory();
+            
+            if (historyItems.length === 0) {
+                history.innerHTML = '<p style="color: #999; text-align: center;">No scans yet</p>';
+                return;
+            }
+
+            let html = '';
+            historyItems.slice(0, 10).forEach(item => {
+                const time = new Date(item.timestamp).toLocaleString();
+                const healthEmoji = item.healthScore >= 0.7 ? '✅' : (item.healthScore >= 0.4 ? '⚠️' : '❌');
+                
+                html += `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <span class="history-plant">${healthEmoji} ${item.plantName}</span>
+                            <span class="history-time">${time}</span>
+                        </div>
+                        <div class="history-status">
+                            Health: ${(item.healthScore * 100).toFixed(0)}% • 
+                            ${item.diseaseCount} issue${item.diseaseCount !== 1 ? 's' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            history.innerHTML = html;
+        }
+
+        // ===== INITIALIZATION =====
+        async function init() {
+            showDeviceGuidance();
+            setupOfflineDetection();
+            
+            try {
+                scanner = new PlantScanner();
+                await scanner.initialize();
+                console.log('✓ Scanner initialized');
+                
+                // Load history
+                updateHistory();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                alert('⚠️ Scanner initialization failed\n\nThe scanner may work with reduced accuracy.\nPlease refresh the page to try again.');
+            }
+        }
+
+        // Start on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(err => {
+                console.log('Service Worker registration failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>
