@@ -786,11 +786,13 @@
         
         // Global scanner instance
         let plantScanner = null;
+        let scanner = null; // Alias for compatibility
         
         // Initialize scanner when DOM is loaded
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 plantScanner = new PlantScanner();
+                scanner = plantScanner; // Set alias
                 console.log('✅ Plant Scanner initialized');
             } catch (error) {
                 console.error('❌ Failed to initialize scanner:', error);
@@ -842,7 +844,6 @@
             }
         });
 
-        let scanner;
         let stream;
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -1019,7 +1020,6 @@
                     stopBtn.style.display = 'none';
                 }
             }
-            }
         };
 
         window.stopCamera = function() {
@@ -1164,16 +1164,17 @@
             historyItems.slice(0, 10).forEach(item => {
                 const time = new Date(item.timestamp).toLocaleString();
                 const healthEmoji = item.healthScore >= 0.7 ? '✅' : (item.healthScore >= 0.4 ? '⚠️' : '❌');
+                const diseaseCount = item.diseases ? item.diseases.length : 0;
                 
                 html += `
                     <div class="history-item">
                         <div class="history-header">
-                            <span class="history-plant">${healthEmoji} ${item.plantName}</span>
+                            <span class="history-plant">${healthEmoji} ${item.plantInfo ? item.plantInfo.name : item.plantName}</span>
                             <span class="history-time">${time}</span>
                         </div>
                         <div class="history-status">
                             Health: ${(item.healthScore * 100).toFixed(0)}% • 
-                            ${item.diseaseCount} issue${item.diseaseCount !== 1 ? 's' : ''}
+                            ${diseaseCount} issue${diseaseCount !== 1 ? 's' : ''}
                         </div>
                     </div>
                 `;

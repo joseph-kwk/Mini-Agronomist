@@ -91,79 +91,6 @@
   <!-- Site Configuration -->
   <script src="config/site-config.js"></script>
   
-  <!-- Theme Toggle Script - Load Early -->
-  <script>
-    // Theme toggle function
-    function toggleTheme() {
-      const body = document.body;
-      const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      
-      if (newTheme === 'dark') {
-        body.classList.add('dark-theme');
-      } else {
-        body.classList.remove('dark-theme');
-      }
-      
-      // Update icon on current page
-      const themeBtn = document.getElementById('themeBtn');
-      if (themeBtn) {
-        const icon = themeBtn.querySelector('.material-icons');
-        if (icon) {
-          icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
-        }
-      }
-      
-      // Save to localStorage - triggers storage event on other tabs
-      localStorage.setItem('theme', newTheme);
-      
-      // Trigger custom event for same-page updates
-      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }));
-    }
-
-    // Load saved theme immediately
-    (function() {
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark-theme');
-        document.body.classList.add('dark-theme');
-      }
-    })();
-    
-    // Listen for theme changes from other tabs/windows
-    window.addEventListener('storage', function(e) {
-      if (e.key === 'theme') {
-        const newTheme = e.newValue;
-        if (newTheme === 'dark') {
-          document.body.classList.add('dark-theme');
-        } else {
-          document.body.classList.remove('dark-theme');
-        }
-        
-        // Update button icon
-        const themeBtn = document.getElementById('themeBtn');
-        if (themeBtn) {
-          const icon = themeBtn.querySelector('.material-icons');
-          if (icon) {
-            icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
-          }
-        }
-      }
-    });
-    
-    // Update icon when DOM loads
-    window.addEventListener('DOMContentLoaded', function() {
-      const savedTheme = localStorage.getItem('theme') || 'light';
-      const themeBtn = document.getElementById('themeBtn');
-      if (themeBtn) {
-        const icon = themeBtn.querySelector('.material-icons');
-        if (icon) {
-          icon.textContent = savedTheme === 'dark' ? 'light_mode' : 'dark_mode';
-        }
-      }
-    });
-  </script>
-  
   <!-- Icons -->
   <link rel="icon" href="assets/icons/favicon.png" type="image/x-icon" />
   <link rel="apple-touch-icon" href="assets/icons/logo.png" />
@@ -174,7 +101,7 @@
 <body>
   <header role="banner">
     <div class="header-container">
-      <a href="#" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform" onclick="location.reload(); return false;">
+      <a href="#" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
         <img src="assets/icons/logo.png" alt="Mini Agronomist" class="nav-logo" width="48" height="48">
         <span>Mini Agronomist</span>
       </a>
@@ -225,7 +152,7 @@
     </div>
 
     <!-- New Feature Banner: Plant Scanner -->
-    <div id="scannerBanner" class="feature-banner scanner-banner" style="display: block;">
+    <div id="scannerBanner" class="feature-banner scanner-banner">
       <div class="banner-content">
         <span class="banner-badge">✨ NEW FEATURE</span>
         <div class="banner-text">
@@ -234,7 +161,7 @@
         </div>
         <div class="banner-actions">
           <a href="plant-scanner.html" class="btn btn-success">Try Scanner Now →</a>
-          <button class="btn btn-ghost" onclick="document.getElementById('scannerBanner').style.display='none'">Maybe Later</button>
+          <button class="btn btn-ghost" id="dismissScanner">Maybe Later</button>
         </div>
       </div>
     </div>
@@ -721,7 +648,7 @@
             <div class="contact-info">
               <p><strong data-i18n="help.contact.support">📧 Support:</strong> support@miniagronomist.com</p>
               <p><strong data-i18n="help.contact.website">🌐 Website:</strong> <span data-website></span></p>
-              <p><strong data-i18n="help.contact.guide">📚 Full Guide:</strong> <a href="onboarding.html" target="_blank" data-i18n="help.contact.tutorial">Complete Tutorial</a></p>
+              <p><strong data-i18n="help.contact.guide">📚 Full Guide:</strong> <a href="pages/onboarding.html" target="_blank" data-i18n="help.contact.tutorial">Complete Tutorial</a></p>
             </div>
           </div>
         </div>

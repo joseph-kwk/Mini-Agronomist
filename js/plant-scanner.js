@@ -277,25 +277,28 @@ class PlantScanner {
       // Generate recommendations
       const recommendations = this.generateRecommendations(plantInfo, diseaseInfo);
       
-      // Compile results
+      // Compile results in format expected by HTML
       const results = {
+        plantInfo: {
+          name: plantInfo.species,
+          confidence: plantInfo.confidence,
+          isCrop: plantInfo.isCrop
+        },
+        healthScore: diseaseInfo.healthScore,
+        status: diseaseInfo.status,
+        diseases: diseaseInfo.diseases.map(d => ({
+          name: d.disease,
+          confidence: d.confidence,
+          severity: d.severity
+        })),
+        recommendations: recommendations.flatMap(rec => rec.items),
         imageData,
         timestamp: Date.now(),
-        plantName: plantInfo.name,
-        species: plantInfo.species,
-        confidence: plantInfo.confidence,
-        healthScore: diseaseInfo.healthScore,
-        diseases: diseaseInfo.diseases,
-        recommendations: recommendations,
-        analysisMode: this.offlineMode ? 'Offline Analysis' : 'AI-Powered Analysis',
-        timestamp: new Date()
+        analysisMode: this.offlineMode ? 'Offline Analysis' : 'AI-Powered Analysis'
       };
       
       // Save to history
       this.saveToHistory(results);
-      
-      // Display results
-      this.displayResults(results);
       
       this.showLoading(false);
       
@@ -609,82 +612,12 @@ class PlantScanner {
   }
 
   // ========================================
-  // DISPLAY FUNCTIONS
+  // PUBLIC API METHODS
   // ========================================
 
-  displayResults(results) {
-    const resultsSection = document.getElementById('results');
-    
-    // Show image
-    document.getElementById('resultImage').src = results.imageData;
-    
-    // Plant identification
-    document.getElementById('plantSpecies').textContent = results.plant.species;
-    document.getElementById('plantType').textContent = results.plant.type;
-    document.getElementById('speciesConfidence').style.width = 
-      (results.plant.confidence * 100) + '%';
-    document.getElementById('speciesConfidenceText').textContent = 
-      (results.plant.confidence * 100).toFixed(1) + '%';
-    
-    // Health status
-    const diseaseInfo = document.getElementById('diseaseInfo');
-    diseaseInfo.className = 'disease-info ' + 
-      (results.disease.status === 'Healthy' ? 'healthy' : '');
-    
-    const healthStatus = document.getElementById('healthStatus');
-    healthStatus.textContent = results.disease.status;
-    healthStatus.className = 'status-indicator ' + results.disease.statusClass;
-    
-    // Disease details
-    if (results.disease.diseases.length > 0) {
-      const mainDisease = results.disease.diseases[0];
-      document.getElementById('diseaseCondition').textContent = mainDisease.disease;
-      document.getElementById('diseaseDescription').textContent = 
-        `Severity: ${mainDisease.severity.toUpperCase()}`;
-    } else {
-      document.getElementById('diseaseCondition').textContent = 'No diseases detected';
-      document.getElementById('diseaseDescription').textContent = 
-        'Plant appears to be in good health';
-    }
-    
-    document.getElementById('diseaseConfidence').style.width = 
-      (results.disease.confidence * 100) + '%';
-    document.getElementById('diseaseConfidenceText').textContent = 
-      (results.disease.confidence * 100).toFixed(1) + '%';
-    
-    // Recommendations
-    const recList = document.getElementById('recommendationsList');
-    recList.innerHTML = '';
-    
-    for (const rec of results.recommendations) {
-      const recSection = document.createElement('div');
-      recSection.style.marginBottom = '15px';
-      
-      const title = document.createElement('h4');
-      title.textContent = rec.title;
-      title.style.marginBottom = '10px';
-      recSection.appendChild(title);
-      
-      const list = document.createElement('ul');
-      for (const item of rec.items) {
-        const li = document.createElement('li');
-        li.textContent = item;
-        list.appendChild(li);
-      }
-      recSection.appendChild(list);
-      
-      recList.appendChild(recSection);
-    }
-    
-    resultsSection.classList.add('show');
-    
-    // Scroll to results
-    resultsSection.scrollIntoView({ behavior: 'smooth' });
+  getHistory() {
+    return this.scanHistory;
   }
-
-  // ========================================
-  // UTILITY FUNCTIONS
-  // ========================================
 
   async loadImage(dataUrl) {
     return new Promise((resolve, reject) => {

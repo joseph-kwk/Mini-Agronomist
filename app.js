@@ -29,7 +29,16 @@ class MiniAgronomist {
       await this.loadData();
       this.setupEventListeners();
       this.setupFormValidation();
-      this.initializeComponents();
+      
+      // Wait for DOM to be ready before initializing components
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          this.initializeComponents();
+        });
+      } else {
+        this.initializeComponents();
+      }
+      
       this.showStatusMessage('Application ready!', 'success');
     } catch (error) {
       this.handleError('Failed to initialize application', error);
@@ -2403,35 +2412,68 @@ class MiniAgronomist {
     this.updateHistoryDisplay();
     this.resetResultsToPlaceholder();
     this.initializeWelcomeBanner();
+    this.initializeScannerBanner();
   }
 
   // Welcome Banner functionality
   initializeWelcomeBanner() {
     const welcomeBanner = document.getElementById('welcomeBanner');
     const dismissButton = document.getElementById('dismissWelcome');
-    
+
     // Check if user has seen welcome before
     const hasSeenWelcome = localStorage.getItem('mini-agronomist-welcome-dismissed');
-    
+
     if (hasSeenWelcome) {
       welcomeBanner?.classList.add('hidden');
+      return; // Don't set up event listeners if already dismissed
     }
-    
+
     // Handle dismiss button
     dismissButton?.addEventListener('click', () => {
       welcomeBanner?.classList.add('hidden');
       localStorage.setItem('mini-agronomist-welcome-dismissed', 'true');
       this.showStatusMessage('Welcome! Start by selecting your region above.', 'info');
     });
-    
-    // Auto-hide after 10 seconds if user doesn't interact
-    if (!hasSeenWelcome) {
-      setTimeout(() => {
-        if (welcomeBanner && !welcomeBanner.classList.contains('hidden')) {
-          welcomeBanner.style.opacity = '0.7';
-        }
-      }, 10000);
+
+    // Auto-hide after 15 seconds if user doesn't interact
+    setTimeout(() => {
+      if (welcomeBanner && !welcomeBanner.classList.contains('hidden')) {
+        welcomeBanner.classList.add('hidden');
+        localStorage.setItem('mini-agronomist-welcome-dismissed', 'true');
+      }
+    }, 15000);
+  }
+
+  // Scanner Banner functionality
+  initializeScannerBanner() {
+    const scannerBanner = document.getElementById('scannerBanner');
+
+    // Check if user has dismissed scanner banner before
+    const hasDismissedScanner = localStorage.getItem('mini-agronomist-scanner-dismissed');
+
+    if (hasDismissedScanner) {
+      return; // Don't show if dismissed
     }
+
+    // Show the banner
+    scannerBanner.style.display = 'block';
+
+    // Handle dismiss button
+    const dismissBtn = document.getElementById('dismissScanner');
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        scannerBanner.style.display = 'none';
+        localStorage.setItem('mini-agronomist-scanner-dismissed', 'true');
+      });
+    }
+
+    // Auto-hide after 20 seconds if user doesn't interact
+    setTimeout(() => {
+      if (scannerBanner && scannerBanner.style.display !== 'none') {
+        scannerBanner.style.display = 'none';
+        localStorage.setItem('mini-agronomist-scanner-dismissed', 'true');
+      }
+    }, 20000);
   }
 
   // Helper functions
@@ -2512,9 +2554,10 @@ function toggleTheme() {
   if (themeBtn) {
     const icon = themeBtn.querySelector('.material-icons');
     if (icon) {
+      // Main app uses material icons
       icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
     } else {
-      // For plant-scanner.html (emoji icon)
+      // Plant scanner uses emoji
       themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
     }
   }
@@ -2533,16 +2576,18 @@ function loadSavedTheme() {
   
   if (savedTheme === 'dark') {
     document.body.classList.add('dark-theme');
-    
-    // Update button icon
-    const themeBtn = document.getElementById('themeBtn');
-    if (themeBtn) {
-      const icon = themeBtn.querySelector('.material-icons');
-      if (icon) {
-        icon.textContent = 'light_mode';
-      } else {
-        themeBtn.textContent = '☀️';
-      }
+  }
+  
+  // Update button icon
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) {
+    const icon = themeBtn.querySelector('.material-icons');
+    if (icon) {
+      // Main app uses material icons
+      icon.textContent = savedTheme === 'dark' ? 'light_mode' : 'dark_mode';
+    } else {
+      // Plant scanner uses emoji
+      themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
     }
   }
 }
@@ -2554,3 +2599,4 @@ loadSavedTheme();
 document.addEventListener('DOMContentLoaded', () => {
   window.miniAgronomist = new MiniAgronomist();
   loadSavedTheme(); // Ensure theme is applied after DOM loads
+});
