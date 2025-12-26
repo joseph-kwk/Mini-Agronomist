@@ -722,11 +722,6 @@ class AdvancedPredictionEngine {
     }
   }
 
-    } catch (error) {
-      console.warn('Model update failed:', error);
-    }
-  }
-
   // Stubs for online sync methods - these functions are placeholders so
   // calls to them do not throw errors if a server integration isn't present.
   // Implement these to integrate with your backend or CDN for model sync.
