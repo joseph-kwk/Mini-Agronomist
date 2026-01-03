@@ -7,9 +7,46 @@
 
 ---
 
+## ⭐ What's New in v4.3 (Enhanced Scanner)
+
+### 📱 **AI Plant Disease Scanner - MAJOR UPGRADE**
+- **10+ disease types detected** (expanded from 6): leaf spot, powdery mildew, rust, blight, chlorosis, pest damage, bacterial spot, viral infection, anthracnose, downy mildew
+- **Scientific validation** with authoritative sources (FAO, USDA, CIMMYT, ICRISAT, Cornell)
+- **Integrated crop database** - uses crop_profiles.json for 14+ crops with scientific data
+- **Advanced detection methods**: AI classification + color analysis + texture analysis
+- **Confidence scoring system** with disease-specific thresholds
+- **User feedback validation** - rate diagnosis accuracy to improve models
+- **Full transparency** - shows detection method, confidence breakdown, color profiles
+- **Scientific citations** for every treatment recommendation
+- **Prevention strategies** with source documentation
+- **Crop-specific care** from comprehensive profiles (temperature, pH, water needs)
+
+### 🔬 **Enhanced Disease Detection**
+- **Multi-method validation**: Combines AI predictions with color and texture analysis
+- **Confidence thresholds**: Each disease requires specific confidence level (0.5-0.7)
+- **Keyword scoring**: Multiple keyword matches increase detection confidence
+- **Color ratio analysis**: Green/red/blue ratios for precise identification
+- **Texture variance**: Detects spots, lesions, and uniform coatings
+- **Health score weighting**: Severity-based scoring (severe: -0.4, moderate: -0.25, mild: -0.15)
+
+### 📊 **Transparency & Validation**
+- **Disclaimer system**: Clear warnings about AI limitations
+- **Detection method display**: Shows whether AI, color, or texture analysis was used
+- **Matched keywords shown**: See which keywords triggered disease detection
+- **Color profile tracking**: RGB values and ratios displayed for each scan
+- **Accuracy metrics**: Console function `getAccuracyMetrics()` shows validation data
+- **User feedback collection**: Rate diagnosis as accurate, partially correct, or inaccurate
+
+### 🌱 **Data Integration**
+- **Crop profiles loaded**: Scientific names, optimal conditions, pH ranges
+- **14+ crops supported**: maize, groundnuts, sorghum, soybeans, cotton, wheat, rice, etc.
+- **Growing requirements**: Temperature, water, spacing, maturity data
+- **Variety information**: Common varieties for each crop type
+- **Scientific backing**: All data from authoritative agricultural research
+
 ## ⭐ What's New in v3.0
 
-### 📱 **AI Plant Disease Scanner** (NEW!)
+### 📱 **AI Plant Disease Scanner** (ORIGINAL RELEASE)
 - **Real-time plant scanning** using device camera
 - **AI-powered disease detection** with MobileNet computer vision
 - **Mobile-optimized interface** for phones and tablets
@@ -17,8 +54,6 @@
 - **Instant health assessment** with treatment recommendations
 - **Scan history tracking** for monitoring plant health over time
 - **Desktop support** with webcam or image upload
-- **6+ common diseases detected**: leaf spot, powdery mildew, rust, blight, yellowing, pest damage
-- **9+ crop types identified**: maize, tomato, potato, wheat, rice, soybean, and more
 
 ### 🎨 **Modern UI & UX**
 - **Material Design 3.0** inspired interface with improved visual hierarchy

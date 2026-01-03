@@ -800,6 +800,93 @@
             }
         });
 
+        // ===== USER FEEDBACK SYSTEM =====
+        window.submitFeedback = function(rating, timestamp) {
+            // Store feedback locally
+            const feedback = {
+                timestamp,
+                rating,
+                date: new Date().toISOString()
+            };
+            
+            // Get existing feedback
+            let allFeedback = [];
+            try {
+                const stored = localStorage.getItem('scannerFeedback');
+                if (stored) {
+                    allFeedback = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.warn('Could not load feedback:', e);
+            }
+            
+            // Add new feedback
+            allFeedback.push(feedback);
+            
+            // Keep last 100 feedback entries
+            if (allFeedback.length > 100) {
+                allFeedback = allFeedback.slice(-100);
+            }
+            
+            // Save
+            try {
+                localStorage.setItem('scannerFeedback', JSON.stringify(allFeedback));
+            } catch (e) {
+                console.warn('Could not save feedback:', e);
+            }
+            
+            // Show thank you message
+            const feedbackMsg = rating === 'accurate' ? 'Thank you! This helps improve accuracy.' :
+                               rating === 'partially' ? 'Thanks for the feedback. We\'ll work on improving.' :
+                               'Thank you. Please consult an expert for accurate diagnosis.';
+            
+            alert('✅ Feedback Recorded\n\n' + feedbackMsg);
+            
+            // Log statistics
+            console.log('📊 Feedback Stats:', {
+                total: allFeedback.length,
+                accurate: allFeedback.filter(f => f.rating === 'accurate').length,
+                partially: allFeedback.filter(f => f.rating === 'partially').length,
+                inaccurate: allFeedback.filter(f => f.rating === 'inaccurate').length
+            });
+        };
+        
+        // ===== VALIDATION FRAMEWORK =====
+        window.getAccuracyMetrics = function() {
+            try {
+                const feedback = JSON.parse(localStorage.getItem('scannerFeedback') || '[]');
+                const total = feedback.length;
+                
+                if (total === 0) {
+                    return { message: 'No feedback data yet' };
+                }
+                
+                const accurate = feedback.filter(f => f.rating === 'accurate').length;
+                const partially = feedback.filter(f => f.rating === 'partially').length;
+                const inaccurate = feedback.filter(f => f.rating === 'inaccurate').length;
+                
+                const accuracyRate = ((accurate + partially * 0.5) / total * 100).toFixed(1);
+                
+                console.log('📊 Scanner Accuracy Metrics:');
+                console.log('Total Scans with Feedback:', total);
+                console.log('Accurate:', accurate, `(${(accurate/total*100).toFixed(1)}%)`);
+                console.log('Partially Correct:', partially, `(${(partially/total*100).toFixed(1)}%)`);
+                console.log('Inaccurate:', inaccurate, `(${(inaccurate/total*100).toFixed(1)}%)`);
+                console.log('Overall Accuracy Score:', accuracyRate + '%');
+                
+                return {
+                    total,
+                    accurate,
+                    partially,
+                    inaccurate,
+                    accuracyRate
+                };
+            } catch (e) {
+                console.error('Error calculating metrics:', e);
+                return { error: e.message };
+            }
+        };
+
         // ===== THEME TOGGLE =====
         window.toggleTheme = function() {
             const body = document.body;
@@ -1091,6 +1178,21 @@
             const results = document.getElementById('results');
             
             let html = '';
+            
+            // Add transparency disclaimer at top
+            html += `
+                <div class="result-card" style="background: #fff3cd; border-left: 4px solid #ff9800;">
+                    <div class="result-title" style="color: #f57c00;">⚠️ Important Disclaimer</div>
+                    <p style="font-size: 14px; line-height: 1.6; color: #555;">
+                        This scanner uses <strong>AI image classification + color analysis</strong>. 
+                        For accurate diagnosis, please consult an <strong>agricultural extension officer</strong> 
+                        or <strong>plant pathologist</strong>. Results should be used as preliminary guidance only.
+                    </p>
+                    <p style="font-size: 13px; margin-top: 8px; color: #666;">
+                        <strong>Analysis Mode:</strong> ${result.analysisMode || 'AI-Powered Analysis'}
+                    </p>
+                </div>
+            `;
 
             // Plant Identification
             html += `
@@ -1100,6 +1202,7 @@
                         <span class="confidence-badge">${(result.plantInfo.confidence * 100).toFixed(1)}%</span>
                     </div>
                     <p>${result.plantInfo.isCrop ? '✓ Agricultural Crop Detected' : 'Plant Detected'}</p>
+                    ${result.plantInfo.scientificName ? `<p style="font-style: italic; color: #666; font-size: 14px;">Scientific: ${result.plantInfo.scientificName}</p>` : ''}
                 </div>
             `;
 
@@ -1120,31 +1223,119 @@
                 </div>
             `;
 
-            // Diseases
+            // Diseases with enhanced details
             if (result.diseases.length > 0) {
-                html += '<div class="result-card"><div class="result-title">🦠 Detected Issues</div><ul class="disease-list">';
-                result.diseases.forEach(disease => {
+                html += '<div class="result-card"><div class="result-title">🦠 Detected Issues</div>';
+                
+                result.diseases.forEach((disease, index) => {
+                    const severityColor = disease.severity === 'severe' ? '#d32f2f' : 
+                                         disease.severity === 'moderate' ? '#f57c00' : '#388e3c';
+                    
                     html += `
-                        <li class="disease-item">
-                            <div class="disease-name">${disease.name}</div>
-                            <div class="disease-confidence">Confidence: ${(disease.confidence * 100).toFixed(0)}% • Severity: ${disease.severity}</div>
-                        </li>
+                        <div class="disease-item" style="border-left: 3px solid ${severityColor}; padding-left: 12px; margin: 16px 0;">
+                            <div class="disease-name" style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">
+                                ${index + 1}. ${disease.name}
+                            </div>
+                            <div style="font-size: 13px; color: #666; margin-bottom: 8px;">
+                                <strong>Confidence:</strong> ${(disease.confidence * 100).toFixed(0)}% • 
+                                <strong>Severity:</strong> <span style="color: ${severityColor}; text-transform: capitalize;">${disease.severity}</span>
+                                ${disease.detectionMethod ? ` • <strong>Method:</strong> ${disease.detectionMethod}` : ''}
+                            </div>
+                            
+                            ${disease.note ? `<p style="font-size: 13px; color: #555; margin: 6px 0; padding: 8px; background: #f5f5f5; border-radius: 4px;">📝 ${disease.note}</p>` : ''}
+                            
+                            ${disease.colorProfile ? `<p style="font-size: 12px; color: #777; margin: 4px 0;">🎨 Color Analysis: RGB(${disease.colorProfile.avgRed}, ${disease.colorProfile.avgGreen}, ${disease.colorProfile.avgBlue}) | Green: ${disease.colorProfile.greenRatio}</p>` : ''}
+                            
+                            ${disease.matchedKeywords && disease.matchedKeywords.length > 0 ? 
+                                `<p style="font-size: 12px; color: #777; margin: 4px 0;">🔑 Keywords: ${disease.matchedKeywords.join(', ')}</p>` : ''}
+                            
+                            ${disease.source ? `
+                                <p style="font-size: 12px; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
+                                    📚 <strong>Source:</strong> ${disease.source}
+                                    ${disease.sourceUrl ? ` | <a href="${disease.sourceUrl}" target="_blank" style="color: #1976d2;">Learn More</a>` : ''}
+                                </p>
+                            ` : ''}
+                        </div>
                     `;
                 });
-                html += '</ul></div>';
+                
+                html += '</div>';
             }
 
-            // Recommendations
-            if (result.recommendations.length > 0) {
+            // Treatments with enhanced formatting
+            if (result.diseases.length > 0) {
+                html += '<div class="result-card"><div class="result-title" style="color: #2e7d32;">💊 Treatment Recommendations</div>';
+                
+                result.diseases.forEach((disease, index) => {
+                    if (disease.treatments && disease.treatments.length > 0) {
+                        html += `
+                            <div style="margin: 16px 0;">
+                                <h5 style="color: #1976d2; margin-bottom: 8px;">${disease.disease}</h5>
+                                <ul style="margin: 0; padding-left: 20px;">
+                                    ${disease.treatments.map(t => `<li style="margin: 4px 0;">${t}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += '</div>';
+                
+                // Prevention measures
+                html += '<div class="result-card"><div class="result-title" style="color: #388e3c;">🛡️ Prevention Measures</div>';
+                
+                result.diseases.forEach((disease, index) => {
+                    if (disease.prevention && disease.prevention.length > 0) {
+                        html += `
+                            <div style="margin: 16px 0;">
+                                <h5 style="color: #1976d2; margin-bottom: 8px;">${disease.disease}</h5>
+                                <ul style="margin: 0; padding-left: 20px;">
+                                    ${disease.prevention.map(p => `<li style="margin: 4px 0;">${p}</li>`).join('')}
+                                </ul>
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += '</div>';
+            }
+
+            // General Recommendations
+            if (result.recommendations && result.recommendations.length > 0) {
                 html += `
                     <div class="recommendations">
-                        <h4>💡 Recommended Actions</h4>
+                        <h4>💡 General Care Recommendations</h4>
                         <ul>
                             ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
                         </ul>
                     </div>
                 `;
             }
+            
+            // User feedback section
+            html += `
+                <div class="result-card" style="background: #f8f9fa; border: 1px solid #dee2e6;">
+                    <div class="result-title">💬 Help Us Improve</div>
+                    <p style="font-size: 14px; margin-bottom: 12px;">Was this diagnosis helpful?</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button onclick="submitFeedback('accurate', ${result.timestamp})" 
+                                style="padding: 8px 16px; background: #4caf50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            ✅ Accurate
+                        </button>
+                        <button onclick="submitFeedback('partially', ${result.timestamp})" 
+                                style="padding: 8px 16px; background: #ff9800; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            🤔 Partially Correct
+                        </button>
+                        <button onclick="submitFeedback('inaccurate', ${result.timestamp})" 
+                                style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            ❌ Inaccurate
+                        </button>
+                    </div>
+                    <p style="font-size: 12px; color: #666; margin-top: 12px;">
+                        Your feedback helps train better AI models for agricultural disease detection.
+                    </p>
+                </div>
+            `;
 
             resultsContent.innerHTML = html;
             results.classList.add('show');

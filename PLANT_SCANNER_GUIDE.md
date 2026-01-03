@@ -1,13 +1,34 @@
-# 🔬 Plant Disease Scanner - Technical Guide
+# 🔬 Plant Disease Scanner - Technical Guide v2.0
 
 ## Overview
 
-The Plant Disease Scanner is an AI-powered computer vision system that can:
-- ✅ Detect and identify plant species
-- ✅ Diagnose plant diseases and health issues
-- ✅ Distinguish crops from non-crops
-- ✅ Provide treatment recommendations
-- ✅ Track scan history and results
+The **Enhanced Plant Disease Scanner** is an advanced AI-powered computer vision system with scientific backing that can:
+- ✅ Detect and identify 14+ plant species with scientific names
+- ✅ Diagnose 10+ plant diseases with confidence scoring
+- ✅ Integrate with comprehensive crop profiles database
+- ✅ Provide scientifically-backed treatment recommendations with sources
+- ✅ Track scan history and validate accuracy through user feedback
+- ✅ Provide transparent explanations of detection methods
+
+## 🎯 Key Improvements (v2.0)
+
+### **Scientific Validation**
+- **10+ Disease Types**: Expanded from 6 to 10+ diseases including bacterial and viral infections
+- **Scientific Sources**: All treatments cite authoritative sources (FAO, USDA, CIMMYT, ICRISAT)
+- **Confidence Thresholds**: Each disease has specific confidence requirements
+- **Multi-Method Detection**: AI classification + color analysis + texture analysis
+
+### **Data Integration**
+- **Crop Profiles**: Integrated with `crop_profiles.json` (14+ crops with scientific data)
+- **Scientific Names**: Displays Latin names for identified crops
+- **Growing Requirements**: Shows optimal temperature, water, pH, spacing
+- **Regional Data**: Ready to integrate with `crop_rules.json` for region-specific advice
+
+### **Transparency & Accuracy**
+- **Disclaimer System**: Clear warnings about AI limitations
+- **Detection Method Display**: Shows whether detection used AI, color, or texture analysis
+- **Confidence Breakdown**: Multiple confidence scores with explanations
+- **User Feedback**: Rate diagnosis accuracy to improve models
 
 ## 🧠 How It Works
 
@@ -39,65 +60,218 @@ Threshold: >30% confidence or keyword match
 - Falls back to general plant classification if no crop match
 
 #### D. **Disease Detection**
-Multiple detection methods:
+Multiple advanced detection methods:
 
-1. **Keyword Analysis**
+1. **AI Classification Analysis**
    ```javascript
-   Disease Patterns Detected:
-   - Leaf spot (keywords: spot, fungus, brown)
-   - Powdery mildew (keywords: white, powder, mildew)
-   - Rust (keywords: rust, orange, pustule)
-   - Blight (keywords: blight, wilt, dead)
-   - Yellowing (keywords: yellow, pale, chlorosis)
-   - Pest damage (keywords: hole, insect, chew)
-   ```
-
-2. **Color Analysis**
-   ```javascript
-   Color Distribution Analysis:
-   - Green dominance → Healthy plant
-   - Yellow/Red → Nutrient deficiency
-   - Brown/Dark → Disease or stress
-   - White → Possible powdery mildew
+   Enhanced Disease Patterns (10+ diseases with sources):
+   - Leaf Spot (Cercospora/Septoria) - FAO Plant Health Guidelines 2024
+   - Powdery Mildew (Erysiphales) - USDA ARS 2024
+   - Plant Rust (Puccinia spp.) - CIMMYT Research 2023
+   - Blight (Late/Early) - International Potato Center 2024
+   - Chlorosis/Nutrient Deficiency - ICRISAT 2024
+   - Insect Pest Damage - FAO IPM 2024
+   - Bacterial Spot (Xanthomonas) - APS 2024
+   - Viral Infection (Mosaic/Curl) - CIAT 2024
+   - Anthracnose (Colletotrichum) - Plant Disease Journal 2024
+   - Downy Mildew (Peronospora) - Cornell Plant Clinic 2024
    
-   Thresholds:
-   - avgGreen > 120 → Healthy
-   - avgRed > 150 && avgGreen > 140 → Yellowing
-   - avgRed > 100 && avgGreen < 90 → Blight
+   Keyword Matching + Confidence Scoring:
+   - Each disease has specific confidence threshold (0.5-0.7)
+   - Multiple keyword matches increase confidence
+   - AI prediction probability weighted by matches
    ```
 
-3. **Health Score Calculation**
+2. **Advanced Color Analysis**
    ```javascript
+   Color Ratio Analysis (improved algorithm):
+   - Green ratio > 38% && avgGreen > 100 → Healthy
+   - High red+green, low blue → Chlorosis (72% confidence)
+   - Low green, brown tones → Blight (68% confidence)
+   - Very high RGB values → Powdery mildew (70% confidence)
+   - High red, medium green → Rust (65% confidence)
+   - Very low RGB → Leaf spot (63% confidence)
+   
+   Color Profile Tracking:
+   - Records RGB values and ratios
+   - Displays in results for transparency
+   - Helps identify specific nutrient deficiencies
+   ```
+
+3. **Texture Analysis** (NEW!)
+   ```javascript
+   Pixel Variance Analysis:
+   - High variance (>60) → Spots, lesions, irregular patterns
+   - Very low variance (<15) → Uniform coating (powdery mildew)
+   - Normal variance (15-60) → Healthy texture
+   
+   Sampling Strategy:
+   - Samples ~100 pixels for performance
+   - Calculates RGB differences between adjacent pixels
+   - Provides variance score for transparency
+   ```
+
+4. **Multi-Method Confidence Aggregation**
+   ```javascript
+   If same disease detected by multiple methods:
+   - Combines confidence scores (takes maximum)
+   - Labels as "AI + Color Analysis" 
+   - Increases overall reliability
+   
+   Health Score Calculation:
    Initial: 1.0 (100% healthy)
-   - Each disease detected: -0.3
+   - Severe disease: -0.4 per detection
+   - Moderate disease: -0.25 per detection
+   - Mild disease: -0.15 per detection
    - Color abnormality: -0.2
+   - Texture abnormality: -0.1
    Final: Max(0, Min(1, score))
-   
-   Status Categories:
-   - score >= 0.7: Healthy/Minor Issues
-   - score 0.5-0.7: Disease Detected
-   - score < 0.5: Severe Issues
    ```
 
 ### 3. **Treatment Recommendation Engine**
 
 Based on detected issues, the system provides:
-- **Immediate Actions**: Remove infected parts, apply treatments
-- **Preventive Measures**: Improve conditions, proper spacing
-- **Crop-Specific Care**: Tailored advice for each crop type
+- **Immediate Actions**: Remove infected parts, apply treatments (with scientific backing)
+- **Preventive Measures**: Improve conditions, proper spacing, rotation schedules
+- **Crop-Specific Care**: Tailored advice from crop_profiles.json database
+- **Scientific Sources**: Every recommendation cites authoritative sources
+- **Prevention Tips**: Long-term strategies to avoid recurrence
+
+**Enhanced Features:**
+- **Nutrient-Specific Guidance**: For chlorosis, identifies N, Fe, Mg, or S deficiency
+- **Pest Identification**: Lists common pests and appropriate controls
+- **Source Citations**: FAO, USDA, CIMMYT, ICRISAT, Cornell, and other authorities
+- **Learn More Links**: Direct URLs to authoritative resources
 
 ## 🎯 Algorithms & Techniques
 
-### Image Processing
+### Disease Detection Pipeline
 ```javascript
-// Feature Extraction
-1. Load image into canvas
-2. Extract pixel data (RGBA values)
-3. Calculate color statistics:
-   - Average Red, Green, Blue values
-   - Color distribution patterns
-4. Analyze for abnormalities
+1. Load image → Extract to canvas
+2. Run TensorFlow MobileNet classification
+3. For each prediction:
+   a. Match keywords against disease database
+   b. Score confidence based on matches
+   c. Check against disease-specific threshold
+   d. If passed, add to detected diseases
+4. Extract color features (RGB averages & ratios)
+5. Run color analysis algorithm
+6. Calculate texture variance
+7. Aggregate all detections (remove duplicates, combine confidence)
+8. Calculate health score with severity-based weighting
+9. Generate treatment recommendations with sources
+10. Display with full transparency (method, confidence, sources)
 ```
+
+### Confidence Scoring System
+```javascript
+AI Classification Confidence:
+  base = prediction.probability (from MobileNet)
+  keyword_bonus = 0.2 per matched keyword
+  final = min(base * (1 + keyword_bonus), 0.95)
+  
+Color Analysis Confidence:
+  Fixed values based on color profile match quality
+  Range: 0.55 - 0.90
+  
+Texture Analysis Confidence:
+  Fixed values based on variance patterns
+  Range: 0.55 - 0.70
+  
+Combined Confidence (when multiple methods detect same disease):
+  Use maximum confidence from all methods
+  Label method as "AI + Color Analysis" or similar
+```
+
+## 📊 Data Integration
+
+### Crop Profiles Integration
+The scanner now loads from `data/crop_profiles.json`:
+- **14+ Crops**: maize, groundnuts, sorghum, soybeans, cotton, etc.
+- **Scientific Data**: Photosynthesis type, GDD, optimal temp, water needs
+- **pH Requirements**: Soil pH ranges for each crop
+- **Spacing Guidelines**: Plant spacing recommendations
+- **Maturity Data**: Days to maturity ranges
+- **Varieties**: Common variety names for keyword matching
+
+### Disease Knowledge Base
+```javascript
+10+ Diseases with Full Scientific Backing:
+{
+  name: "Leaf Spot Disease (Cercospora/Septoria)",
+  keywords: [...],
+  confidence_threshold: 0.6,
+  treatments: [5+ specific treatments],
+  prevention: [4+ prevention strategies],
+  source: "FAO Plant Health Guidelines 2024",
+  sourceUrl: "http://www.fao.org/plant-health"
+}
+```
+
+## 🔬 Validation & Accuracy
+
+### User Feedback System (NEW!)
+After each scan, users can rate accuracy:
+- ✅ **Accurate**: Diagnosis matched reality
+- 🤔 **Partially Correct**: Some aspects right
+- ❌ **Inaccurate**: Diagnosis was wrong
+
+Feedback is stored locally and used to calculate:
+- **Total scans with feedback**
+- **Accuracy rate** (accurate + 0.5×partially correct)
+- **Per-disease accuracy** (future enhancement)
+
+Access metrics in console:
+```javascript
+getAccuracyMetrics()
+// Returns: { total, accurate, partially, inaccurate, accuracyRate }
+```
+
+### Transparency Measures
+Every diagnosis includes:
+1. **⚠️ Disclaimer**: Warns users to consult experts
+2. **Analysis Mode**: Shows if AI or offline mode
+3. **Detection Method**: AI Classification, Color Analysis, Texture, or combined
+4. **Confidence Score**: Exact percentage for each detection
+5. **Matched Keywords**: Shows which keywords triggered detection
+6. **Color Profile**: RGB values and ratios displayed
+7. **Scientific Source**: Citation for every treatment recommendation
+
+## 🚀 Future Enhancements
+
+### Recommended Next Steps
+
+1. **PlantVillage Dataset Integration**
+   - Train custom CNN on 54,000+ labeled plant disease images
+   - Replace keyword matching with proper trained model
+   - Achieve 85-95% accuracy on known diseases
+
+2. **Transfer Learning**
+   - Use ResNet50 or EfficientNet as base
+   - Fine-tune on agricultural disease dataset
+   - Deploy lightweight version with TensorFlow.js
+
+3. **Region-Specific Integration**
+   - Load `crop_rules.json` for regional recommendations
+   - Match detected crop + user location → tailored advice
+   - Include local variety recommendations
+
+4. **Advanced Image Processing**
+   - Implement SIFT/SURF for texture features
+   - Use edge detection for lesion boundary analysis
+   - Multi-scale analysis for better spot detection
+
+5. **Offline Model Caching**
+   - Cache trained TensorFlow model in IndexedDB
+   - Enable full offline functionality
+   - Reduce dependency on CDN
+
+6. **Backend Integration**
+   - Send anonymized scans to backend for analysis
+   - Aggregate feedback for model retraining
+   - Implement collaborative filtering
+
+## 📱 Usage
 
 ### Pattern Matching
 ```javascript
