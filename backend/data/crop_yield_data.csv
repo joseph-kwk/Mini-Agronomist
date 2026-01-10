@@ -1,0 +1,30 @@
+Region,Crop,Soil_Type,Rainfall_mm,Temperature_C,pH,Yield_Tons_Ha
+southern_africa,maize,loam,650,26.0,6.0,5.5
+southern_africa,maize,sandy loam,620,27.0,5.8,4.2
+southern_africa,groundnuts,loam,600,25.0,6.2,2.1
+southern_africa,sorghum,clay,550,28.0,6.5,3.2
+eastern_africa_highlands,maize,volcanic loam,1200,20.0,6.2,6.8
+eastern_africa_highlands,maize,clay,1100,21.0,6.0,5.9
+eastern_africa_highlands,groundnuts,volcanic loam,1150,19.0,6.3,2.5
+northern_sahel,maize,sandy,350,32.0,7.0,1.8
+northern_sahel,sorghum,sandy,300,34.0,7.2,1.5
+northern_sahel,groundnuts,light clay,320,33.0,6.8,1.2
+north_america_midwest,maize,silt loam,850,18.0,6.5,11.2
+north_america_midwest,maize,clay loam,880,19.0,6.2,10.5
+north_america_midwest,soybeans,silt loam,820,20.0,6.6,3.8
+north_america_midwest,soybeans,clay loam,840,21.0,6.4,3.5
+north_america_pacific_coast,maize,sandy loam,400,22.0,6.8,8.5
+north_america_pacific_coast,tomatoes,loam,450,21.0,6.5,80.0
+south_america_cerrado,maize,oxisol,1500,27.0,5.0,7.5
+south_america_cerrado,soybeans,oxisol,1450,28.0,5.2,3.2
+western_europe,maize,silty loam,700,15.0,6.5,9.0
+western_europe,barley,silty loam,680,14.0,6.4,7.2
+south_asia,rice,alluvial loam,900,29.0,6.8,5.5
+south_asia,maize,alluvial loam,850,28.0,7.0,6.2
+southeast_asia,rice,ultisol,2000,28.0,5.5,5.8
+southeast_asia,maize,ultisol,1800,29.0,5.2,4.5
+southern_africa,maize,loam,700,25.0,6.1,5.8
+southern_africa,groundnuts,sandy loam,580,26.0,5.9,1.9
+eastern_africa_highlands,maize,volcanic loam,1250,20.5,6.3,7.0
+north_america_midwest,maize,silt loam,860,18.5,6.6,11.5
+south_asia,rice,clay,950,28.5,6.7,5.9

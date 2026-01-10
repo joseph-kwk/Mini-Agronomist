@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,38 @@
     <link rel="stylesheet" href="../style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
     <style>
+        /* Theme Button */
+        .theme-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        body.dark-theme .theme-btn {
+            background: #2d2d2d;
+        }
+
         .legal-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 2rem;
             line-height: 1.6;
         }
+
         .legal-section {
             margin-bottom: 2rem;
             padding: 1.5rem;
@@ -20,17 +47,20 @@
             border-radius: 8px;
             box-shadow: var(--elevation-1);
         }
+
         .legal-section h2 {
             color: var(--primary);
             border-bottom: 2px solid var(--primary);
             padding-bottom: 0.5rem;
         }
+
         .highlight-box {
             background: var(--primary-container);
             padding: 1rem;
             border-radius: 8px;
             margin: 1rem 0;
         }
+
         .last-updated {
             background: var(--secondary-container);
             padding: 1rem;
@@ -39,8 +69,30 @@
             margin-bottom: 2rem;
         }
     </style>
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const isDark = document.body.classList.contains('dark-theme');
+            const btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = isDark ? '☀️' : '🌙';
+        });
+    </script>
 </head>
+
 <body>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
     <header role="banner">
         <div class="header-container">
             <a href="../index.html" class="nav-brand" title="Mini Agronomist - Agricultural Intelligence Platform">
@@ -57,10 +109,12 @@
                     <a href="../ml_demo.html" role="button" tabindex="0">🤖 ML Analytics</a>
                 </nav>
                 <div class="header-buttons">
-                    <button class="icon-btn" onclick="window.location.href='../index.html'" aria-label="Back to home" title="🏠 Home">
+                    <button class="icon-btn" onclick="window.location.href='../index.html'" aria-label="Back to home"
+                        title="🏠 Home">
                         <span class="material-icons">home</span>
                     </button>
-                    <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Toggle mobile navigation menu" title="🔽 Menu">
+                    <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn"
+                        aria-label="Toggle mobile navigation menu" title="🔽 Menu">
                         <span class="material-icons">menu</span>
                     </button>
                 </div>
@@ -69,161 +123,184 @@
     </header>
 
     <main style="margin-top: 80px;">
-    <div class="legal-container">
-        <header style="text-align: center; margin-bottom: 3rem;">
-            <h1>📋 Terms of Service</h1>
-            <p style="color: var(--on-surface-variant);">Mini Agronomist - Agricultural Yield Prediction Tool</p>
-        </header>
+        <div class="legal-container">
+            <header style="text-align: center; margin-bottom: 3rem;">
+                <h1>📋 Terms of Service</h1>
+                <p style="color: var(--on-surface-variant);">Mini Agronomist - Agricultural Yield Prediction Tool</p>
+            </header>
 
-        <div class="last-updated">
-            <strong>Last Updated:</strong> August 5, 2025<br>
-            <strong>Effective Date:</strong> August 5, 2025
-        </div>
+            <div class="last-updated">
+                <strong>Last Updated:</strong> August 5, 2025<br>
+                <strong>Effective Date:</strong> August 5, 2025
+            </div>
 
-        <div class="legal-section">
-            <h2>1. Acceptance of Terms</h2>
-            <p>By accessing and using Mini Agronomist ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.</p>
-            
-            <div class="highlight-box">
-                <strong>Important:</strong> These terms apply to the free version of Mini Agronomist. Separate terms may apply to premium features when available.
+            <div class="legal-section">
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing and using Mini Agronomist ("the Service"), you accept and agree to be bound by the terms
+                    and provision of this agreement. If you do not agree to abide by the above, please do not use this
+                    service.</p>
+
+                <div class="highlight-box">
+                    <strong>Important:</strong> These terms apply to the free version of Mini Agronomist. Separate terms
+                    may apply to premium features when available.
+                </div>
+            </div>
+
+            <div class="legal-section">
+                <h2>2. Description of Service</h2>
+                <p>Mini Agronomist is a web-based agricultural yield prediction tool that provides:</p>
+                <ul>
+                    <li>Crop yield predictions based on regional data and environmental factors</li>
+                    <li>Agricultural recommendations and insights</li>
+                    <li>Historical tracking of predictions and results</li>
+                    <li>Educational content about farming practices</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Nature of Service:</strong> This is an educational and informational tool. All predictions
+                    and recommendations are estimates based on historical data and algorithms.
+                </div>
+            </div>
+
+            <div class="legal-section">
+                <h2>3. User Responsibilities</h2>
+                <p>As a user of Mini Agronomist, you agree to:</p>
+                <ul>
+                    <li><strong>Provide Accurate Information:</strong> Enter truthful and accurate data for best results
+                    </li>
+                    <li><strong>Use Responsibly:</strong> Understand that predictions are estimates, not guarantees</li>
+                    <li><strong>Comply with Laws:</strong> Use the service in accordance with applicable laws and
+                        regulations</li>
+                    <li><strong>Respect Resources:</strong> Avoid excessive or automated usage that may strain our
+                        systems</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>4. Disclaimer of Warranties</h2>
+                <p><strong>IMPORTANT AGRICULTURAL DISCLAIMER:</strong></p>
+                <ul>
+                    <li><strong>No Guarantees:</strong> Yield predictions are estimates based on historical data and
+                        cannot guarantee actual results</li>
+                    <li><strong>Weather Variability:</strong> Actual weather conditions may differ significantly from
+                        predictions</li>
+                    <li><strong>Local Factors:</strong> Many local factors affect crop yields that our system cannot
+                        account for</li>
+                    <li><strong>Professional Advice:</strong> This tool does not replace professional agricultural
+                        consulting</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Use Your Judgment:</strong> Always combine our predictions with your local knowledge,
+                    experience, and current conditions when making farming decisions.
+                </div>
+            </div>
+
+            <div class="legal-section">
+                <h2>5. Limitation of Liability</h2>
+                <p>Mini Agronomist and its creators shall not be liable for:</p>
+                <ul>
+                    <li>Any crop losses or agricultural damages</li>
+                    <li>Financial losses resulting from prediction inaccuracies</li>
+                    <li>Decisions made based on our recommendations</li>
+                    <li>Service interruptions or technical issues</li>
+                    <li>Data loss or corruption</li>
+                </ul>
+
+                <div class="highlight-box">
+                    <strong>Maximum Liability:</strong> Our total liability to you for any claim shall not exceed the
+                    amount you paid for the service (currently $0 for the free version).
+                </div>
+            </div>
+
+            <div class="legal-section">
+                <h2>6. Privacy and Data Protection</h2>
+                <p>Your privacy is important to us:</p>
+                <ul>
+                    <li><strong>Local Storage:</strong> Your data is stored locally on your device</li>
+                    <li><strong>No Data Collection:</strong> We do not collect or transmit your farm data</li>
+                    <li><strong>Anonymous Usage:</strong> No personal information is required to use the service</li>
+                    <li><strong>No Tracking:</strong> We do not track individual users or farming activities</li>
+                </ul>
+
+                <p>For complete privacy details, please review our <a href="privacy-policy.html">Privacy Policy</a>.</p>
+            </div>
+
+            <div class="legal-section">
+                <h2>7. Intellectual Property</h2>
+                <p>The Mini Agronomist service and its content are protected by intellectual property laws:</p>
+                <ul>
+                    <li><strong>Our Rights:</strong> We own the software, algorithms, design, and content</li>
+                    <li><strong>Your Data:</strong> You retain all rights to the data you input</li>
+                    <li><strong>Permitted Use:</strong> You may use the service for personal or commercial farming
+                        activities</li>
+                    <li><strong>Restrictions:</strong> You may not copy, modify, distribute, or reverse engineer the
+                        service</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>8. Service Availability</h2>
+                <p>While we strive to provide reliable service:</p>
+                <ul>
+                    <li><strong>No Uptime Guarantee:</strong> Service may be temporarily unavailable for maintenance
+                    </li>
+                    <li><strong>Updates and Changes:</strong> We may update features and algorithms without notice</li>
+                    <li><strong>Beta Features:</strong> Some features may be experimental or in testing</li>
+                    <li><strong>Discontinuation:</strong> We reserve the right to discontinue the service with
+                        reasonable notice</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>9. Changes to Terms</h2>
+                <p>We may update these terms from time to time:</p>
+                <ul>
+                    <li><strong>Notification:</strong> Changes will be posted on this page with updated dates</li>
+                    <li><strong>Continued Use:</strong> Your continued use constitutes acceptance of new terms</li>
+                    <li><strong>Major Changes:</strong> Significant changes may be highlighted or communicated
+                        separately</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>10. Contact Information</h2>
+                <p>For questions about these terms or the service:</p>
+                <ul>
+                    <li><strong>Email:</strong> legal@miniagronomist.com</li>
+                    <li><strong>Support:</strong> support@miniagronomist.com</li>
+                    <li><strong>Website:</strong> www.miniagronomist.com</li>
+                </ul>
+            </div>
+
+            <div class="legal-section">
+                <h2>11. Governing Law</h2>
+                <p>These terms shall be governed by and construed in accordance with applicable laws. Any disputes shall
+                    be resolved through binding arbitration or in courts of competent jurisdiction.</p>
+            </div>
+
+            <div
+                style="text-align: center; margin: 3rem 0; padding: 2rem; background: var(--surface-variant); border-radius: 12px;">
+                <h3>📝 Agreement Summary</h3>
+                <p>By using Mini Agronomist, you agree that:</p>
+                <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                    <li>✅ Predictions are estimates, not guarantees</li>
+                    <li>✅ You'll use your own judgment for farming decisions</li>
+                    <li>✅ The service is provided "as-is" without warranties</li>
+                    <li>✅ Your data stays private and local to your device</li>
+                </ul>
+                <br>
+                <a href="index.html" class="btn btn-primary"
+                    style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600; margin-right: 1rem;">
+                    🏠 Back to App
+                </a>
+                <a href="privacy-policy.html" class="btn btn-secondary"
+                    style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
+                    🔒 Privacy Policy
+                </a>
             </div>
         </div>
-
-        <div class="legal-section">
-            <h2>2. Description of Service</h2>
-            <p>Mini Agronomist is a web-based agricultural yield prediction tool that provides:</p>
-            <ul>
-                <li>Crop yield predictions based on regional data and environmental factors</li>
-                <li>Agricultural recommendations and insights</li>
-                <li>Historical tracking of predictions and results</li>
-                <li>Educational content about farming practices</li>
-            </ul>
-            
-            <div class="highlight-box">
-                <strong>Nature of Service:</strong> This is an educational and informational tool. All predictions and recommendations are estimates based on historical data and algorithms.
-            </div>
-        </div>
-
-        <div class="legal-section">
-            <h2>3. User Responsibilities</h2>
-            <p>As a user of Mini Agronomist, you agree to:</p>
-            <ul>
-                <li><strong>Provide Accurate Information:</strong> Enter truthful and accurate data for best results</li>
-                <li><strong>Use Responsibly:</strong> Understand that predictions are estimates, not guarantees</li>
-                <li><strong>Comply with Laws:</strong> Use the service in accordance with applicable laws and regulations</li>
-                <li><strong>Respect Resources:</strong> Avoid excessive or automated usage that may strain our systems</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>4. Disclaimer of Warranties</h2>
-            <p><strong>IMPORTANT AGRICULTURAL DISCLAIMER:</strong></p>
-            <ul>
-                <li><strong>No Guarantees:</strong> Yield predictions are estimates based on historical data and cannot guarantee actual results</li>
-                <li><strong>Weather Variability:</strong> Actual weather conditions may differ significantly from predictions</li>
-                <li><strong>Local Factors:</strong> Many local factors affect crop yields that our system cannot account for</li>
-                <li><strong>Professional Advice:</strong> This tool does not replace professional agricultural consulting</li>
-            </ul>
-            
-            <div class="highlight-box">
-                <strong>Use Your Judgment:</strong> Always combine our predictions with your local knowledge, experience, and current conditions when making farming decisions.
-            </div>
-        </div>
-
-        <div class="legal-section">
-            <h2>5. Limitation of Liability</h2>
-            <p>Mini Agronomist and its creators shall not be liable for:</p>
-            <ul>
-                <li>Any crop losses or agricultural damages</li>
-                <li>Financial losses resulting from prediction inaccuracies</li>
-                <li>Decisions made based on our recommendations</li>
-                <li>Service interruptions or technical issues</li>
-                <li>Data loss or corruption</li>
-            </ul>
-            
-            <div class="highlight-box">
-                <strong>Maximum Liability:</strong> Our total liability to you for any claim shall not exceed the amount you paid for the service (currently $0 for the free version).
-            </div>
-        </div>
-
-        <div class="legal-section">
-            <h2>6. Privacy and Data Protection</h2>
-            <p>Your privacy is important to us:</p>
-            <ul>
-                <li><strong>Local Storage:</strong> Your data is stored locally on your device</li>
-                <li><strong>No Data Collection:</strong> We do not collect or transmit your farm data</li>
-                <li><strong>Anonymous Usage:</strong> No personal information is required to use the service</li>
-                <li><strong>No Tracking:</strong> We do not track individual users or farming activities</li>
-            </ul>
-            
-            <p>For complete privacy details, please review our <a href="privacy-policy.html">Privacy Policy</a>.</p>
-        </div>
-
-        <div class="legal-section">
-            <h2>7. Intellectual Property</h2>
-            <p>The Mini Agronomist service and its content are protected by intellectual property laws:</p>
-            <ul>
-                <li><strong>Our Rights:</strong> We own the software, algorithms, design, and content</li>
-                <li><strong>Your Data:</strong> You retain all rights to the data you input</li>
-                <li><strong>Permitted Use:</strong> You may use the service for personal or commercial farming activities</li>
-                <li><strong>Restrictions:</strong> You may not copy, modify, distribute, or reverse engineer the service</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>8. Service Availability</h2>
-            <p>While we strive to provide reliable service:</p>
-            <ul>
-                <li><strong>No Uptime Guarantee:</strong> Service may be temporarily unavailable for maintenance</li>
-                <li><strong>Updates and Changes:</strong> We may update features and algorithms without notice</li>
-                <li><strong>Beta Features:</strong> Some features may be experimental or in testing</li>
-                <li><strong>Discontinuation:</strong> We reserve the right to discontinue the service with reasonable notice</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>9. Changes to Terms</h2>
-            <p>We may update these terms from time to time:</p>
-            <ul>
-                <li><strong>Notification:</strong> Changes will be posted on this page with updated dates</li>
-                <li><strong>Continued Use:</strong> Your continued use constitutes acceptance of new terms</li>
-                <li><strong>Major Changes:</strong> Significant changes may be highlighted or communicated separately</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>10. Contact Information</h2>
-            <p>For questions about these terms or the service:</p>
-            <ul>
-                <li><strong>Email:</strong> legal@miniagronomist.com</li>
-                <li><strong>Support:</strong> support@miniagronomist.com</li>
-                <li><strong>Website:</strong> www.miniagronomist.com</li>
-            </ul>
-        </div>
-
-        <div class="legal-section">
-            <h2>11. Governing Law</h2>
-            <p>These terms shall be governed by and construed in accordance with applicable laws. Any disputes shall be resolved through binding arbitration or in courts of competent jurisdiction.</p>
-        </div>
-
-        <div style="text-align: center; margin: 3rem 0; padding: 2rem; background: var(--surface-variant); border-radius: 12px;">
-            <h3>📝 Agreement Summary</h3>
-            <p>By using Mini Agronomist, you agree that:</p>
-            <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
-                <li>✅ Predictions are estimates, not guarantees</li>
-                <li>✅ You'll use your own judgment for farming decisions</li>
-                <li>✅ The service is provided "as-is" without warranties</li>
-                <li>✅ Your data stays private and local to your device</li>
-            </ul>
-            <br>
-            <a href="index.html" class="btn btn-primary" style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600; margin-right: 1rem;">
-                🏠 Back to App
-            </a>
-            <a href="privacy-policy.html" class="btn btn-secondary" style="display: inline-block; padding: 1rem 2rem; text-decoration: none; border-radius: 8px; font-weight: 600;">
-                🔒 Privacy Policy
-            </a>
-        </div>
-    </div>
     </main>
 </body>
+
 </html>

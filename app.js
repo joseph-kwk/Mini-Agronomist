@@ -2513,6 +2513,14 @@ class MiniAgronomist {
     this.resetResultsToPlaceholder();
     this.initializeWelcomeBanner();
     this.initializeScannerBanner();
+
+    // specific fix for mobile menu button if not initialized elsewhere
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    if (mobileMenuBtn) {
+      // Remove any existing listeners by cloning (simple way) or just add new one if idempotent
+      mobileMenuBtn.removeEventListener('click', this.toggleMobileMenu);
+      mobileMenuBtn.addEventListener('click', () => this.toggleMobileMenu());
+    }
   }
 
   // Welcome Banner functionality

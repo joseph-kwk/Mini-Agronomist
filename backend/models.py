@@ -12,12 +12,12 @@ class WaterBalanceRequest(BaseModel):
     soil_capacity: float = 100.0
 
 class MLTrainRequest(BaseModel):
-    features: List[List[float]]
+    features: List[Any]
     target_yields: List[float]
     model_name: str = "default"
 
 class MLPredictRequest(BaseModel):
-    features: List[List[float]]
+    features: List[Any]
     model_name: str = "default"
 
 class ClimateRiskRequest(BaseModel):

@@ -106,18 +106,21 @@ def comprehensive_prediction(request: ComprehensivePredictionRequest):
     )
     
     # 4. ML Prediction
-    # Create feature vector from inputs
-    # [avg_temp, rainfall, soil_ph, gdd, percent_moisture]
-    features = [[
-        avg_temp,
-        request.rainfall,
-        request.soil_ph,
-        gdd,
-        wb_results["soil_moisture"]
-    ]]
+    # Create feature dictionary matching the CSV training columns
+    # Region,Crop,Soil_Type,Rainfall_mm,Temperature_C,pH
+    avg_temp = (request.temperature_min + request.temperature_max) / 2
     
-    # Use demo model for now until trained
-    ml_result = ml.predict_yield(features, "demo_model")
+    features = [{
+        "Region": request.region,
+        "Crop": request.crop,
+        "Soil_Type": request.soil_type,
+        "Rainfall_mm": request.rainfall,
+        "Temperature_C": avg_temp,
+        "pH": request.soil_ph
+    }]
+    
+    # Use real model (will auto-train from CSV if first run)
+    ml_result = ml.predict_yield(features, "real_model")
     predicted_yield = ml_result[0] if ml_result else 0.0
     
     # Calculate confidence based on data quality (mock)

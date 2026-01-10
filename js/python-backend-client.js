@@ -3,10 +3,16 @@
 
 class PythonBackendClient {
   constructor() {
-    this.baseURL = 'http://localhost:8001';
+    // Use centralized config if available, otherwise fallback to default
+    if (window.SITE_CONFIG && window.SITE_CONFIG.api) {
+      this.baseURL = window.SITE_CONFIG.api.pythonBackend;
+    } else {
+      this.baseURL = 'http://localhost:8001';
+    }
+
     this.isAvailable = false;
     this.models = [];
-    
+
     this.init();
   }
 
@@ -31,10 +37,10 @@ class PythonBackendClient {
         const data = await response.json();
         this.isAvailable = true;
         console.log('🐍 Python backend connected:', data);
-        
+
         // Load available models
         await this.loadAvailableModels();
-        
+
         return true;
       } else {
         this.isAvailable = false;
@@ -146,12 +152,12 @@ class PythonBackendClient {
       }
 
       const result = await response.json();
-      
+
       // Update available models
       if (!this.models.includes(modelName)) {
         this.models.push(modelName);
       }
-      
+
       return result;
     } catch (error) {
       console.error('Model training error:', error);
@@ -279,7 +285,7 @@ class PythonBackendClient {
     try {
       // Use comprehensive prediction endpoint
       const result = await this.comprehensivePrediction(predictionData);
-      
+
       return {
         gdd: result.gdd,
         waterBalance: result.water_balance,
@@ -289,7 +295,7 @@ class PythonBackendClient {
         computedBy: 'python_backend',
         computedAt: result.computed_at
       };
-      
+
     } catch (error) {
       console.error('Enhanced prediction error:', error);
       throw error;
@@ -317,7 +323,7 @@ class PythonBackendClient {
     ];
 
     const demoYields = [
-      4.2, 5.1, 3.8, 5.8, 4.6, 
+      4.2, 5.1, 3.8, 5.8, 4.6,
       4.0, 5.5, 4.9, 3.9, 6.0
     ]; // Corresponding yields in tons/hectare
 

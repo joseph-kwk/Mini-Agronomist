@@ -31,7 +31,9 @@ const STATIC_RESOURCES = [
   '/js/prediction-monitor.js',
   '/manifest.json',
   '/assets/icons/logo.png',
-  '/assets/icons/favicon.png'
+  '/assets/icons/favicon.png',
+  'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js',
+  'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js'
 ];
 
 // Data files that should be cached
@@ -44,7 +46,7 @@ const DATA_RESOURCES = [
 // Install event - cache static resources
 self.addEventListener('install', event => {
   console.log('Service Worker installing...');
-  
+
   event.waitUntil(
     Promise.all([
       // Cache static resources
@@ -52,7 +54,7 @@ self.addEventListener('install', event => {
         console.log('Caching static resources');
         return cache.addAll(STATIC_RESOURCES);
       }),
-      
+
       // Cache data resources
       caches.open(DATA_CACHE_NAME).then(cache => {
         console.log('Caching data resources');
@@ -71,15 +73,15 @@ self.addEventListener('install', event => {
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
   console.log('Service Worker activating...');
-  
+
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           // Delete old caches
-          if (cacheName !== STATIC_CACHE_NAME && 
-              cacheName !== DATA_CACHE_NAME &&
-              cacheName.startsWith('mini-agronomist-')) {
+          if (cacheName !== STATIC_CACHE_NAME &&
+            cacheName !== DATA_CACHE_NAME &&
+            cacheName.startsWith('mini-agronomist-')) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
@@ -97,41 +99,75 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
-  
+
   // Handle different types of requests
   if (request.method !== 'GET') return;
-  
+
   // Handle data requests (JSON files)
   if (url.pathname.startsWith('/data/')) {
     event.respondWith(handleDataRequest(request));
     return;
   }
-  
+
   // Handle static resource requests
-  if (STATIC_RESOURCES.some(resource => url.pathname === resource || url.pathname === '/')) {
+  if (STATIC_RESOURCES.some(resource => {
+    // Check match for relative paths
+    if (resource.startsWith('/')) {
+      return url.pathname === resource || url.pathname === '/';
+    }
+    // Check match for absolute URLs (CDN libraries)
+    return request.url === resource;
+  })) {
     event.respondWith(handleStaticRequest(request));
     return;
   }
-  
+
   // Handle external font/icon requests
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(handleFontRequest(request));
     return;
   }
-  
+
+  // Handle AI Model requests (TFJS models) - Cache First
+  if (url.hostname === 'storage.googleapis.com' || url.pathname.includes('model.json') || url.pathname.includes('group1-shard')) {
+    event.respondWith(handleAIModelRequest(request));
+    return;
+  }
+
   // For all other requests, try network first, then cache
   event.respondWith(handleOtherRequests(request));
 });
+
+// Handle AI Model requests with cache-first strategy
+async function handleAIModelRequest(request) {
+  try {
+    const cache = await caches.open(AI_MODEL_CACHE);
+    const cachedResponse = await cache.match(request);
+
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+
+    const networkResponse = await fetch(request);
+    if (networkResponse.ok) {
+      cache.put(request, networkResponse.clone());
+    }
+    return networkResponse;
+  } catch (error) {
+    console.error('AI Model request failed:', error);
+    return new Response('Offline - Model Unavailable', { status: 503 });
+  }
+}
 
 // Handle data requests with cache-first strategy
 async function handleDataRequest(request) {
   try {
     const cache = await caches.open(DATA_CACHE_NAME);
     const cachedResponse = await cache.match(request);
-    
+
     if (cachedResponse) {
       console.log('Serving data from cache:', request.url);
-      
+
       // Try to update cache in background
       fetch(request).then(response => {
         if (response.ok) {
@@ -140,24 +176,24 @@ async function handleDataRequest(request) {
       }).catch(() => {
         // Ignore network errors when updating cache
       });
-      
+
       return cachedResponse;
     }
-    
+
     // If not in cache, try network
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-    
+
   } catch (error) {
     console.error('Data request failed:', error);
     // Return offline fallback
     return new Response(
-      JSON.stringify({ error: "Data unavailable offline" }), 
-      { 
-        status: 503, 
+      JSON.stringify({ error: "Data unavailable offline" }),
+      {
+        status: 503,
         headers: { 'Content-Type': 'application/json' }
       }
     );
@@ -169,30 +205,30 @@ async function handleStaticRequest(request) {
   try {
     const cache = await caches.open(STATIC_CACHE_NAME);
     const cachedResponse = await cache.match(request);
-    
+
     if (cachedResponse) {
       console.log('Serving static resource from cache:', request.url);
       return cachedResponse;
     }
-    
+
     // If not in cache, try network
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-    
+
   } catch (error) {
     console.error('Static request failed:', error);
-    
+
     // Return offline fallback page
     if (request.url.includes('.html') || request.headers.get('Accept')?.includes('text/html')) {
       return caches.match('/index.html');
     }
-    
+
     return new Response(
-      'Offline - Resource unavailable', 
-      { status: 503, headers: { 'Content-Type': 'text/plain' }}
+      'Offline - Resource unavailable',
+      { status: 503, headers: { 'Content-Type': 'text/plain' } }
     );
   }
 }
@@ -202,17 +238,17 @@ async function handleFontRequest(request) {
   try {
     const cache = await caches.open(STATIC_CACHE_NAME);
     const cachedResponse = await cache.match(request);
-    
+
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
       cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-    
+
   } catch (error) {
     console.log('Font request failed, using system fonts');
     return new Response('', { status: 404 });
@@ -223,28 +259,28 @@ async function handleFontRequest(request) {
 async function handleOtherRequests(request) {
   try {
     const networkResponse = await fetch(request);
-    
+
     // Cache successful responses
     if (networkResponse.ok && request.method === 'GET') {
       const cache = await caches.open(CACHE_NAME);
       cache.put(request, networkResponse.clone());
     }
-    
+
     return networkResponse;
-    
+
   } catch (error) {
     // Try to serve from cache
     const cache = await caches.open(CACHE_NAME);
     const cachedResponse = await cache.match(request);
-    
+
     if (cachedResponse) {
       console.log('Serving from cache (offline):', request.url);
       return cachedResponse;
     }
-    
+
     return new Response(
-      'Offline - Resource unavailable', 
-      { status: 503, headers: { 'Content-Type': 'text/plain' }}
+      'Offline - Resource unavailable',
+      { status: 503, headers: { 'Content-Type': 'text/plain' } }
     );
   }
 }
@@ -291,7 +327,7 @@ self.addEventListener('push', event => {
         }
       ]
     };
-    
+
     event.waitUntil(
       self.registration.showNotification('Mini Agronomist', options)
     );
@@ -301,7 +337,7 @@ self.addEventListener('push', event => {
 // Handle notification clicks
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  
+
   if (event.action === 'explore') {
     event.waitUntil(
       clients.openWindow('/')
@@ -319,10 +355,10 @@ self.addEventListener('periodicsync', event => {
 async function updateAgriculturalData() {
   try {
     console.log('Updating agricultural data in background');
-    
+
     // Update data caches
     const cache = await caches.open(DATA_CACHE_NAME);
-    
+
     const updatePromises = DATA_RESOURCES.map(async resource => {
       try {
         const response = await fetch(resource);
@@ -334,9 +370,9 @@ async function updateAgriculturalData() {
         console.log('Failed to update:', resource, error);
       }
     });
-    
+
     await Promise.all(updatePromises);
-    
+
   } catch (error) {
     console.error('Background data update failed:', error);
   }
