@@ -2,136 +2,605 @@
   "maize": {
     "scientific_name": "Zea mays",
     "photosynthesis_type": "C4",
-    "days_to_maturity": [90, 150],
-    "growing_degree_days": [1200, 2000],
-    "optimal_temp_c": [18, 30],
-    "water_requirement_mm": [450, 900],
-    "soil_ph_range": [5.5, 7.5],
-    "root_depth_cm": [60, 150],
-    "sowing_depth_cm": [3, 5],
-    "plant_spacing_cm": [20, 30],
-    "common_varieties": ["PAN 67", "ZM 521", "Pioneer P1151", "DKC61-42"],
+    "days_to_maturity": [
+      90,
+      150
+    ],
+    "growing_degree_days": [
+      1200,
+      2000
+    ],
+    "optimal_temp_c": [
+      18,
+      30
+    ],
+    "water_requirement_mm": [
+      450,
+      900
+    ],
+    "soil_ph_range": [
+      5.5,
+      7.5
+    ],
+    "root_depth_cm": [
+      60,
+      150
+    ],
+    "sowing_depth_cm": [
+      3,
+      5
+    ],
+    "plant_spacing_cm": [
+      20,
+      30
+    ],
+    "common_varieties": [
+      "PAN 67",
+      "ZM 521",
+      "Pioneer P1151",
+      "DKC61-42"
+    ],
     "description": "A versatile cereal crop, well-adapted to warm climates with moderate to high rainfall.",
     "category": "cereal"
   },
   "groundnuts": {
     "scientific_name": "Arachis hypogaea",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [90, 140],
-    "growing_degree_days": [900, 1400],
-    "optimal_temp_c": [20, 30],
-    "water_requirement_mm": [350, 600],
-    "soil_ph_range": [5.0, 7.0],
-    "root_depth_cm": [30, 50],
-    "sowing_depth_cm": [3, 5],
-    "plant_spacing_cm": [10, 15],
-    "common_varieties": ["Mnandi", "JL 24", "Manipintar", "CG7"],
+    "days_to_maturity": [
+      90,
+      140
+    ],
+    "growing_degree_days": [
+      900,
+      1400
+    ],
+    "optimal_temp_c": [
+      20,
+      30
+    ],
+    "water_requirement_mm": [
+      350,
+      600
+    ],
+    "soil_ph_range": [
+      5.0,
+      7.0
+    ],
+    "root_depth_cm": [
+      30,
+      50
+    ],
+    "sowing_depth_cm": [
+      3,
+      5
+    ],
+    "plant_spacing_cm": [
+      10,
+      15
+    ],
+    "common_varieties": [
+      "Mnandi",
+      "JL 24",
+      "Manipintar",
+      "CG7"
+    ],
     "description": "A nitrogen-fixing legume crop that improves soil fertility and provides protein-rich pods.",
     "category": "legume"
   },
   "sorghum": {
     "scientific_name": "Sorghum bicolor",
     "photosynthesis_type": "C4",
-    "days_to_maturity": [75, 120],
-    "growing_degree_days": [1000, 1600],
-    "optimal_temp_c": [22, 34],
-    "water_requirement_mm": [300, 600],
-    "soil_ph_range": [5.5, 8.0],
-    "root_depth_cm": [100, 200],
-    "sowing_depth_cm": [2, 4],
-    "plant_spacing_cm": [15, 25],
-    "common_varieties": ["Matatan", "Meko", "Seredo", "Gadam", "Dabaru"],
+    "days_to_maturity": [
+      75,
+      120
+    ],
+    "growing_degree_days": [
+      1000,
+      1600
+    ],
+    "optimal_temp_c": [
+      22,
+      34
+    ],
+    "water_requirement_mm": [
+      300,
+      600
+    ],
+    "soil_ph_range": [
+      5.5,
+      8.0
+    ],
+    "root_depth_cm": [
+      100,
+      200
+    ],
+    "sowing_depth_cm": [
+      2,
+      4
+    ],
+    "plant_spacing_cm": [
+      15,
+      25
+    ],
+    "common_varieties": [
+      "Matatan",
+      "Meko",
+      "Seredo",
+      "Gadam",
+      "Dabaru"
+    ],
     "description": "A drought-tolerant cereal crop ideal for semi-arid regions with limited water availability.",
     "category": "cereal"
   },
   "soybeans": {
     "scientific_name": "Glycine max",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [90, 140],
-    "growing_degree_days": [1200, 1800],
-    "optimal_temp_c": [20, 30],
-    "water_requirement_mm": [450, 700],
-    "soil_ph_range": [6.0, 7.0],
-    "root_depth_cm": [60, 120],
-    "sowing_depth_cm": [2, 4],
-    "plant_spacing_cm": [8, 15],
-    "common_varieties": ["Asgrow AG2433", "Pioneer P22T41", "BRS Guan xian", "M soy 7339"],
+    "days_to_maturity": [
+      90,
+      140
+    ],
+    "growing_degree_days": [
+      1200,
+      1800
+    ],
+    "optimal_temp_c": [
+      20,
+      30
+    ],
+    "water_requirement_mm": [
+      450,
+      700
+    ],
+    "soil_ph_range": [
+      6.0,
+      7.0
+    ],
+    "root_depth_cm": [
+      60,
+      120
+    ],
+    "sowing_depth_cm": [
+      2,
+      4
+    ],
+    "plant_spacing_cm": [
+      8,
+      15
+    ],
+    "common_varieties": [
+      "Asgrow AG2433",
+      "Pioneer P22T41",
+      "BRS Guan xian",
+      "M soy 7339"
+    ],
     "description": "A high-protein legume crop that fixes nitrogen and is widely used for oil and protein production.",
     "category": "legume"
   },
   "rice": {
     "scientific_name": "Oryza sativa",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [90, 180],
-    "growing_degree_days": [1200, 2200],
-    "optimal_temp_c": [20, 35],
-    "water_requirement_mm": [1000, 2000],
-    "soil_ph_range": [5.5, 7.0],
-    "root_depth_cm": [20, 40],
-    "sowing_depth_cm": [1, 3],
-    "plant_spacing_cm": [15, 25],
-    "common_varieties": ["IR 64", "Swarna", "Jasmine 85", "IR 8"],
+    "days_to_maturity": [
+      90,
+      180
+    ],
+    "growing_degree_days": [
+      1200,
+      2200
+    ],
+    "optimal_temp_c": [
+      20,
+      35
+    ],
+    "water_requirement_mm": [
+      1000,
+      2000
+    ],
+    "soil_ph_range": [
+      5.5,
+      7.0
+    ],
+    "root_depth_cm": [
+      20,
+      40
+    ],
+    "sowing_depth_cm": [
+      1,
+      3
+    ],
+    "plant_spacing_cm": [
+      15,
+      25
+    ],
+    "common_varieties": [
+      "IR 64",
+      "Swarna",
+      "Jasmine 85",
+      "IR 8"
+    ],
     "description": "A staple cereal crop requiring flooded conditions or high moisture environments.",
     "category": "cereal"
   },
   "barley": {
     "scientific_name": "Hordeum vulgare",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [90, 120],
-    "growing_degree_days": [1000, 1500],
-    "optimal_temp_c": [12, 25],
-    "water_requirement_mm": [300, 500],
-    "soil_ph_range": [6.0, 7.5],
-    "root_depth_cm": [100, 150],
-    "sowing_depth_cm": [2, 5],
-    "plant_spacing_cm": [12, 20],
-    "common_varieties": ["Concerto", "LG Golden Promise", "Clipper", "Hindmarsh", "Decanter"],
+    "days_to_maturity": [
+      90,
+      120
+    ],
+    "growing_degree_days": [
+      1000,
+      1500
+    ],
+    "optimal_temp_c": [
+      12,
+      25
+    ],
+    "water_requirement_mm": [
+      300,
+      500
+    ],
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "root_depth_cm": [
+      100,
+      150
+    ],
+    "sowing_depth_cm": [
+      2,
+      5
+    ],
+    "plant_spacing_cm": [
+      12,
+      20
+    ],
+    "common_varieties": [
+      "Concerto",
+      "LG Golden Promise",
+      "Clipper",
+      "Hindmarsh",
+      "Decanter"
+    ],
     "description": "A cool-season cereal crop suitable for temperate climates and marginal soils.",
     "category": "cereal"
   },
   "beans": {
     "scientific_name": "Phaseolus vulgaris",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [60, 100],
-    "growing_degree_days": [800, 1200],
-    "optimal_temp_c": [18, 24],
-    "water_requirement_mm": [300, 500],
-    "soil_ph_range": [6.0, 7.0],
-    "root_depth_cm": [30, 60],
-    "sowing_depth_cm": [3, 5],
-    "plant_spacing_cm": [8, 15],
-    "common_varieties": ["BAT 477", "Red Mexican"],
+    "days_to_maturity": [
+      60,
+      100
+    ],
+    "growing_degree_days": [
+      800,
+      1200
+    ],
+    "optimal_temp_c": [
+      18,
+      24
+    ],
+    "water_requirement_mm": [
+      300,
+      500
+    ],
+    "soil_ph_range": [
+      6.0,
+      7.0
+    ],
+    "root_depth_cm": [
+      30,
+      60
+    ],
+    "sowing_depth_cm": [
+      3,
+      5
+    ],
+    "plant_spacing_cm": [
+      8,
+      15
+    ],
+    "common_varieties": [
+      "BAT 477",
+      "Red Mexican"
+    ],
     "description": "A nitrogen-fixing legume that provides protein and improves soil fertility.",
     "category": "legume"
   },
   "tomatoes": {
     "scientific_name": "Solanum lycopersicum",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [70, 120],
-    "growing_degree_days": [1000, 1800],
-    "optimal_temp_c": [18, 26],
-    "water_requirement_mm": [400, 800],
-    "soil_ph_range": [6.0, 6.8],
-    "root_depth_cm": [30, 60],
-    "sowing_depth_cm": [0.5, 1],
-    "plant_spacing_cm": [30, 60],
-    "common_varieties": ["Early Girl", "Beefsteak"],
+    "days_to_maturity": [
+      70,
+      120
+    ],
+    "growing_degree_days": [
+      1000,
+      1800
+    ],
+    "optimal_temp_c": [
+      18,
+      26
+    ],
+    "water_requirement_mm": [
+      400,
+      800
+    ],
+    "soil_ph_range": [
+      6.0,
+      6.8
+    ],
+    "root_depth_cm": [
+      30,
+      60
+    ],
+    "sowing_depth_cm": [
+      0.5,
+      1
+    ],
+    "plant_spacing_cm": [
+      30,
+      60
+    ],
+    "common_varieties": [
+      "Early Girl",
+      "Beefsteak"
+    ],
     "description": "A warm-season vegetable crop requiring consistent moisture and warm temperatures.",
     "category": "vegetable"
   },
   "sweet_potato": {
     "scientific_name": "Ipomoea batatas",
     "photosynthesis_type": "C3",
-    "days_to_maturity": [90, 120],
-    "growing_degree_days": [1200, 1800],
-    "optimal_temp_c": [20, 30],
-    "water_requirement_mm": [500, 750],
-    "soil_ph_range": [5.8, 6.2],
-    "root_depth_cm": [30, 50],
-    "sowing_depth_cm": [8, 15],
-    "plant_spacing_cm": [25, 40],
-    "common_varieties": ["Beauregard", "Covington"],
+    "days_to_maturity": [
+      90,
+      120
+    ],
+    "growing_degree_days": [
+      1200,
+      1800
+    ],
+    "optimal_temp_c": [
+      20,
+      30
+    ],
+    "water_requirement_mm": [
+      500,
+      750
+    ],
+    "soil_ph_range": [
+      5.8,
+      6.2
+    ],
+    "root_depth_cm": [
+      30,
+      50
+    ],
+    "sowing_depth_cm": [
+      8,
+      15
+    ],
+    "plant_spacing_cm": [
+      25,
+      40
+    ],
+    "common_varieties": [
+      "Beauregard",
+      "Covington"
+    ],
     "description": "A nutritious root vegetable that tolerates poor soils and provides good yields.",
     "category": "root_vegetable"
+  },
+  "wheat": {
+    "scientific_name": "Triticum aestivum",
+    "photosynthesis_type": "C3",
+    "days_to_maturity": [
+      100,
+      150
+    ],
+    "growing_degree_days": [
+      1400,
+      2000
+    ],
+    "optimal_temp_c": [
+      15,
+      24
+    ],
+    "water_requirement_mm": [
+      450,
+      650
+    ],
+    "soil_ph_range": [
+      6.0,
+      7.5
+    ],
+    "root_depth_cm": [
+      90,
+      150
+    ],
+    "sowing_depth_cm": [
+      2,
+      4
+    ],
+    "plant_spacing_cm": [
+      10,
+      15
+    ],
+    "common_varieties": [
+      "PBW 343",
+      "DWR 162",
+      "Yecora Rojo"
+    ],
+    "description": "A major cereal grain, staple food worldwide, requires cool weather for tillering.",
+    "category": "cereal"
+  },
+  "potato": {
+    "scientific_name": "Solanum tuberosum",
+    "photosynthesis_type": "C3",
+    "days_to_maturity": [
+      70,
+      120
+    ],
+    "growing_degree_days": [
+      1200,
+      1800
+    ],
+    "optimal_temp_c": [
+      15,
+      20
+    ],
+    "water_requirement_mm": [
+      500,
+      700
+    ],
+    "soil_ph_range": [
+      4.8,
+      6.5
+    ],
+    "root_depth_cm": [
+      30,
+      60
+    ],
+    "sowing_depth_cm": [
+      5,
+      10
+    ],
+    "plant_spacing_cm": [
+      20,
+      30
+    ],
+    "common_varieties": [
+      "Russet Burbank",
+      "Yukon Gold",
+      "Kufri Jyoti"
+    ],
+    "description": "High-yield tuber crop, requires cool nights and consistent moisture.",
+    "category": "tuber"
+  },
+  "cotton": {
+    "scientific_name": "Gossypium hirsutum",
+    "photosynthesis_type": "C3",
+    "days_to_maturity": [
+      150,
+      180
+    ],
+    "growing_degree_days": [
+      2200,
+      2800
+    ],
+    "optimal_temp_c": [
+      25,
+      35
+    ],
+    "water_requirement_mm": [
+      700,
+      1200
+    ],
+    "soil_ph_range": [
+      5.5,
+      8.5
+    ],
+    "root_depth_cm": [
+      100,
+      180
+    ],
+    "sowing_depth_cm": [
+      2,
+      4
+    ],
+    "plant_spacing_cm": [
+      30,
+      50
+    ],
+    "common_varieties": [
+      "Bt Cotton",
+      "Stoneville"
+    ],
+    "description": "Fiber crop requiring long frost-free periods and extensive sun.",
+    "category": "commercial"
+  },
+  "sugarcane": {
+    "scientific_name": "Saccharum officinarum",
+    "photosynthesis_type": "C4",
+    "days_to_maturity": [
+      300,
+      365
+    ],
+    "growing_degree_days": [
+      3500,
+      5000
+    ],
+    "optimal_temp_c": [
+      20,
+      35
+    ],
+    "water_requirement_mm": [
+      1500,
+      2500
+    ],
+    "soil_ph_range": [
+      5.0,
+      8.0
+    ],
+    "root_depth_cm": [
+      50,
+      100
+    ],
+    "sowing_depth_cm": [
+      5,
+      10
+    ],
+    "plant_spacing_cm": [
+      90,
+      120
+    ],
+    "common_varieties": [
+      "Co 0238",
+      "Co 86032"
+    ],
+    "description": "Perennial grass for sugar production, high water and nutrient needs.",
+    "category": "commercial"
+  },
+  "cassava": {
+    "scientific_name": "Manihot esculenta",
+    "photosynthesis_type": "C3",
+    "days_to_maturity": [
+      240,
+      360
+    ],
+    "growing_degree_days": [
+      2500,
+      4000
+    ],
+    "optimal_temp_c": [
+      25,
+      29
+    ],
+    "water_requirement_mm": [
+      600,
+      1500
+    ],
+    "soil_ph_range": [
+      4.5,
+      7.0
+    ],
+    "root_depth_cm": [
+      40,
+      100
+    ],
+    "sowing_depth_cm": [
+      5,
+      10
+    ],
+    "plant_spacing_cm": [
+      70,
+      100
+    ],
+    "common_varieties": [
+      "TMS 30572",
+      "TME 419"
+    ],
+    "description": "Drought-tolerant woody shrub grown for its edible starchy tuberous root.",
+    "category": "tuber"
   }
 }

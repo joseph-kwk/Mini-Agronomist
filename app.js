@@ -10,14 +10,14 @@ class MiniAgronomist {
     this.currentPrediction = null;
     this.predictionHistory = [];
     this.isLoading = false;
-    
+
     // Pro feature managers
     this.proFeatureManager = null;
     this.fieldManager = null;
     this.advancedAnalytics = null;
     this.authManager = null; // Will be set by AuthManager when initialized
     this.pythonIntegration = null; // Will be set when Python loads
-    
+
     this.init();
   }
 
@@ -25,11 +25,11 @@ class MiniAgronomist {
     try {
       // Initialize Pro features first
       await this.initializeProFeatures();
-      
+
       await this.loadData();
       this.setupEventListeners();
       this.setupFormValidation();
-      
+
       // Wait for DOM to be ready before initializing components
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
@@ -38,7 +38,7 @@ class MiniAgronomist {
       } else {
         this.initializeComponents();
       }
-      
+
       this.showStatusMessage('Application ready!', 'success');
     } catch (error) {
       this.handleError('Failed to initialize application', error);
@@ -50,12 +50,12 @@ class MiniAgronomist {
     // Initialize Pro Feature Manager
     if (window.ProFeatureManager) {
       this.proFeatureManager = new ProFeatureManager();
-      
+
       // Initialize Field Manager if Pro features available
       if (this.proFeatureManager.hasFeature('fieldManagement') && window.FieldManager) {
         this.fieldManager = new FieldManager(this.proFeatureManager);
       }
-      
+
       // Initialize Advanced Analytics if available
       if (this.proFeatureManager.hasFeature('advancedAnalytics') && window.AdvancedAnalytics) {
         this.advancedAnalytics = new AdvancedAnalytics(this.proFeatureManager, this.fieldManager);
@@ -67,10 +67,10 @@ class MiniAgronomist {
   onPythonReady() {
     console.log('🐍 Python scientific computing is now available!');
     this.pythonIntegration = window.pythonIntegration;
-    
+
     // Update UI to show Python-enhanced features
     this.updatePythonFeatureUI();
-    
+
     // Show notification
     this.showMessage('🧮 Advanced scientific computing enabled! Enhanced predictions now available.', 'success');
   }
@@ -86,7 +86,7 @@ class MiniAgronomist {
         section.appendChild(badge);
       }
     });
-    
+
     // Enable advanced prediction options
     this.enableAdvancedPredictions();
   }
@@ -117,9 +117,9 @@ class MiniAgronomist {
           </div>
         </div>
       `;
-      
+
       predictionContainer.appendChild(advancedToggle);
-      
+
       // Add event listener
       document.getElementById('pythonEnhancedToggle').addEventListener('click', this.togglePythonPredictions.bind(this));
     }
@@ -128,7 +128,7 @@ class MiniAgronomist {
   async togglePythonPredictions() {
     const toggle = document.getElementById('pythonEnhancedToggle');
     const content = document.getElementById('pythonEnhancedContent');
-    
+
     if (toggle.classList.contains('active')) {
       // Disable enhanced predictions
       toggle.classList.remove('active');
@@ -139,7 +139,7 @@ class MiniAgronomist {
       toggle.classList.add('active');
       content.classList.add('visible');
       toggle.textContent = 'Enhanced Mode Active';
-      
+
       // Re-run current prediction with Python enhancement
       if (this.currentPrediction) {
         await this.runPythonEnhancedPrediction();
@@ -148,16 +148,50 @@ class MiniAgronomist {
   }
 
   async runPythonEnhancedPrediction() {
+    // Check if Backend is available first (Priority 1)
+    if (window.pythonBackendClient && window.pythonBackendClient.isConnected()) {
+      try {
+        this.showLoadingOverlay('Running scientific analysis (Backend)...');
+
+        const currentData = this.currentPrediction;
+        const predictionData = {
+          temperature: {
+            min: parseFloat(document.getElementById('tempMin')?.value || 20),
+            max: parseFloat(document.getElementById('tempMax')?.value || 30),
+            avg: (parseFloat(document.getElementById('tempMin')?.value || 20) + parseFloat(document.getElementById('tempMax')?.value || 30)) / 2
+          },
+          rainfall: parseFloat(document.getElementById('rainfall')?.value || 500),
+          soilType: document.getElementById('soil')?.value || 'loam',
+          plantingDate: document.getElementById('plantingDate')?.value || new Date().toISOString(),
+          crop: currentData.inputs.crop,
+          region: currentData.inputs.region,
+          soilPh: 7.0 // Default
+        };
+
+        const results = await window.pythonBackendClient.enhancedPrediction(predictionData);
+        this.displayPythonResults(results);
+        this.hideLoadingOverlay();
+        return;
+      } catch (error) {
+        console.warn('Backend prediction failed, trying Pyodide...', error);
+        // Fall through to Pyodide
+      }
+    }
+
+    // Fallback to Pyodide (Priority 2)
     if (!this.pythonIntegration?.isReady() || !this.currentPrediction) {
+      if (!this.pythonIntegration?.isReady()) {
+        this.showMessage('Python environment is still loading...', 'warning');
+      }
       return;
     }
-    
+
     try {
-      this.showLoadingOverlay('Running scientific analysis...');
-      
+      this.showLoadingOverlay('Running scientific analysis (Browser)...');
+
       // Get current prediction data
       const currentData = this.currentPrediction;
-      
+
       // Prepare data for Python analysis
       const predictionData = {
         temperature: {
@@ -172,15 +206,15 @@ class MiniAgronomist {
         cropData: currentData.crop || {},
         regionData: currentData.region || {}
       };
-      
+
       // Run enhanced prediction
       const enhancedResults = await this.pythonIntegration.enhancedPrediction(predictionData);
-      
+
       // Display enhanced results
       this.displayPythonResults(enhancedResults);
-      
+
       this.hideLoadingOverlay();
-      
+
     } catch (error) {
       console.error('Enhanced prediction error:', error);
       this.hideLoadingOverlay();
@@ -191,7 +225,7 @@ class MiniAgronomist {
   displayPythonResults(results) {
     const content = document.getElementById('pythonEnhancedContent');
     if (!content) return;
-    
+
     // Create enhanced results display
     const resultsHTML = `
       <div class="python-computation-result">
@@ -245,7 +279,7 @@ class MiniAgronomist {
         Advanced calculations using NumPy, SciPy, and Scikit-learn
       </div>
     `;
-    
+
     // Replace existing content with enhanced results
     content.innerHTML = resultsHTML;
   }
@@ -253,7 +287,7 @@ class MiniAgronomist {
   // Enhanced Data Loading with Pro features
   async loadData() {
     this.showLoadingOverlay('Loading agricultural data...');
-    
+
     try {
       const loadPromises = [
         this.fetchJSON("data/crop_rules.json"),
@@ -267,11 +301,11 @@ class MiniAgronomist {
       }
 
       const results = await Promise.all(loadPromises);
-      
+
       this.cropData = results[0];
       this.cropProfiles = results[1];
       this.regionData = results[2];
-      
+
       // Load Pro crop data if available
       if (results[3]) {
         this.proCropData = results[3];
@@ -290,7 +324,7 @@ class MiniAgronomist {
 
       this.validateDataIntegrity();
       this.populateDropdowns();
-      
+
     } catch (error) {
       throw new Error(`Data loading failed: ${error.message}`);
     } finally {
@@ -323,31 +357,31 @@ class MiniAgronomist {
     document.getElementById("resetForm")?.addEventListener("click", () => this.resetForm());
     document.getElementById("newPrediction")?.addEventListener("click", () => this.startNewPrediction());
     document.getElementById("clearHistory")?.addEventListener("click", () => this.clearPredictionHistory());
-    
+
     // Tool buttons
     document.getElementById("exportBtn")?.addEventListener("click", () => this.exportResults());
     document.getElementById("compareBtn")?.addEventListener("click", () => this.openComparisonTool());
     document.getElementById("printBtn")?.addEventListener("click", () => this.printReport());
-    
+
     // Help and settings
     document.getElementById("helpBtn")?.addEventListener("click", () => this.showHelpModal());
     document.getElementById("settingsBtn")?.addEventListener("click", () => this.showSettingsModal());
-    
+
     // Mobile menu toggle
     document.getElementById("mobileMenuBtn")?.addEventListener("click", () => this.toggleMobileMenu());
-    
+
     // Close mobile menu when clicking outside
     document.addEventListener('click', (e) => {
       const mobileMenu = document.querySelector('.nav-links');
       const mobileMenuBtn = document.getElementById('mobileMenuBtn');
       const headerContainer = document.querySelector('.header-container');
-      
-      if (mobileMenu?.classList.contains('mobile-open') && 
-          !headerContainer?.contains(e.target)) {
+
+      if (mobileMenu?.classList.contains('mobile-open') &&
+        !headerContainer?.contains(e.target)) {
         this.closeMobileMenu();
       }
     });
-    
+
     // Modal close handlers
     document.querySelectorAll('.modal-close').forEach(btn => {
       btn.addEventListener('click', (e) => this.closeModal(e.target.closest('.modal')));
@@ -355,13 +389,13 @@ class MiniAgronomist {
 
     // Keyboard navigation
     document.addEventListener('keydown', (e) => this.handleKeyboardNavigation(e));
-    
+
     // Enhanced header scroll behavior
     let lastScrollY = window.scrollY;
     window.addEventListener('scroll', () => {
       const header = document.querySelector('header');
       const currentScrollY = window.scrollY;
-      
+
       if (header) {
         if (currentScrollY > 50) {
           header.classList.add('scrolled');
@@ -369,7 +403,7 @@ class MiniAgronomist {
           header.classList.remove('scrolled');
         }
       }
-      
+
       lastScrollY = currentScrollY;
     });
   }
@@ -377,7 +411,7 @@ class MiniAgronomist {
   // Enhanced Form Validation
   setupFormValidation() {
     const fields = ['region', 'crop', 'soil', 'rainfall', 'plantingDate'];
-    
+
     fields.forEach(fieldId => {
       const field = document.getElementById(fieldId);
       if (field) {
@@ -390,7 +424,7 @@ class MiniAgronomist {
   validateField(fieldId, value) {
     const field = document.getElementById(fieldId);
     const statusDiv = field?.parentElement.querySelector('.field-status');
-    
+
     if (!field || !statusDiv) return;
 
     let isValid = true;
@@ -450,7 +484,7 @@ class MiniAgronomist {
         const plantingDate = new Date(value);
         const today = new Date();
         const oneYearFromNow = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
-        
+
         if (!value || plantingDate.toString() === "Invalid Date") {
           isValid = false;
           message = 'Please select a valid planting date';
@@ -484,13 +518,13 @@ class MiniAgronomist {
   // Enhanced Form Submission
   async handleFormSubmission(event) {
     event.preventDefault();
-    
+
     if (this.isLoading) return;
 
     // Validate all fields
     const formData = this.getFormData();
     const validationResult = this.validateFormData(formData);
-    
+
     if (!validationResult.isValid) {
       this.showErrorMessage(validationResult.errors.join('<br>'));
       return;
@@ -499,12 +533,12 @@ class MiniAgronomist {
     try {
       this.isLoading = true;
       this.showLoadingOverlay('Analyzing crop data...');
-      
+
       // Simulate processing time for better UX
       await new Promise(resolve => setTimeout(resolve, 1200));
-      
+
       const prediction = await this.generatePrediction(formData);
-      
+
       if (prediction) {
         this.displayPredictionResults(prediction);
         this.savePredictionToHistory(prediction);
@@ -513,7 +547,7 @@ class MiniAgronomist {
       } else {
         throw new Error('No prediction data available for this combination');
       }
-      
+
     } catch (error) {
       this.handleError('Failed to generate prediction', error);
     } finally {
@@ -535,13 +569,13 @@ class MiniAgronomist {
 
   validateFormData(formData) {
     const errors = [];
-    
+
     if (!formData.region) errors.push("❌ Please select your agricultural region");
     if (!formData.soil) errors.push("❌ Please select soil type");
     if (!formData.crop) errors.push("❌ Please select crop type");
     if (isNaN(formData.rainfall) || formData.rainfall < 0) errors.push("❌ Please enter valid rainfall amount");
     if (!formData.plantingDate || formData.plantingDate.toString() === "Invalid Date") errors.push("❌ Please select valid planting date");
-    
+
     return {
       isValid: errors.length === 0,
       errors
@@ -551,7 +585,7 @@ class MiniAgronomist {
   // Enhanced Prediction Generation
   async generatePrediction(formData) {
     const { region, soil, crop, rainfall, plantingDate } = formData;
-    
+
     // Check if we have data for this combination
     if (!this.cropData[region]?.[crop]?.[soil]) {
       return null;
@@ -562,7 +596,7 @@ class MiniAgronomist {
     const regionInfo = this.regionData[region];
 
     // Enhanced yield calculation with more factors
-    const yieldCalculation = this.calculateEnhancedYield(
+    const yieldCalculation = await this.calculateEnhancedYield(
       cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop
     );
 
@@ -583,6 +617,58 @@ class MiniAgronomist {
   }
 
   async calculateEnhancedYield(cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop) {
+    // 1. Priority: Python Backend (Full Scientific Analysis)
+    if (window.pythonBackendClient && window.pythonBackendClient.isConnected()) {
+      try {
+        console.log("🚀 Using Python Backend for prediction...");
+        const predictionData = {
+          temperature: {
+            min: this.getRegionTempMin(region) || 15,
+            max: this.getRegionTempMax(region) || 30,
+            avg: (this.getRegionTempMin(region) + this.getRegionTempMax(region)) / 2
+          },
+          rainfall: parseFloat(rainfall),
+          soilType: regionInfo.soil_profiles?.[0]?.type || 'loam',
+          plantingDate: plantingDate,
+          crop: crop,
+          region: region,
+          soilPh: 7.0
+        };
+
+        const backendResult = await window.pythonBackendClient.enhancedPrediction(predictionData);
+
+        // Map backend result to app structure
+        const mlPred = backendResult.mlPrediction || {};
+        const yieldVal = mlPred.predicted_yield || 0;
+        const conf = mlPred.confidence || 0.7;
+
+        return {
+          yieldEstimate: Math.round(yieldVal * 10) / 10,
+          riskLevel: 1 - conf,
+          finalScore: conf,
+          confidence: conf,
+          factorScores: {
+            rainfall: 0.9, // Backend considers this integrated
+            timing: 0.9,
+            water: backendResult.waterBalance?.water_stress < 0.4 ? 0.9 : 0.6,
+            soil: 0.85,
+            temperature: 0.85
+          },
+          method: 'python_backend_scientific',
+          dataQuality: 'high',
+          scientificMetrics: {
+            gdd: backendResult.gdd,
+            waterBalance: backendResult.waterBalance,
+            et: backendResult.estimatedEt
+          },
+          source: "Scientific Computation",
+          baseTip: "Optimized based on scientific analysis."
+        };
+      } catch (e) {
+        console.warn("Python Backend failed, falling back...", e);
+      }
+    }
+
     try {
       // Prepare form data for advanced engine
       const formData = {
@@ -615,7 +701,7 @@ class MiniAgronomist {
 
       // Use advanced prediction engine for sophisticated ML/statistical analysis
       const advancedPrediction = await this.advancedEngine.generateAdvancedPrediction(formData, cropRules, cropProfile, regionInfo);
-      
+
       // Fallback to original method if advanced prediction fails
       if (!advancedPrediction || advancedPrediction.yieldEstimate <= 0) {
         return this.calculateLegacyYield(cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop);
@@ -625,7 +711,9 @@ class MiniAgronomist {
         yieldEstimate: Math.round(advancedPrediction.yieldEstimate * 10) / 10,
         riskLevel: 1 - (advancedPrediction.confidence || 0.5),
         finalScore: advancedPrediction.confidence || 0.5,
-        factorScores: advancedPrediction.factors || {},
+        factorScores: advancedPrediction.factors || {
+          rainfall: 0.5, timing: 0.5, water: 0.5, soil: 0.5, temperature: 0.5
+        },
         confidence: advancedPrediction.confidence,
         method: advancedPrediction.method,
         dataQuality: advancedPrediction.dataQuality,
@@ -638,11 +726,23 @@ class MiniAgronomist {
         source: cropRules.source,
         baseTip: cropRules.tip
       };
-      
+
     } catch (error) {
       console.error('Advanced yield calculation error:', error);
       return this.calculateLegacyYield(cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop);
     }
+  }
+
+  // Helper to extract temp data roughly from regionInfo which is structure as avg_monthly_temp_c array
+  getRegionTempMin(region) {
+    const data = this.regionData[region];
+    if (!data) return 15;
+    return Math.min(...data.avg_monthly_temp_c) - 5; // Approx min
+  }
+  getRegionTempMax(region) {
+    const data = this.regionData[region];
+    if (!data) return 30;
+    return Math.max(...data.avg_monthly_temp_c) + 5; // Approx max
   }
 
   calculateLegacyYield(cropRules, cropProfile, regionInfo, rainfall, plantingDate, region, crop) {
@@ -655,7 +755,7 @@ class MiniAgronomist {
     const waterMatchScore = this.calculateWaterRequirementScore(regionInfo, cropProfile);
     const soilCompatibilityScore = this.calculateSoilCompatibilityScore(regionInfo, cropProfile, cropRules);
     const temperatureScore = this.calculateTemperatureScore(regionInfo, cropProfile);
-    
+
     // Enhanced weighted scoring
     const weights = {
       rainfall: 0.30,
@@ -707,13 +807,13 @@ class MiniAgronomist {
   calculateTimingScore(region, crop, plantingDate) {
     const regionInfo = this.regionData[region];
     const plantingWindow = regionInfo.planting_windows?.[crop];
-    
+
     if (!plantingWindow) return 0.8; // Default score if no specific window data
-    
+
     const plantMonth = plantingDate.getMonth();
     const startMonth = this.getMonthNumber(plantingWindow.start);
     const endMonth = this.getMonthNumber(plantingWindow.end);
-    
+
     if (this.isWithinPlantingWindow(plantMonth, startMonth, endMonth)) {
       return 1.0;
     } else {
@@ -724,7 +824,7 @@ class MiniAgronomist {
   calculateWaterRequirementScore(regionInfo, cropProfile) {
     const annualRainfall = regionInfo.annual_rainfall_mm;
     const avgWaterRequirement = (cropProfile.water_requirement_mm[0] + cropProfile.water_requirement_mm[1]) / 2;
-    
+
     const ratio = annualRainfall / avgWaterRequirement;
     return Math.min(1.0, Math.max(0.2, ratio));
   }
@@ -733,23 +833,23 @@ class MiniAgronomist {
     // Find matching soil profile
     const soilType = Object.keys(cropRules)[0]; // Assuming single soil type per rule
     const soilProfile = regionInfo.soil_profiles?.find(s => s.type === soilType);
-    
+
     if (!soilProfile) return 0.7; // Default score
-    
+
     const soilPHMid = (soilProfile.ph_range[0] + soilProfile.ph_range[1]) / 2;
     const cropPHMid = (cropProfile.soil_ph_range[0] + cropProfile.soil_ph_range[1]) / 2;
     const pHDiff = Math.abs(soilPHMid - cropPHMid);
-    
+
     return Math.max(0.3, 1.0 - (pHDiff / 3.0));
   }
 
   calculateTemperatureScore(regionInfo, cropProfile) {
     if (!regionInfo.avg_monthly_temp_c || !cropProfile.optimal_temp_c) return 0.8;
-    
+
     const avgRegionTemp = regionInfo.avg_monthly_temp_c.reduce((a, b) => a + b) / regionInfo.avg_monthly_temp_c.length;
     const optimalTempMid = (cropProfile.optimal_temp_c[0] + cropProfile.optimal_temp_c[1]) / 2;
     const tempDiff = Math.abs(avgRegionTemp - optimalTempMid);
-    
+
     return Math.max(0.3, 1.0 - (tempDiff / 20));
   }
 
@@ -763,7 +863,7 @@ class MiniAgronomist {
     this.updateAnalyticsSection(prediction);
     this.updateHarvestSection(prediction);
     this.showNewPredictionButton();
-    
+
     // Smooth scroll to results
     document.getElementById('output')?.scrollIntoView({ behavior: 'smooth' });
   }
@@ -772,7 +872,7 @@ class MiniAgronomist {
     const { region, crop, soil, rainfall, plantingDate } = prediction.inputs;
     const regionDisplay = this.regionData[region]?.display_name || region;
     const cropDisplay = this.cropProfiles[crop]?.scientific_name || crop;
-    
+
     const summary = `
       <strong>Region:</strong> ${regionDisplay}<br>
       <strong>Crop:</strong> ${cropDisplay} (${crop})<br>
@@ -780,7 +880,7 @@ class MiniAgronomist {
       <strong>Rainfall:</strong> ${rainfall}mm/week<br>
       <strong>Planting:</strong> ${plantingDate.toLocaleDateString()}
     `;
-    
+
     const summaryElement = document.getElementById('conditionsSummary');
     if (summaryElement) {
       summaryElement.innerHTML = summary;
@@ -801,7 +901,7 @@ class MiniAgronomist {
     if (confidenceElement) {
       const confidence = prediction.confidence;
       let confidenceClass, confidenceText;
-      
+
       if (confidence >= 0.8) {
         confidenceClass = 'high';
         confidenceText = `High Confidence (${Math.round(confidence * 100)}%)`;
@@ -812,7 +912,7 @@ class MiniAgronomist {
         confidenceClass = 'low';
         confidenceText = `Low Confidence (${Math.round(confidence * 100)}%)`;
       }
-      
+
       confidenceElement.textContent = confidenceText;
       confidenceElement.className = `confidence-indicator ${confidenceClass}`;
     }
@@ -841,12 +941,12 @@ class MiniAgronomist {
     const analyticsElement = document.getElementById('analytics');
     if (analyticsElement) {
       const scores = prediction.factorScores;
-      
+
       document.getElementById('tempScore').textContent = `${Math.round(scores.temperature * 100)}%`;
       document.getElementById('waterScore').textContent = `${Math.round(scores.water * 100)}%`;
       document.getElementById('soilScore').textContent = `${Math.round(scores.soil * 100)}%`;
       document.getElementById('timingScore').textContent = `${Math.round(scores.timing * 100)}%`;
-      
+
       analyticsElement.classList.remove('hidden');
     }
   }
@@ -855,11 +955,11 @@ class MiniAgronomist {
     const harvestElement = document.getElementById('harvestInfo');
     if (harvestElement && prediction.harvestInfo) {
       const info = prediction.harvestInfo;
-      
+
       document.getElementById('harvestDate').textContent = info.harvestDate || 'Not calculated';
       document.getElementById('recommendedVarieties').textContent = info.varieties?.join(', ') || 'Not specified';
       document.getElementById('growingPeriod').textContent = info.growingPeriod || 'Not calculated';
-      
+
       harvestElement.classList.remove('hidden');
     }
   }
@@ -875,19 +975,19 @@ class MiniAgronomist {
 
   generateRecommendations(cropRules, cropProfile, regionInfo, yieldCalculation) {
     const recommendations = [cropRules.tip];
-    
+
     if (yieldCalculation.factorScores.rainfall < 0.7) {
       recommendations.push("Consider supplemental irrigation during dry periods.");
     }
-    
+
     if (yieldCalculation.factorScores.soil < 0.8) {
       recommendations.push("Soil improvement with organic matter is recommended.");
     }
-    
+
     if (regionInfo.region_tips && regionInfo.region_tips.length > 0) {
       recommendations.push(regionInfo.region_tips[0]);
     }
-    
+
     return recommendations;
   }
 
@@ -895,7 +995,7 @@ class MiniAgronomist {
     const daysToMaturity = (cropProfile.days_to_maturity[0] + cropProfile.days_to_maturity[1]) / 2;
     const harvestDate = new Date(plantingDate);
     harvestDate.setDate(harvestDate.getDate() + daysToMaturity);
-    
+
     return {
       harvestDate: harvestDate.toLocaleDateString(),
       varieties: cropProfile.common_varieties?.slice(0, 3) || [],
@@ -934,7 +1034,7 @@ class MiniAgronomist {
       statusElement.textContent = message;
       statusElement.className = `status-message ${type}`;
       statusElement.classList.remove('hidden');
-      
+
       setTimeout(() => {
         statusElement.classList.add('hidden');
       }, 4000);
@@ -967,12 +1067,12 @@ class MiniAgronomist {
     try {
       this.populateRegionDropdown();
       this.populateCropDropdown();
-      
+
       // Initialize Pro features if available
       if (this.proFeatureManager) {
         this.initializeProUI();
       }
-      
+
       console.log("✅ Dropdowns populated successfully");
     } catch (error) {
       console.error("❌ Error populating dropdowns:", error);
@@ -998,7 +1098,7 @@ class MiniAgronomist {
       // Add Pro features to UI
       this.addProFeatureButtons();
       this.updateUIForTier();
-      
+
       console.log("✅ Pro UI initialized for tier:", this.proFeatureManager.userTier);
     } catch (error) {
       console.error("❌ Error initializing Pro UI:", error);
@@ -1113,7 +1213,7 @@ class MiniAgronomist {
     try {
       // Pro features are available for now (auth disabled)
       // Will be gated when authentication is re-enabled
-      
+
       switch (featureId) {
         case 'field-manager':
           if (this.proFeatureManager?.hasFeature('fieldManagement')) {
@@ -1156,7 +1256,7 @@ class MiniAgronomist {
   updateUIForTier() {
     const tier = this.proFeatureManager.userTier;
     document.body.classList.add(`tier-${tier}`);
-    
+
     // Update UI elements based on tier
     if (tier === 'free') {
       this.showUpgradePrompts();
@@ -1357,10 +1457,10 @@ class MiniAgronomist {
     this.proFeatureManager.userTier = tier;
     localStorage.setItem('miniAgronomist-pro-status', 'active');
     localStorage.setItem('miniAgronomist_tier', tier);
-    
+
     // Close any open modals
     document.querySelectorAll('.pro-modal').forEach(modal => modal.remove());
-    
+
     // Refresh Pro features
     if (this.proFeatureManager) {
       this.proFeatureManager.userTier = tier;
@@ -1372,7 +1472,7 @@ class MiniAgronomist {
     // Update UI
     this.updateUIForTier();
     this.showMessage(`🎉 ${tier.toUpperCase()} features activated! You now have access to all premium features.`, 'success', 5000);
-    
+
     // Refresh the page to show new features
     setTimeout(() => location.reload(), 2000);
   }
@@ -1380,7 +1480,7 @@ class MiniAgronomist {
   // Additional Pro feature helper methods
   generateFieldsList() {
     const fields = this.fieldManager?.getFields() || [];
-    
+
     if (fields.length === 0) {
       return `
         <div class="empty-state">
@@ -1451,8 +1551,8 @@ class MiniAgronomist {
     };
 
     // Create and download JSON file
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-      type: 'application/json' 
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json'
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1477,11 +1577,11 @@ class MiniAgronomist {
     tabBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         const targetTab = btn.dataset.tab;
-        
+
         // Update active states
         tabBtns.forEach(b => b.classList.remove('active'));
         tabPanels.forEach(p => p.classList.remove('active'));
-        
+
         btn.classList.add('active');
         const targetPanel = document.getElementById(`${targetTab}-panel`);
         if (targetPanel) {
@@ -1502,16 +1602,16 @@ class MiniAgronomist {
     tabBtns.forEach(btn => {
       btn.addEventListener('click', async () => {
         const targetTab = btn.dataset.tab;
-        
+
         // Update active states
         tabBtns.forEach(b => b.classList.remove('active'));
         tabPanels.forEach(p => p.classList.remove('active'));
-        
+
         btn.classList.add('active');
         const targetPanel = document.getElementById(`${targetTab}-panel`);
         if (targetPanel) {
           targetPanel.classList.add('active');
-          
+
           // Load analytics data for the selected tab
           await this.loadAnalyticsData(targetTab, targetPanel);
         }
@@ -1530,7 +1630,7 @@ class MiniAgronomist {
 
     try {
       let analyticsHTML = '';
-      
+
       switch (tabType) {
         case 'yield':
           analyticsHTML = await this.generateYieldAnalytics();
@@ -1886,8 +1986,8 @@ class MiniAgronomist {
 
   generateCropOptions() {
     if (!this.cropProfiles) return '';
-    
-    return Object.entries(this.cropProfiles).map(([key, crop]) => 
+
+    return Object.entries(this.cropProfiles).map(([key, crop]) =>
       `<option value="${key}">${crop.scientific_name || key}</option>`
     ).join('');
   }
@@ -1927,10 +2027,10 @@ class MiniAgronomist {
     if (this.fieldManager) {
       this.fieldManager.createField(fieldData);
       this.showMessage(`✅ Field "${fieldData.name}" added successfully!`, 'success');
-      
+
       // Close modal and refresh field list
       form.closest('.pro-modal').remove();
-      
+
       // Refresh field manager if open
       const fieldManagerModal = document.querySelector('.pro-modal .field-manager');
       if (fieldManagerModal) {
@@ -1959,7 +2059,7 @@ class MiniAgronomist {
     if (!regionSelect) return;
 
     regionSelect.innerHTML = '<option value="">Select your agricultural region...</option>';
-    
+
     Object.entries(this.regionData).forEach(([key, region]) => {
       const option = document.createElement("option");
       option.value = key;
@@ -1973,7 +2073,7 @@ class MiniAgronomist {
     if (!cropSelect) return;
 
     cropSelect.innerHTML = '<option value="">Select your crop...</option>';
-    
+
     Object.entries(this.cropProfiles).forEach(([key, crop]) => {
       const option = document.createElement("option");
       option.value = key;
@@ -1985,7 +2085,7 @@ class MiniAgronomist {
   handleRegionChange(regionKey) {
     this.updateSoilOptions(regionKey);
     this.validateField('region', regionKey);
-    
+
     if (regionKey) {
       const regionInfo = this.regionData[regionKey];
       this.showStatusMessage(`Selected: ${regionInfo.display_name}`, 'success');
@@ -1997,7 +2097,7 @@ class MiniAgronomist {
     if (!soilSelect) return;
 
     soilSelect.innerHTML = '<option value="">Select soil type...</option>';
-    
+
     if (regionKey && this.regionData[regionKey]?.soil_profiles) {
       this.regionData[regionKey].soil_profiles.forEach(soil => {
         const option = document.createElement("option");
@@ -2010,7 +2110,7 @@ class MiniAgronomist {
 
   handleCropChange(cropKey) {
     this.validateField('crop', cropKey);
-    
+
     if (cropKey) {
       const cropInfo = this.cropProfiles[cropKey];
       this.showStatusMessage(`Selected: ${cropInfo.scientific_name}`, 'success');
@@ -2027,13 +2127,13 @@ class MiniAgronomist {
 
   exportResults() {
     if (!this.currentPrediction) return;
-    
+
     const exportData = {
       prediction: this.currentPrediction,
       exportDate: new Date().toISOString(),
       version: '2.0'
     };
-    
+
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -2043,7 +2143,7 @@ class MiniAgronomist {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    
+
     this.showStatusMessage('Results exported successfully!', 'success');
   }
 
@@ -2062,7 +2162,7 @@ class MiniAgronomist {
     if (this.predictionHistory.length > 10) {
       this.predictionHistory = this.predictionHistory.slice(0, 10);
     }
-    
+
     try {
       localStorage.setItem('miniAgronomistHistory', JSON.stringify(this.predictionHistory));
       this.updateHistoryDisplay();
@@ -2122,10 +2222,10 @@ class MiniAgronomist {
     const modal = document.getElementById('helpModal');
     if (modal) {
       modal.classList.remove('hidden');
-      
+
       // Initialize FAQ functionality
       this.initializeFAQModal();
-      
+
       // Focus management
       const firstTab = modal.querySelector('.faq-tab');
       if (firstTab) firstTab.focus();
@@ -2136,13 +2236,13 @@ class MiniAgronomist {
     // Tab functionality
     const tabs = document.querySelectorAll('.faq-tab');
     const contents = document.querySelectorAll('.faq-content');
-    
+
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         // Remove active class from all tabs and contents
         tabs.forEach(t => t.classList.remove('active'));
         contents.forEach(c => c.classList.remove('active'));
-        
+
         // Add active class to clicked tab and corresponding content
         tab.classList.add('active');
         const targetContent = document.getElementById(tab.dataset.tab);
@@ -2166,13 +2266,13 @@ class MiniAgronomist {
       question.addEventListener('click', () => {
         const answer = question.nextElementSibling;
         const isActive = question.classList.contains('active');
-        
+
         // Close all other FAQ items
         faqQuestions.forEach(q => {
           q.classList.remove('active');
           q.nextElementSibling.classList.remove('active');
         });
-        
+
         // Toggle current item
         if (!isActive) {
           question.classList.add('active');
@@ -2185,23 +2285,23 @@ class MiniAgronomist {
   filterFAQContent(searchTerm) {
     const faqItems = document.querySelectorAll('.faq-item');
     const helpSteps = document.querySelectorAll('.help-step');
-    
+
     // Filter FAQ items
     faqItems.forEach(item => {
       const question = item.querySelector('.faq-question').textContent.toLowerCase();
       const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
-      
+
       if (question.includes(searchTerm) || answer.includes(searchTerm)) {
         item.style.display = 'block';
       } else {
         item.style.display = 'none';
       }
     });
-    
+
     // Filter help steps
     helpSteps.forEach(step => {
       const content = step.textContent.toLowerCase();
-      
+
       if (content.includes(searchTerm)) {
         step.style.display = 'flex';
       } else {
@@ -2228,7 +2328,7 @@ class MiniAgronomist {
     modal.setAttribute('role', 'dialog');
     modal.setAttribute('aria-labelledby', 'settings-title');
     modal.setAttribute('aria-modal', 'true');
-    
+
     modal.innerHTML = `
       <div class="modal-content" onclick="event.stopPropagation()">
         <div class="modal-header">
@@ -2296,18 +2396,18 @@ class MiniAgronomist {
     const form = document.getElementById('inputForm');
     if (form) {
       form.reset();
-      
+
       // Clear validation states
       document.querySelectorAll('.field-status').forEach(status => {
         status.textContent = '';
         status.className = 'field-status';
       });
-      
+
       document.querySelectorAll('input, select').forEach(field => {
         field.setAttribute('aria-invalid', 'false');
       });
     }
-    
+
     this.resetResultsToPlaceholder();
     this.hideErrorMessage();
     this.showStatusMessage('Form reset', 'info');
@@ -2319,7 +2419,7 @@ class MiniAgronomist {
       'yieldResult': '🌱 Ready to predict',
       'confidence': 'Select your crop, soil type, rainfall, and planting date to get started'
     };
-    
+
     Object.entries(elements).forEach(([id, text]) => {
       const element = document.getElementById(id);
       if (element) {
@@ -2327,19 +2427,19 @@ class MiniAgronomist {
         element.className = element.className.replace(/(^|\s)(high|medium|low)(\s|$)/, '$1placeholder$3');
       }
     });
-    
+
     // Hide enhanced sections
     ['analytics', 'harvestInfo'].forEach(id => {
       const element = document.getElementById(id);
       if (element) element.classList.add('hidden');
     });
-    
+
     // Disable tool buttons
     ['exportBtn', 'compareBtn', 'printBtn'].forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) btn.disabled = true;
     });
-    
+
     this.hideNewPredictionButton();
   }
 
@@ -2386,7 +2486,7 @@ class MiniAgronomist {
   // Data Validation
   validateDataIntegrity() {
     const warnings = [];
-    
+
     // Validate structure and required fields
     Object.entries(this.cropData).forEach(([region, crops]) => {
       Object.entries(crops).forEach(([crop, soils]) => {
@@ -2491,34 +2591,34 @@ class MiniAgronomist {
     const mobileMenu = document.querySelector('.nav-links');
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const menuIcon = mobileMenuBtn?.querySelector('.material-icons');
-    
+
     if (mobileMenu) {
       const isOpen = mobileMenu.classList.toggle('mobile-open');
-      
+
       // Update button icon
       if (menuIcon) {
         menuIcon.textContent = isOpen ? 'close' : 'menu';
       }
-      
+
       // Update aria attributes
       mobileMenuBtn?.setAttribute('aria-expanded', isOpen.toString());
       mobileMenuBtn?.setAttribute('title', isOpen ? '✕ Close Menu' : '🔽 Open Menu');
     }
   }
-  
+
   closeMobileMenu() {
     const mobileMenu = document.querySelector('.nav-links');
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const menuIcon = mobileMenuBtn?.querySelector('.material-icons');
-    
+
     if (mobileMenu?.classList.contains('mobile-open')) {
       mobileMenu.classList.remove('mobile-open');
-      
+
       // Reset button icon
       if (menuIcon) {
         menuIcon.textContent = 'menu';
       }
-      
+
       // Update aria attributes
       mobileMenuBtn?.setAttribute('aria-expanded', 'false');
       mobileMenuBtn?.setAttribute('title', '🔽 Open Menu');
@@ -2541,14 +2641,14 @@ function toggleTheme() {
   const body = document.body;
   const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  
+
   // Toggle theme class
   if (newTheme === 'dark') {
     body.classList.add('dark-theme');
   } else {
     body.classList.remove('dark-theme');
   }
-  
+
   // Update theme button icon
   const themeBtn = document.getElementById('themeBtn');
   if (themeBtn) {
@@ -2561,10 +2661,10 @@ function toggleTheme() {
       themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
     }
   }
-  
+
   // Save preference
   localStorage.setItem('theme', newTheme);
-  
+
   // Show toast notification
   const themeName = newTheme === 'dark' ? 'Dark' : 'Light';
   console.log(`🎨 Switched to ${themeName} Mode`);
@@ -2573,11 +2673,11 @@ function toggleTheme() {
 // Load saved theme on page load
 function loadSavedTheme() {
   const savedTheme = localStorage.getItem('theme') || 'light';
-  
+
   if (savedTheme === 'dark') {
     document.body.classList.add('dark-theme');
   }
-  
+
   // Update button icon
   const themeBtn = document.getElementById('themeBtn');
   if (themeBtn) {
