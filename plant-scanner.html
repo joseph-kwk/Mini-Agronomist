@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -11,7 +13,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="assets/icons/favicon.png">
     <link rel="shortcut icon" href="assets/icons/favicon.png">
-    
+
     <!-- AI/ML Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
@@ -58,7 +60,7 @@
         }
 
         body.dark-theme #themeBtn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Device Banner */
@@ -71,19 +73,37 @@
             color: white;
             padding: 14px 20px;
             z-index: 10000;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
             animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: none;
         }
 
-        .device-banner.show { display: block; }
-        .device-banner.success { background: #4CAF50; }
-        .device-banner.warning { background: #ff9800; }
-        .device-banner.info { background: #2196F3; }
+        .device-banner.show {
+            display: block;
+        }
+
+        .device-banner.success {
+            background: #4CAF50;
+        }
+
+        .device-banner.warning {
+            background: #ff9800;
+        }
+
+        .device-banner.info {
+            background: #2196F3;
+        }
 
         @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .banner-content {
@@ -107,7 +127,7 @@
         }
 
         .banner-close {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
             width: 32px;
@@ -122,8 +142,9 @@
             transition: background 0.2s;
         }
 
-        .banner-close:hover, .banner-close:active {
-            background: rgba(255,255,255,0.3);
+        .banner-close:hover,
+        .banner-close:active {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         /* Container */
@@ -150,7 +171,7 @@
             height: 80px;
             margin: 0 auto 16px;
             display: block;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
             animation: logoFloat 3s ease-in-out infinite;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -158,12 +179,19 @@
 
         .scanner-logo:hover {
             transform: scale(1.1);
-            filter: drop-shadow(0 6px 16px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.3));
         }
 
         @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
         }
 
         .site-name {
@@ -183,7 +211,7 @@
         h1 {
             font-size: 32px;
             margin-bottom: 8px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
         header p {
@@ -195,7 +223,7 @@
         .device-info {
             display: inline-block;
             padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
@@ -208,7 +236,7 @@
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
             margin-bottom: 20px;
         }
 
@@ -255,7 +283,7 @@
             width: 80%;
             max-width: 400px;
             aspect-ratio: 1;
-            border: 3px dashed rgba(255,255,255,0.5);
+            border: 3px dashed rgba(255, 255, 255, 0.5);
             border-radius: 12px;
             pointer-events: none;
         }
@@ -265,7 +293,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
             padding: 10px 20px;
             border-radius: 20px;
@@ -557,8 +585,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Offline Indicator */
@@ -573,7 +606,7 @@
             border-radius: 24px;
             font-size: 14px;
             font-weight: 700;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             display: none;
             z-index: 9999;
             backdrop-filter: blur(10px);
@@ -585,8 +618,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
-            50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+
+            50% {
+                opacity: 0.8;
+                transform: translateX(-50%) scale(1.05);
+            }
         }
 
         /* Mobile Optimizations */
@@ -625,7 +667,8 @@
                 width: 100%;
             }
 
-            .btn, .upload-label {
+            .btn,
+            .upload-label {
                 width: 100%;
                 min-width: unset;
                 padding: 18px 24px;
@@ -661,15 +704,19 @@
 
         /* Touch Device Optimizations */
         @media (hover: none) and (pointer: coarse) {
-            .btn, .upload-label {
-                min-height: 48px; /* WCAG 2.1 touch target */
+
+            .btn,
+            .upload-label {
+                min-height: 48px;
+                /* WCAG 2.1 touch target */
             }
         }
 
         /* High DPI Displays */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        @media (-webkit-min-device-pixel-ratio: 2),
+        (min-resolution: 192dpi) {
             .scanner-card {
-                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             }
         }
 
@@ -678,13 +725,14 @@
             .container {
                 padding-top: 60px;
             }
-            
+
             #video {
                 max-height: 300px;
             }
         }
     </style>
 </head>
+
 <body>
     <!-- Device Detection Banner -->
     <div class="device-banner" id="deviceBanner">
@@ -703,11 +751,14 @@
     <div class="container" id="mainContainer">
         <header>
             <div style="display: flex; justify-content: center; align-items: center; gap: 12px; position: relative;">
-                <button id="themeBtn" onclick="toggleTheme()" style="position: absolute; right: 10px; top: 10px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; transition: all 0.3s; backdrop-filter: blur(10px);" title="Toggle Theme">
+                <button id="themeBtn" onclick="toggleTheme()"
+                    style="position: absolute; right: 10px; top: 10px; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; transition: all 0.3s; backdrop-filter: blur(10px);"
+                    title="Toggle Theme">
                     🌙
                 </button>
             </div>
-            <img src="assets/icons/logo.png" alt="Mini Agronomist" class="scanner-logo" onclick="window.location.href='index.html'">
+            <img src="assets/icons/logo.png" alt="Mini Agronomist" class="scanner-logo"
+                onclick="window.location.href='index.html'">
             <div class="site-name" onclick="window.location.href='index.html'">🌾 Mini Agronomist</div>
             <h1>🌱 Plant Disease Scanner</h1>
             <p>AI-Powered Plant Health Analysis</p>
@@ -717,38 +768,29 @@
         <!-- Scanner Section -->
         <div class="scanner-card">
             <h2 class="section-title">📷 Scan Plant</h2>
-            
+
             <div class="video-wrapper" id="videoWrapper">
-                <video id="video" autoplay playsinline 
-                       aria-label="Camera feed for plant scanning"
-                       aria-describedby="cameraGuide"
-                       role="img"></video>
+                <video id="video" autoplay playsinline aria-label="Camera feed for plant scanning"
+                    aria-describedby="cameraGuide" role="img"></video>
                 <div class="camera-overlay" aria-hidden="true"></div>
-                <div class="camera-guide" id="cameraGuide" 
-                     role="status" aria-live="polite" aria-atomic="true">
+                <div class="camera-guide" id="cameraGuide" role="status" aria-live="polite" aria-atomic="true">
                     Position plant in frame
                 </div>
             </div>
-            <canvas id="canvas" style="display: none;" 
-                    aria-hidden="true" role="presentation"></canvas>
+            <canvas id="canvas" style="display: none;" aria-hidden="true" role="presentation"></canvas>
 
             <div class="controls">
                 <div class="btn-group">
-                    <button class="btn btn-primary" id="startBtn" onclick="startCamera()" 
-                            aria-label="Start camera to begin plant scanning"
-                            role="button" tabindex="0">
+                    <button class="btn btn-primary" id="startBtn" onclick="startCamera()"
+                        aria-label="Start camera to begin plant scanning" role="button" tabindex="0">
                         📸 Start Camera
                     </button>
-                    <button class="btn btn-success" id="captureBtn" onclick="captureAndAnalyze()" 
-                            style="display: none;"
-                            aria-label="Capture photo and analyze plant health"
-                            role="button" tabindex="0">
+                    <button class="btn btn-success" id="captureBtn" onclick="captureAndAnalyze()" style="display: none;"
+                        aria-label="Capture photo and analyze plant health" role="button" tabindex="0">
                         ✓ Capture & Analyze
                     </button>
-                    <button class="btn btn-danger" id="stopBtn" onclick="stopCamera()" 
-                            style="display: none;"
-                            aria-label="Stop camera and return to start"
-                            role="button" tabindex="0">
+                    <button class="btn btn-danger" id="stopBtn" onclick="stopCamera()" style="display: none;"
+                        aria-label="Stop camera and return to start" role="button" tabindex="0">
                         ⏹ Stop Camera
                     </button>
                 </div>
@@ -782,33 +824,44 @@
     </div>
 
     <script type="module">
-        import { PlantScanner } from './js/plant-scanner.js';
-        
         // Global scanner instance
         let plantScanner = null;
         let scanner = null; // Alias for compatibility
-        
+
         // Initialize scanner when DOM is loaded
         document.addEventListener('DOMContentLoaded', async () => {
             try {
+                // Dynamic import for cache busting
+                const module = await import('./js/plant-scanner.js?v=' + Date.now());
+                const PlantScanner = module.PlantScanner;
+
                 plantScanner = new PlantScanner();
                 scanner = plantScanner; // Set alias
                 console.log('✅ Plant Scanner initialized');
             } catch (error) {
                 console.error('❌ Failed to initialize scanner:', error);
-                showError('Failed to initialize plant scanner. Please refresh the page.');
+
+                // Fallback for offline usage usually handled by service worker, 
+                // but if import fails completely:
+                try {
+                    const module = await import('./js/plant-scanner.js');
+                    const PlantScanner = module.PlantScanner;
+                    plantScanner = new PlantScanner();
+                } catch (e) {
+                    showError('Failed to initialize plant scanner. Please refresh the page.');
+                }
             }
         });
 
         // ===== USER FEEDBACK SYSTEM =====
-        window.submitFeedback = function(rating, timestamp) {
+        window.submitFeedback = function (rating, timestamp) {
             // Store feedback locally
             const feedback = {
                 timestamp,
                 rating,
                 date: new Date().toISOString()
             };
-            
+
             // Get existing feedback
             let allFeedback = [];
             try {
@@ -819,29 +872,29 @@
             } catch (e) {
                 console.warn('Could not load feedback:', e);
             }
-            
+
             // Add new feedback
             allFeedback.push(feedback);
-            
+
             // Keep last 100 feedback entries
             if (allFeedback.length > 100) {
                 allFeedback = allFeedback.slice(-100);
             }
-            
+
             // Save
             try {
                 localStorage.setItem('scannerFeedback', JSON.stringify(allFeedback));
             } catch (e) {
                 console.warn('Could not save feedback:', e);
             }
-            
+
             // Show thank you message
             const feedbackMsg = rating === 'accurate' ? 'Thank you! This helps improve accuracy.' :
-                               rating === 'partially' ? 'Thanks for the feedback. We\'ll work on improving.' :
-                               'Thank you. Please consult an expert for accurate diagnosis.';
-            
+                rating === 'partially' ? 'Thanks for the feedback. We\'ll work on improving.' :
+                    'Thank you. Please consult an expert for accurate diagnosis.';
+
             alert('✅ Feedback Recorded\n\n' + feedbackMsg);
-            
+
             // Log statistics
             console.log('📊 Feedback Stats:', {
                 total: allFeedback.length,
@@ -850,30 +903,30 @@
                 inaccurate: allFeedback.filter(f => f.rating === 'inaccurate').length
             });
         };
-        
+
         // ===== VALIDATION FRAMEWORK =====
-        window.getAccuracyMetrics = function() {
+        window.getAccuracyMetrics = function () {
             try {
                 const feedback = JSON.parse(localStorage.getItem('scannerFeedback') || '[]');
                 const total = feedback.length;
-                
+
                 if (total === 0) {
                     return { message: 'No feedback data yet' };
                 }
-                
+
                 const accurate = feedback.filter(f => f.rating === 'accurate').length;
                 const partially = feedback.filter(f => f.rating === 'partially').length;
                 const inaccurate = feedback.filter(f => f.rating === 'inaccurate').length;
-                
+
                 const accuracyRate = ((accurate + partially * 0.5) / total * 100).toFixed(1);
-                
+
                 console.log('📊 Scanner Accuracy Metrics:');
                 console.log('Total Scans with Feedback:', total);
-                console.log('Accurate:', accurate, `(${(accurate/total*100).toFixed(1)}%)`);
-                console.log('Partially Correct:', partially, `(${(partially/total*100).toFixed(1)}%)`);
-                console.log('Inaccurate:', inaccurate, `(${(inaccurate/total*100).toFixed(1)}%)`);
+                console.log('Accurate:', accurate, `(${(accurate / total * 100).toFixed(1)}%)`);
+                console.log('Partially Correct:', partially, `(${(partially / total * 100).toFixed(1)}%)`);
+                console.log('Inaccurate:', inaccurate, `(${(inaccurate / total * 100).toFixed(1)}%)`);
                 console.log('Overall Accuracy Score:', accuracyRate + '%');
-                
+
                 return {
                     total,
                     accurate,
@@ -888,22 +941,22 @@
         };
 
         // ===== THEME TOGGLE =====
-        window.toggleTheme = function() {
+        window.toggleTheme = function () {
             const body = document.body;
             const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+
             if (newTheme === 'dark') {
                 body.classList.add('dark-theme');
             } else {
                 body.classList.remove('dark-theme');
             }
-            
+
             const themeBtn = document.getElementById('themeBtn');
             if (themeBtn) {
                 themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
             }
-            
+
             localStorage.setItem('theme', newTheme);
         };
 
@@ -914,9 +967,9 @@
             const themeBtn = document.getElementById('themeBtn');
             if (themeBtn) themeBtn.textContent = '☀️';
         }
-        
+
         // Listen for theme changes from other tabs
-        window.addEventListener('storage', function(e) {
+        window.addEventListener('storage', function (e) {
             if (e.key === 'theme') {
                 const newTheme = e.newValue;
                 if (newTheme === 'dark') {
@@ -944,7 +997,7 @@
             const isIOS = /iphone|ipad|ipod/i.test(ua);
             const isAndroid = /android/i.test(ua);
             const hasMediaDevices = 'mediaDevices' in navigator && 'getUserMedia' in navigator.mediaDevices;
-            
+
             return {
                 isMobile,
                 isTablet,
@@ -983,7 +1036,7 @@
                 bannerIcon.textContent = '⚠️';
                 bannerText.textContent = 'No camera detected. You can upload plant images for analysis. To use live scanning: connect a webcam or use a smartphone/tablet.';
                 banner.className = 'device-banner warning show';
-                
+
                 // Hide camera controls, show only upload
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('videoWrapper').style.display = 'none';
@@ -992,7 +1045,7 @@
             container.classList.add('with-banner');
         }
 
-        window.closeBanner = function() {
+        window.closeBanner = function () {
             const banner = document.getElementById('deviceBanner');
             banner.classList.remove('show');
             document.getElementById('mainContainer').classList.remove('with-banner');
@@ -1001,7 +1054,7 @@
         // ===== OFFLINE DETECTION =====
         function setupOfflineDetection() {
             const indicator = document.getElementById('offlineIndicator');
-            
+
             function updateOnlineStatus() {
                 if (!navigator.onLine) {
                     indicator.classList.add('show');
@@ -1016,13 +1069,13 @@
         }
 
         // ===== CAMERA FUNCTIONS =====
-        window.startCamera = async function() {
+        window.startCamera = async function () {
             const video = document.getElementById('video');
             const startBtn = document.getElementById('startBtn');
             const captureBtn = document.getElementById('captureBtn');
             const stopBtn = document.getElementById('stopBtn');
             const device = detectDevice();
-            
+
             if (!device.hasCamera) {
                 showError('Camera not available. Please connect a webcam or use a smartphone/tablet for scanning.');
                 return;
@@ -1031,7 +1084,7 @@
             try {
                 startBtn.disabled = true;
                 startBtn.innerHTML = '⏳ Starting Camera...';
-                
+
                 // Enhanced constraints for PC compatibility
                 const constraints = {
                     video: {
@@ -1040,7 +1093,7 @@
                         frameRate: { ideal: 30, max: 60 }
                     }
                 };
-                
+
                 // Add facing mode for mobile devices
                 if (device.isMobile || device.isTablet) {
                     constraints.video.facingMode = 'environment';
@@ -1048,10 +1101,10 @@
 
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
-                
+
                 video.onloadedmetadata = () => {
                     video.play();
-                    
+
                     // Update UI
                     if (startBtn) {
                         startBtn.style.display = 'none';
@@ -1062,21 +1115,21 @@
                     if (stopBtn) {
                         stopBtn.style.display = 'block';
                     }
-                    
+
                     const guide = document.getElementById('cameraGuide');
                     if (guide) {
-                        const message = device && (device.isMobile || device.isTablet) 
+                        const message = device && (device.isMobile || device.isTablet)
                             ? 'Position plant leaves clearly in frame'
                             : '💻 Selfie camera active - position plant in front of screen';
                         guide.textContent = message;
                     }
-                    
+
                     console.log('✅ Camera started successfully');
                 };
             } catch (error) {
                 console.error('Camera error:', error);
                 let errorMsg = '❌ Cannot access camera\n\n';
-                
+
                 if (error.name === 'NotAllowedError') {
                     errorMsg += '📷 Camera permission denied\n\n';
                     errorMsg += 'To enable camera:\n';
@@ -1090,10 +1143,10 @@
                 } else {
                     errorMsg += `Error: ${error.message}\n`;
                 }
-                
+
                 errorMsg += '\n💡 Alternative: Upload plant images instead!';
                 showError(errorMsg.replace(/\\n/g, '\n'));
-                
+
                 // Reset UI
                 if (startBtn) {
                     startBtn.disabled = false;
@@ -1109,7 +1162,7 @@
             }
         };
 
-        window.stopCamera = function() {
+        window.stopCamera = function () {
             if (currentStream) {
                 currentStream.getTracks().forEach(track => track.stop());
                 currentStream = null;
@@ -1117,22 +1170,22 @@
                     video.srcObject = null;
                 }
             }
-            
+
             document.getElementById('startBtn').style.display = 'block';
             document.getElementById('captureBtn').style.display = 'none';
             document.getElementById('stopBtn').style.display = 'none';
         };
 
-        window.captureAndAnalyze = async function() {
+        window.captureAndAnalyze = async function () {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0);
-            
+
             const imageData = canvas.toDataURL('image/jpeg', 0.9);
             await analyzeImage(imageData);
         };
 
-        window.handleImageUpload = async function(event) {
+        window.handleImageUpload = async function (event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -1157,7 +1210,7 @@
         async function analyzeImage(imageData) {
             const loading = document.getElementById('loading');
             const results = document.getElementById('results');
-            
+
             loading.classList.add('show');
             results.classList.remove('show');
 
@@ -1176,9 +1229,9 @@
         function displayResults(result) {
             const resultsContent = document.getElementById('resultsContent');
             const results = document.getElementById('results');
-            
+
             let html = '';
-            
+
             // Add transparency disclaimer at top
             html += `
                 <div class="result-card" style="background: #fff3cd; border-left: 4px solid #ff9800;">
@@ -1209,7 +1262,7 @@
             // Health Score
             const healthPercent = (result.healthScore * 100).toFixed(0);
             const healthClass = result.healthScore >= 0.7 ? 'healthy' : (result.healthScore >= 0.4 ? 'warning' : 'danger');
-            
+
             html += `
                 <div class="result-card">
                     <div class="result-title">❤️ Health Score</div>
@@ -1226,11 +1279,11 @@
             // Diseases with enhanced details
             if (result.diseases.length > 0) {
                 html += '<div class="result-card"><div class="result-title">🦠 Detected Issues</div>';
-                
+
                 result.diseases.forEach((disease, index) => {
-                    const severityColor = disease.severity === 'severe' ? '#d32f2f' : 
-                                         disease.severity === 'moderate' ? '#f57c00' : '#388e3c';
-                    
+                    const severityColor = disease.severity === 'severe' ? '#d32f2f' :
+                        disease.severity === 'moderate' ? '#f57c00' : '#388e3c';
+
                     html += `
                         <div class="disease-item" style="border-left: 3px solid ${severityColor}; padding-left: 12px; margin: 16px 0;">
                             <div class="disease-name" style="font-size: 16px; font-weight: 600; margin-bottom: 6px;">
@@ -1246,8 +1299,8 @@
                             
                             ${disease.colorProfile ? `<p style="font-size: 12px; color: #777; margin: 4px 0;">🎨 Color Analysis: RGB(${disease.colorProfile.avgRed}, ${disease.colorProfile.avgGreen}, ${disease.colorProfile.avgBlue}) | Green: ${disease.colorProfile.greenRatio}</p>` : ''}
                             
-                            ${disease.matchedKeywords && disease.matchedKeywords.length > 0 ? 
-                                `<p style="font-size: 12px; color: #777; margin: 4px 0;">🔑 Keywords: ${disease.matchedKeywords.join(', ')}</p>` : ''}
+                            ${disease.matchedKeywords && disease.matchedKeywords.length > 0 ?
+                            `<p style="font-size: 12px; color: #777; margin: 4px 0;">🔑 Keywords: ${disease.matchedKeywords.join(', ')}</p>` : ''}
                             
                             ${disease.source ? `
                                 <p style="font-size: 12px; color: #666; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee;">
@@ -1258,14 +1311,14 @@
                         </div>
                     `;
                 });
-                
+
                 html += '</div>';
             }
 
             // Treatments with enhanced formatting
             if (result.diseases.length > 0) {
                 html += '<div class="result-card"><div class="result-title" style="color: #2e7d32;">💊 Treatment Recommendations</div>';
-                
+
                 result.diseases.forEach((disease, index) => {
                     if (disease.treatments && disease.treatments.length > 0) {
                         html += `
@@ -1278,12 +1331,12 @@
                         `;
                     }
                 });
-                
+
                 html += '</div>';
-                
+
                 // Prevention measures
                 html += '<div class="result-card"><div class="result-title" style="color: #388e3c;">🛡️ Prevention Measures</div>';
-                
+
                 result.diseases.forEach((disease, index) => {
                     if (disease.prevention && disease.prevention.length > 0) {
                         html += `
@@ -1296,7 +1349,7 @@
                         `;
                     }
                 });
-                
+
                 html += '</div>';
             }
 
@@ -1311,7 +1364,7 @@
                     </div>
                 `;
             }
-            
+
             // User feedback section
             html += `
                 <div class="result-card" style="background: #f8f9fa; border: 1px solid #dee2e6;">
@@ -1345,7 +1398,7 @@
         function updateHistory(result) {
             const history = document.getElementById('history');
             const historyItems = scanner.getHistory();
-            
+
             if (historyItems.length === 0) {
                 history.innerHTML = '<p style="color: #999; text-align: center;">No scans yet</p>';
                 return;
@@ -1356,7 +1409,7 @@
                 const time = new Date(item.timestamp).toLocaleString();
                 const healthEmoji = item.healthScore >= 0.7 ? '✅' : (item.healthScore >= 0.4 ? '⚠️' : '❌');
                 const diseaseCount = item.diseases ? item.diseases.length : 0;
-                
+
                 html += `
                     <div class="history-item">
                         <div class="history-header">
@@ -1370,7 +1423,7 @@
                     </div>
                 `;
             });
-            
+
             history.innerHTML = html;
         }
 
@@ -1378,8 +1431,8 @@
         async function init() {
             showDeviceGuidance();
             setupOfflineDetection();
-        // Initialize when DOM is ready - no need for separate init function
-        // PlantScanner handles its own initialization
+            // Initialize when DOM is ready - no need for separate init function
+            // PlantScanner handles its own initialization
         }
 
         // Start on page load
@@ -1397,4 +1450,5 @@
         }
     </script>
 </body>
+
 </html>

@@ -6,28 +6,28 @@ class PlantScanner {
     this.video = document.getElementById('video');
     this.canvas = document.getElementById('canvas');
     this.ctx = this.canvas.getContext('2d');
-    
+
     this.model = null;
     this.diseaseModel = null;
     this.stream = null;
     this.offlineMode = false; // Track if running in offline mode
-    
+
     this.scanHistory = [];
     this.loadHistory();
-    
+
     this.init();
   }
 
   async init() {
     try {
       console.log('🚀 Initializing Plant Scanner...');
-      
+
       // Load pre-trained models
       await this.loadModels();
-      
+
       // Setup event listeners
       this.setupEventListeners();
-      
+
       console.log('✅ Plant Scanner initialized');
     } catch (error) {
       console.error('❌ Initialization failed:', error);
@@ -42,47 +42,44 @@ class PlantScanner {
   async loadModels() {
     try {
       console.log('📦 Loading AI models...');
-      
+
       // Check if TensorFlow.js is available
       if (typeof tf === 'undefined') {
         throw new Error('TensorFlow.js not loaded. Check internet connection or try refreshing.');
       }
-      
+
       // Check if MobileNet is available
       if (typeof mobilenet === 'undefined') {
         throw new Error('MobileNet not loaded. Check internet connection or try refreshing.');
       }
-      
+
       // Load MobileNet for general image classification
       this.model = await mobilenet.load();
       console.log('✅ Image classification model loaded');
-      
+
       // Initialize custom disease detection model
       await this.loadDiseaseModel();
-      
+
       console.log('✅ All models loaded successfully');
     } catch (error) {
       console.error('❌ Model loading failed:', error);
-      
+
       // Set offline mode - scanner will work with reduced accuracy
       this.offlineMode = true;
       console.warn('⚠️ Running in offline mode - scanner may work with reduced accuracy');
-      
+
       // Still initialize disease detection model (works offline)
       await this.loadDiseaseModel();
-      
+
       // Show user notification
       this.showOfflineNotification();
     }
   }
 
   async loadDiseaseModel() {
-    // Load crop profiles from data file
-    await this.loadCropProfiles();
-    
     // Comprehensive disease detection model with scientific backing
     console.log('📊 Initializing advanced disease detection model...');
-    
+
     this.diseaseModel = {
       // Expanded disease patterns database with scientific references
       patterns: {
@@ -310,23 +307,30 @@ class PlantScanner {
           sourceUrl: 'https://plantclinic.cornell.edu'
         }
       },
-      
+
       // Enhanced crop identification database - will be populated from crop_profiles.json
       crops: {},
-      
+
       // Crop profiles loaded from data file
       cropProfiles: null
     };
-    
+
+    // Load crop profiles from data file
+    await this.loadCropProfiles();
+
     console.log('✅ Advanced disease detection model ready with 10+ disease types');
   }
-  
+
   async loadCropProfiles() {
+    if (!this.diseaseModel) {
+      console.warn('⚠️ diseaseModel was null in loadCropProfiles, re-initializing');
+      this.diseaseModel = { patterns: {}, crops: {}, cropProfiles: null };
+    }
     try {
       const response = await fetch('data/crop_profiles.json');
       if (response.ok) {
         this.diseaseModel.cropProfiles = await response.json();
-        
+
         // Build crop keyword database from profiles
         for (const [cropKey, profile] of Object.entries(this.diseaseModel.cropProfiles)) {
           const keywords = [
@@ -334,15 +338,15 @@ class PlantScanner {
             profile.scientific_name.toLowerCase(),
             profile.category
           ];
-          
+
           // Add common varieties as keywords
           if (profile.common_varieties) {
             keywords.push(...profile.common_varieties.map(v => v.toLowerCase()));
           }
-          
+
           this.diseaseModel.crops[cropKey] = keywords;
         }
-        
+
         console.log(`✅ Loaded ${Object.keys(this.diseaseModel.cropProfiles).length} crop profiles`);
       } else {
         console.warn('⚠️ Could not load crop profiles, using fallback database');
@@ -353,8 +357,12 @@ class PlantScanner {
       this.loadFallbackCrops();
     }
   }
-  
+
   loadFallbackCrops() {
+    if (!this.diseaseModel) {
+      console.warn('⚠️ diseaseModel was null in loadFallbackCrops, re-initializing');
+      this.diseaseModel = { patterns: {}, crops: {}, cropProfiles: null };
+    }
     // Fallback crop database
     this.diseaseModel.crops = {
       'maize': ['corn', 'maize', 'cereal', 'zea mays'],
@@ -369,19 +377,19 @@ class PlantScanner {
       'cotton': ['cotton', 'fiber', 'gossypium'],
       'banana': ['banana', 'plantain', 'fruit', 'musa']
     };
-  }  
+  }
   // Show offline mode notification
   showOfflineNotification() {
     const banner = document.getElementById('deviceBanner');
     const icon = document.getElementById('bannerIcon');
     const text = document.getElementById('bannerText');
-    
+
     if (banner && icon && text) {
       icon.textContent = '⚠️';
       text.textContent = 'Running in offline mode - AI models not loaded. Scanner will work with reduced accuracy.';
       banner.style.display = 'block';
       banner.className = 'device-banner warning-banner';
-      
+
       // Auto-hide after 10 seconds
       setTimeout(() => {
         if (banner.style.display !== 'none') {
@@ -399,7 +407,7 @@ class PlantScanner {
   async startCamera() {
     try {
       console.log('📷 Starting camera...');
-      
+
       const constraints = {
         video: {
           facingMode: 'environment', // Use back camera on mobile
@@ -410,9 +418,9 @@ class PlantScanner {
 
       this.stream = await navigator.mediaDevices.getUserMedia(constraints);
       this.video.srcObject = this.stream;
-      
+
       document.getElementById('captureBtn').disabled = false;
-      
+
       console.log('✅ Camera started');
       return true;
     } catch (error) {
@@ -434,7 +442,7 @@ class PlantScanner {
     this.canvas.width = this.video.videoWidth;
     this.canvas.height = this.video.videoHeight;
     this.ctx.drawImage(this.video, 0, 0);
-    
+
     return this.canvas.toDataURL('image/jpeg', 0.9);
   }
 
@@ -445,14 +453,14 @@ class PlantScanner {
   async analyzeImage(imageData) {
     try {
       this.showLoading(true);
-      
+
       console.log(`🔍 Analysis mode: ${this.offlineMode ? 'Offline' : 'AI-Powered'}`);
-      
+
       // Create image element
       const img = await this.loadImage(imageData);
-      
+
       let classification = [];
-      
+
       // Only run AI classification if model is available
       if (this.model && !this.offlineMode) {
         // Run classification with TensorFlow model
@@ -462,23 +470,23 @@ class PlantScanner {
         console.log('📴 Using offline analysis mode');
         classification = [{ className: 'Plant (offline analysis)', probability: 0.6 }];
       }
-      
+
       // Detect if it's a plant
       const isPlant = this.isPlantImage(classification);
-      
+
       if (!isPlant) {
         throw new Error('No plant detected in image. Please capture a clear image of a plant.');
       }
-      
+
       // Identify plant species
       const plantInfo = this.identifyPlant(classification);
-      
+
       // Detect diseases
       const diseaseInfo = await this.detectDisease(img, classification);
-      
+
       // Generate recommendations
       const recommendations = this.generateRecommendations(plantInfo, diseaseInfo);
-      
+
       // Compile results in format expected by HTML
       const results = {
         plantInfo: {
@@ -498,12 +506,12 @@ class PlantScanner {
         timestamp: Date.now(),
         analysisMode: this.offlineMode ? 'Offline Analysis' : 'AI-Powered Analysis'
       };
-      
+
       // Save to history
       this.saveToHistory(results);
-      
+
       this.showLoading(false);
-      
+
       return results;
     } catch (error) {
       this.showLoading(false);
@@ -518,7 +526,7 @@ class PlantScanner {
       console.log('🔄 Offline classification - using simplified analysis');
       return [{ className: 'Plant', probability: 0.6 }];
     }
-    
+
     try {
       // Use MobileNet for classification
       const predictions = await this.model.classify(img);
@@ -568,7 +576,7 @@ class PlantScanner {
 
     for (const pred of predictions) {
       const className = pred.className.toLowerCase();
-      
+
       // Check against crop database
       for (const [cropName, keywords] of Object.entries(this.diseaseModel.crops)) {
         for (const keyword of keywords) {
@@ -603,7 +611,7 @@ class PlantScanner {
   async detectDisease(img, classifications) {
     // Advanced disease detection using multiple analysis methods
     const imageFeatures = await this.extractImageFeatures(img);
-    
+
     // Analyze for disease patterns
     let detectedDiseases = [];
     let diseaseScores = new Map();
@@ -612,11 +620,11 @@ class PlantScanner {
     // Method 1: Check for disease indicators in AI classifications
     for (const pred of classifications) {
       const className = pred.className.toLowerCase();
-      
+
       for (const [diseaseKey, diseaseData] of Object.entries(this.diseaseModel.patterns)) {
         let matchScore = 0;
         let matchedKeywords = [];
-        
+
         // Score based on keyword matches
         for (const keyword of diseaseData.keywords) {
           if (className.includes(keyword)) {
@@ -624,14 +632,14 @@ class PlantScanner {
             matchedKeywords.push(keyword);
           }
         }
-        
+
         // Only add if confidence exceeds threshold and keywords matched
         if (matchScore > 0 && pred.probability >= (diseaseData.confidence_threshold || 0.5)) {
           const finalConfidence = Math.min(pred.probability * (1 + matchScore), 0.95);
-          
+
           if (!diseaseScores.has(diseaseKey) || diseaseScores.get(diseaseKey) < finalConfidence) {
             diseaseScores.set(diseaseKey, finalConfidence);
-            
+
             const diseaseInfo = {
               disease: diseaseData.name,
               severity: diseaseData.severity,
@@ -643,7 +651,7 @@ class PlantScanner {
               source: diseaseData.source,
               sourceUrl: diseaseData.sourceUrl
             };
-            
+
             // Add nutrient-specific info if available
             if (diseaseData.nutrient_types) {
               diseaseInfo.nutrient_types = diseaseData.nutrient_types;
@@ -651,7 +659,7 @@ class PlantScanner {
             if (diseaseData.common_pests) {
               diseaseInfo.common_pests = diseaseData.common_pests;
             }
-            
+
             // Replace or add disease
             const existingIndex = detectedDiseases.findIndex(d => d.disease === diseaseInfo.disease);
             if (existingIndex >= 0) {
@@ -659,10 +667,10 @@ class PlantScanner {
             } else {
               detectedDiseases.push(diseaseInfo);
             }
-            
+
             // Reduce health score based on severity
-            const severityImpact = diseaseData.severity === 'severe' ? 0.4 : 
-                                   diseaseData.severity === 'moderate' ? 0.25 : 0.15;
+            const severityImpact = diseaseData.severity === 'severe' ? 0.4 :
+              diseaseData.severity === 'moderate' ? 0.25 : 0.15;
             healthScore -= severityImpact;
           }
         }
@@ -671,11 +679,11 @@ class PlantScanner {
 
     // Method 2: Advanced color and texture analysis
     const colorAnalysis = this.analyzeColors(imageFeatures);
-    
+
     if (colorAnalysis.abnormal) {
       const diseaseType = colorAnalysis.diseaseType;
       const diseaseData = this.diseaseModel.patterns[diseaseType];
-      
+
       if (diseaseData && colorAnalysis.confidence >= (diseaseData.confidence_threshold || 0.5)) {
         // Only add if not already detected with higher confidence
         if (!diseaseScores.has(diseaseType) || diseaseScores.get(diseaseType) < colorAnalysis.confidence) {
@@ -690,7 +698,7 @@ class PlantScanner {
             source: diseaseData.source,
             sourceUrl: diseaseData.sourceUrl
           };
-          
+
           const existingIndex = detectedDiseases.findIndex(d => d.disease === diseaseInfo.disease);
           if (existingIndex >= 0) {
             // Combine confidence scores
@@ -702,12 +710,12 @@ class PlantScanner {
           } else {
             detectedDiseases.push(diseaseInfo);
           }
-          
+
           healthScore -= 0.2;
         }
       }
     }
-    
+
     // Method 3: Texture and pattern analysis
     const textureAnalysis = this.analyzeTexture(imageFeatures);
     if (textureAnalysis.abnormal) {
@@ -716,16 +724,16 @@ class PlantScanner {
 
     // Determine overall health status
     healthScore = Math.max(0, Math.min(1, healthScore));
-    
+
     // Sort diseases by confidence
     detectedDiseases.sort((a, b) => b.confidence - a.confidence);
-    
+
     // Limit to top 5 most confident detections
     detectedDiseases = detectedDiseases.slice(0, 5);
-    
+
     let status = 'Healthy';
     let statusClass = 'status-healthy';
-    
+
     if (detectedDiseases.length > 0) {
       if (healthScore < 0.5) {
         status = 'Severe Issues Detected';
@@ -744,7 +752,7 @@ class PlantScanner {
       statusClass,
       healthScore,
       diseases: detectedDiseases,
-      confidence: detectedDiseases.length > 0 ? 
+      confidence: detectedDiseases.length > 0 ?
         detectedDiseases[0].confidence : 0.95
     };
   }
@@ -753,24 +761,24 @@ class PlantScanner {
     // Extract color and texture features
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
-    
+
     tempCanvas.width = img.width;
     tempCanvas.height = img.height;
     tempCtx.drawImage(img, 0, 0);
-    
+
     const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
     const data = imageData.data;
-    
+
     // Calculate color statistics
     let totalR = 0, totalG = 0, totalB = 0;
     let pixelCount = data.length / 4;
-    
+
     for (let i = 0; i < data.length; i += 4) {
       totalR += data[i];
       totalG += data[i + 1];
       totalB += data[i + 2];
     }
-    
+
     return {
       avgRed: totalR / pixelCount,
       avgGreen: totalG / pixelCount,
@@ -781,20 +789,20 @@ class PlantScanner {
 
   analyzeColors(features) {
     const { avgRed, avgGreen, avgBlue } = features;
-    
+
     // Calculate color ratios for better analysis
     const totalColor = avgRed + avgGreen + avgBlue;
     const greenRatio = avgGreen / totalColor;
     const redRatio = avgRed / totalColor;
     const blueRatio = avgBlue / totalColor;
-    
+
     const colorProfile = {
       avgRed: avgRed.toFixed(1),
       avgGreen: avgGreen.toFixed(1),
       avgBlue: avgBlue.toFixed(1),
       greenRatio: (greenRatio * 100).toFixed(1) + '%'
     };
-    
+
     // Healthy plant detection (green dominant)
     if (greenRatio > 0.38 && avgGreen > avgRed && avgGreen > avgBlue && avgGreen > 100) {
       return {
@@ -803,7 +811,7 @@ class PlantScanner {
         profile: colorProfile
       };
     }
-    
+
     // Yellow/chlorotic leaves (nutrient deficiency)
     if (avgRed > 150 && avgGreen > 140 && avgBlue < 110 && redRatio > 0.35) {
       return {
@@ -815,7 +823,7 @@ class PlantScanner {
         note: 'Yellow discoloration suggests nitrogen, iron, or magnesium deficiency'
       };
     }
-    
+
     // Brown/necrotic tissue (blight, leaf spot)
     if (avgRed > 90 && avgGreen < 95 && avgBlue < 75 && greenRatio < 0.32) {
       return {
@@ -827,7 +835,7 @@ class PlantScanner {
         note: 'Brown/dark tissue indicates cell death - possible blight or severe leaf spot'
       };
     }
-    
+
     // White/gray powdery appearance (powdery mildew)
     if (avgRed > 200 && avgGreen > 200 && avgBlue > 190 && totalColor > 600) {
       return {
@@ -839,7 +847,7 @@ class PlantScanner {
         note: 'White powdery coating on leaf surface'
       };
     }
-    
+
     // Orange/rust colored (rust disease)
     if (avgRed > 160 && avgGreen > 90 && avgGreen < 140 && avgBlue < 90 && redRatio > 0.40) {
       return {
@@ -851,7 +859,7 @@ class PlantScanner {
         note: 'Orange/rust pustules on leaf surface'
       };
     }
-    
+
     // Dark spots (bacterial or fungal spot diseases)
     if (avgRed < 100 && avgGreen < 80 && avgBlue < 70 && totalColor < 240) {
       return {
@@ -863,7 +871,7 @@ class PlantScanner {
         note: 'Dark spots indicate fungal or bacterial infection'
       };
     }
-    
+
     // Slight abnormality
     if (greenRatio < 0.33 && avgGreen < 100) {
       return {
@@ -875,28 +883,28 @@ class PlantScanner {
         note: 'Color analysis suggests plant stress - monitor closely'
       };
     }
-    
+
     return {
       abnormal: false,
       confidence: 0.70,
       profile: colorProfile
     };
   }
-  
+
   analyzeTexture(features) {
     // Simple texture analysis based on pixel variance
     // In a production system, this would use more sophisticated algorithms
     const { imageData } = features;
-    
+
     if (!imageData || imageData.length < 1000) {
       return { abnormal: false, confidence: 0.5 };
     }
-    
+
     // Sample pixels to calculate variance (performance optimization)
     let sumVariance = 0;
     let sampleCount = 0;
     const sampleStep = Math.floor(imageData.length / 400); // Sample ~100 pixels
-    
+
     for (let i = 0; i < imageData.length - 8; i += sampleStep) {
       const r1 = imageData[i];
       const g1 = imageData[i + 1];
@@ -904,14 +912,14 @@ class PlantScanner {
       const r2 = imageData[i + 4];
       const g2 = imageData[i + 5];
       const b2 = imageData[i + 6];
-      
+
       const variance = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
       sumVariance += variance;
       sampleCount++;
     }
-    
+
     const avgVariance = sampleCount > 0 ? sumVariance / sampleCount : 0;
-    
+
     // High variance suggests spots, lesions, or irregular patterns
     if (avgVariance > 60) {
       return {
@@ -921,7 +929,7 @@ class PlantScanner {
         variance: avgVariance.toFixed(1)
       };
     }
-    
+
     // Very low variance might indicate powdery coating
     if (avgVariance < 15) {
       return {
@@ -931,7 +939,7 @@ class PlantScanner {
         variance: avgVariance.toFixed(1)
       };
     }
-    
+
     return {
       abnormal: false,
       confidence: 0.70,
@@ -988,7 +996,7 @@ class PlantScanner {
         profile.description || 'Follow recommended growing practices'
       ];
     }
-    
+
     // Fallback tips
     const tips = {
       'maize': [
@@ -1038,7 +1046,7 @@ class PlantScanner {
   }
 
   capitalize(str) {
-    return str.split('_').map(word => 
+    return str.split('_').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   }
@@ -1076,12 +1084,12 @@ class PlantScanner {
       ...results,
       id: Date.now()
     });
-    
+
     // Keep only last 20 scans
     if (this.scanHistory.length > 20) {
       this.scanHistory = this.scanHistory.slice(0, 20);
     }
-    
+
     this.saveHistory();
     this.updateHistoryDisplay();
   }
@@ -1113,15 +1121,15 @@ class PlantScanner {
   updateHistoryDisplay() {
     const historySection = document.getElementById('history');
     const historyList = document.getElementById('historyList');
-    
+
     if (this.scanHistory.length === 0) {
       historySection.style.display = 'none';
       return;
     }
-    
+
     historySection.style.display = 'block';
     historyList.innerHTML = '';
-    
+
     for (const item of this.scanHistory.slice(0, 10)) {
       const historyItem = document.createElement('div');
       historyItem.className = 'history-item';
@@ -1164,7 +1172,7 @@ class PlantScanner {
     // Upload image
     const uploadBtn = document.getElementById('uploadBtn');
     const fileInput = document.getElementById('fileInput');
-    
+
     if (uploadBtn && fileInput) {
       uploadBtn.addEventListener('click', () => {
         fileInput.click();
@@ -1203,7 +1211,7 @@ class PlantScanner {
         alert('Result saved to history!');
       });
     }
-    
+
     console.log('✅ Event listeners setup complete');
   }
 }
