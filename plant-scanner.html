@@ -638,24 +638,33 @@
             }
 
             .container {
-                padding: 70px 12px 12px;
+                padding: 60px 12px 12px;
             }
 
             .container.with-banner {
-                padding-top: 100px;
+                padding-top: 90px;
             }
 
             h1 {
-                font-size: 26px;
+                font-size: 24px;
+                margin-bottom: 4px;
+            }
+
+            .scanner-logo {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 8px;
             }
 
             header p {
-                font-size: 14px;
+                font-size: 13px;
+                margin-bottom: 8px;
             }
 
             .scanner-card {
-                padding: 20px;
+                padding: 16px;
                 border-radius: 16px;
+                margin-bottom: 16px;
             }
 
             .section-title {
@@ -683,7 +692,8 @@
             }
 
             #video {
-                min-height: 250px;
+                min-height: 200px;
+                max-height: 40vh;
             }
         }
 
@@ -984,7 +994,7 @@
             }
         });
 
-        let stream;
+        var currentStream = null;
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -1099,8 +1109,8 @@
                     constraints.video.facingMode = 'environment';
                 }
 
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = currentStream;
+                window.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = window.currentStream;
 
                 video.onloadedmetadata = () => {
                     video.play();
@@ -1163,9 +1173,9 @@
         };
 
         window.stopCamera = function () {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-                currentStream = null;
+            if (window.currentStream) {
+                window.currentStream.getTracks().forEach(track => track.stop());
+                window.currentStream = null;
                 if (video) {
                     video.srcObject = null;
                 }

@@ -758,136 +758,186 @@ class PlantScanner {
   }
 
   async extractImageFeatures(img) {
-    // Extract color and texture features
+    // Advanced feature extraction using Pixel-level HSL Analysis
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
 
-    tempCanvas.width = img.width;
-    tempCanvas.height = img.height;
-    tempCtx.drawImage(img, 0, 0);
+    // Resize for performance while maintaining aspect ratio
+    const maxSize = 500;
+    let width = img.width;
+    let height = img.height;
 
-    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
-    const data = imageData.data;
-
-    // Calculate color statistics
-    let totalR = 0, totalG = 0, totalB = 0;
-    let pixelCount = data.length / 4;
-
-    for (let i = 0; i < data.length; i += 4) {
-      totalR += data[i];
-      totalG += data[i + 1];
-      totalB += data[i + 2];
+    if (width > height) {
+      if (width > maxSize) {
+        height = height * (maxSize / width);
+        width = maxSize;
+      }
+    } else {
+      if (height > maxSize) {
+        width = width * (maxSize / height);
+        height = maxSize;
+      }
     }
 
-    return {
+    tempCanvas.width = width;
+    tempCanvas.height = height;
+    tempCtx.drawImage(img, 0, 0, width, height);
+
+    const imageData = tempCtx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    // Analysis Buckets
+    let healthyPixels = 0;
+    let chloroticPixels = 0; // Yellowing
+    let necroticPixels = 0;  // Brown/Dead
+    let otherPixels = 0;
+    let totalPlantPixels = 0;
+
+    // Color accumulators for average calculation
+    let totalR = 0, totalG = 0, totalB = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      totalR += r;
+      totalG += g;
+      totalB += b;
+
+      // Convert to HSL for better biological classification
+      const [h, s, l] = this.rgbToHsl(r, g, b);
+
+      // Filter out background (very bright white/gray or very dark)
+      if (s < 0.1 || l > 0.95 || l < 0.05) {
+        continue;
+      }
+
+      // Classification Logic based on Plant Pathology Color Indices
+      // Green (Healthy): Hue 70-160
+      // Yellow (Chlorosis): Hue 40-70
+      // Brown (Necrosis): Hue 0-40 or 330-360 (with lower lightness)
+
+      if (h >= 70 && h <= 170 && s > 0.2 && l > 0.15 && l < 0.85) {
+        healthyPixels++;
+        totalPlantPixels++;
+      } else if (h >= 35 && h < 70 && s > 0.25) {
+        chloroticPixels++;
+        totalPlantPixels++;
+      } else if ((h < 35 || h > 330) && s > 0.2 && l < 0.6) {
+        necroticPixels++;
+        totalPlantPixels++;
+      } else {
+        otherPixels++;
+      }
+    }
+
+    const pixelCount = data.length / 4;
+
+    // Normalize stats
+    const stats = {
+      healthyRadio: totalPlantPixels > 0 ? healthyPixels / totalPlantPixels : 0,
+      chlorosisRatio: totalPlantPixels > 0 ? chloroticPixels / totalPlantPixels : 0,
+      necrosisRatio: totalPlantPixels > 0 ? necroticPixels / totalPlantPixels : 0,
+      plantCoverage: totalPlantPixels / pixelCount,
       avgRed: totalR / pixelCount,
       avgGreen: totalG / pixelCount,
       avgBlue: totalB / pixelCount,
-      imageData: data
+      rawImageData: imageData
     };
+
+    console.log('🔬 Micro-Analysis Results:', {
+      'Healthy Tissue': (stats.healthyRadio * 100).toFixed(1) + '%',
+      'Chlorosis (Yellow)': (stats.chlorosisRatio * 100).toFixed(1) + '%',
+      'Necrosis (Brown)': (stats.necrosisRatio * 100).toFixed(1) + '%'
+    });
+
+    return stats;
+  }
+
+  // Helper: RGB to HSL conversion
+  rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0; // achromatic
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+    return [h * 360, s, l];
   }
 
   analyzeColors(features) {
-    const { avgRed, avgGreen, avgBlue } = features;
-
-    // Calculate color ratios for better analysis
-    const totalColor = avgRed + avgGreen + avgBlue;
-    const greenRatio = avgGreen / totalColor;
-    const redRatio = avgRed / totalColor;
-    const blueRatio = avgBlue / totalColor;
+    const { healthyRadio, chlorosisRatio, necrosisRatio, avgRed, avgGreen, avgBlue } = features;
 
     const colorProfile = {
+      healthy: (healthyRadio * 100).toFixed(1) + '%',
+      yellowing: (chlorosisRatio * 100).toFixed(1) + '%',
+      browning: (necrosisRatio * 100).toFixed(1) + '%',
       avgRed: avgRed.toFixed(1),
       avgGreen: avgGreen.toFixed(1),
       avgBlue: avgBlue.toFixed(1),
-      greenRatio: (greenRatio * 100).toFixed(1) + '%'
+      greenRatio: (healthyRadio * 100).toFixed(1) + '%' // Computed healthy ratio
     };
 
-    // Healthy plant detection (green dominant)
-    if (greenRatio > 0.38 && avgGreen > avgRed && avgGreen > avgBlue && avgGreen > 100) {
-      return {
-        abnormal: false,
-        confidence: 0.90,
-        profile: colorProfile
-      };
-    }
+    let abnormal = false;
+    let suggestedIssue = null;
+    let diseaseType = null;
+    let confidence = 0.0;
+    let note = 'Plant appears healthy based on color analysis';
 
-    // Yellow/chlorotic leaves (nutrient deficiency)
-    if (avgRed > 150 && avgGreen > 140 && avgBlue < 110 && redRatio > 0.35) {
-      return {
-        abnormal: true,
-        suggestedIssue: 'Chlorosis / Nutrient Deficiency',
-        confidence: 0.72,
-        diseaseType: 'yellowing',
-        profile: colorProfile,
-        note: 'Yellow discoloration suggests nitrogen, iron, or magnesium deficiency'
-      };
-    }
+    // Pathology Logic Rule Engine
 
-    // Brown/necrotic tissue (blight, leaf spot)
-    if (avgRed > 90 && avgGreen < 95 && avgBlue < 75 && greenRatio < 0.32) {
-      return {
-        abnormal: true,
-        suggestedIssue: 'Blight',
-        confidence: 0.68,
-        diseaseType: 'blight',
-        profile: colorProfile,
-        note: 'Brown/dark tissue indicates cell death - possible blight or severe leaf spot'
-      };
+    // Case 1: Severe Necrosis (Blight/Rot)
+    if (necrosisRatio > 0.15) {
+      abnormal = true;
+      diseaseType = 'blight';
+      suggestedIssue = 'Blight or fungal rot detected';
+      confidence = Math.min(0.5 + (necrosisRatio * 2), 0.95); // High confidence if lots of brown
+      note = 'Significant necrotic (dead) tissue detected. High risk of blight.';
     }
-
-    // White/gray powdery appearance (powdery mildew)
-    if (avgRed > 200 && avgGreen > 200 && avgBlue > 190 && totalColor > 600) {
-      return {
-        abnormal: true,
-        suggestedIssue: 'Powdery Mildew (Erysiphales)',
-        confidence: 0.70,
-        diseaseType: 'powdery_mildew',
-        profile: colorProfile,
-        note: 'White powdery coating on leaf surface'
-      };
+    // Case 2: Significant Chlorosis (Yellowing)
+    else if (chlorosisRatio > 0.15) {
+      abnormal = true;
+      diseaseType = 'yellowing';
+      suggestedIssue = 'Nutrient Deficiency (Chlorosis)';
+      confidence = Math.min(0.5 + (chlorosisRatio * 2), 0.9);
+      note = 'Widespread yellowing suggests nitrogen or iron deficiency.';
     }
-
-    // Orange/rust colored (rust disease)
-    if (avgRed > 160 && avgGreen > 90 && avgGreen < 140 && avgBlue < 90 && redRatio > 0.40) {
-      return {
-        abnormal: true,
-        suggestedIssue: 'Plant Rust (Puccinia spp.)',
-        confidence: 0.65,
-        diseaseType: 'rust',
-        profile: colorProfile,
-        note: 'Orange/rust pustules on leaf surface'
-      };
+    // Case 3: Rust (Specific Orange/Reddish brown hues often mixed)
+    else if (necrosisRatio > 0.05 && avgRed > avgGreen * 1.2) {
+      abnormal = true;
+      diseaseType = 'rust';
+      suggestedIssue = 'Plant Rust (Puccinia spp.)';
+      confidence = 0.65;
+      note = 'Reddish-brown discoloration is consistent with Rust.';
     }
-
-    // Dark spots (bacterial or fungal spot diseases)
-    if (avgRed < 100 && avgGreen < 80 && avgBlue < 70 && totalColor < 240) {
-      return {
-        abnormal: true,
-        suggestedIssue: 'Leaf Spot Disease (Cercospora/Septoria)',
-        confidence: 0.63,
-        diseaseType: 'leaf_spot',
-        profile: colorProfile,
-        note: 'Dark spots indicate fungal or bacterial infection'
-      };
-    }
-
-    // Slight abnormality
-    if (greenRatio < 0.33 && avgGreen < 100) {
-      return {
-        abnormal: true,
-        suggestedIssue: 'Plant stress detected',
-        confidence: 0.55,
-        diseaseType: 'yellowing',
-        profile: colorProfile,
-        note: 'Color analysis suggests plant stress - monitor closely'
-      };
+    // Case 4: Minor Stress
+    else if (healthyRadio < 0.6) {
+      abnormal = true;
+      suggestedIssue = 'General Plant Stress';
+      confidence = 0.5;
+      note = 'Plant shows low healthy leaf area. Check water and sunlight.';
     }
 
     return {
-      abnormal: false,
-      confidence: 0.70,
-      profile: colorProfile
+      abnormal,
+      suggestedIssue,
+      diseaseType,
+      confidence,
+      profile: colorProfile,
+      note
     };
   }
 

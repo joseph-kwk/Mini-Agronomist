@@ -138,6 +138,52 @@ def comprehensive_prediction(request: ComprehensivePredictionRequest):
         "computed_at": datetime.now().isoformat()
     }
 
+# --- Real Data Integrations ---
+import urllib.request
+import json
+
+@app.get("/api/weather/{region}")
+def get_real_weather(region: str):
+    """
+    Fetch real-time weather data from Open-Meteo (Free API, no key required).
+    """
+    # Coordinates mapping for supported regions
+    coords_map = {
+        "southern_africa": {"lat": -25.74, "lon": 28.22}, # Pretoria
+        "east_african_highlands": {"lat": -1.29, "lon": 36.82}, # Nairobi
+        "northern_sahel": {"lat": 13.51, "lon": 2.12}, # Niamey
+        "north_america_midwest": {"lat": 41.87, "lon": -93.62}, # Iowa
+        "north_america_pacific": {"lat": 36.77, "lon": -119.41}, # California
+        "south_america_cerrado": {"lat": -15.79, "lon": -47.88}, # Brasilia
+    }
+    
+    location = coords_map.get(region.lower(), {"lat": 0.0, "lon": 0.0})
+    
+    if location["lat"] == 0.0:
+        return {"error": "Region coordinates not found", "using_mock": True}
+
+    url = (
+        f"https://api.open-meteo.com/v1/forecast?"
+        f"latitude={location['lat']}&longitude={location['lon']}"
+        f"&current=temperature_2m,rain,relative_humidity_2m"
+        f"&daily=temperature_2m_max,temperature_2m_min,rain_sum"
+        f"&timezone=auto&forecast_days=7"
+    )
+    
+    try:
+        # Set a timeout to prevent hanging
+        with urllib.request.urlopen(url, timeout=5) as response:
+            data = json.loads(response.read().decode())
+            return {
+                "source": "Open-Meteo",
+                "coordinates": location,
+                "current": data.get("current", {}),
+                "forecast": data.get("daily", {})
+            }
+    except Exception as e:
+        print(f"Weather API Error: {e}")
+        return {"error": str(e), "unavailable": True}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
