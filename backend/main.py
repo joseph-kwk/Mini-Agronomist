@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import numpy as np
@@ -9,6 +10,7 @@ from models import (
     GDDRequest, WaterBalanceRequest, MLTrainRequest, 
     MLPredictRequest, ClimateRiskRequest, ComprehensivePredictionRequest
 )
+import auth
 
 app = FastAPI(title="Mini Agronomist Backend", version="4.3.0")
 
@@ -183,6 +185,58 @@ def get_real_weather(region: str):
     except Exception as e:
         print(f"Weather API Error: {e}")
         return {"error": str(e), "unavailable": True}
+
+# --- Authentication & Admin ---
+users_db = {}
+
+@app.on_event("startup")
+def startup_event():
+    # Create default admin user
+    # In a real app, load from DB
+    # Password: admin123
+    users_db["admin"] = {
+        "username": "admin",
+        "hashed_password": auth.get_password_hash("admin123"),
+        "role": "admin"
+    }
+
+@app.post("/token", response_model=auth.Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = users_db.get(form_data.username)
+    if not user or not auth.verify_password(form_data.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    # access_token_expires = auth.timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    # We need to import timedelta from datetime or use auth's import if exposed
+    # auth.py imports datetime and timedelta.
+    # simpler:
+    access_token = auth.create_access_token(
+        data={"sub": user["username"], "role": user["role"]}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/me")
+async def read_users_me(current_user: auth.TokenData = Depends(auth.get_current_user)):
+    return current_user
+
+@app.get("/admin/dashboard")
+async def admin_dashboard(current_user: auth.TokenData = Depends(auth.get_current_user)):
+    # Verify role (mocked for now)
+    if current_user.username != "admin": 
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    return {
+        "message": "Welcome to the Admin Dashboard",
+        "user": current_user.username,
+        "stats": {
+            "users": 150,
+            "models_trained": 12,
+            "api_calls_today": 3400
+        }
+    }
 
 if __name__ == "__main__":
     import uvicorn
