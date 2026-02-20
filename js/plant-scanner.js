@@ -492,14 +492,24 @@ class PlantScanner {
         plantInfo: {
           name: plantInfo.species,
           confidence: plantInfo.confidence,
-          isCrop: plantInfo.isCrop
+          isCrop: plantInfo.isCrop,
+          scientificName: plantInfo.scientificName || ''
         },
         healthScore: diseaseInfo.healthScore,
         status: diseaseInfo.status,
         diseases: diseaseInfo.diseases.map(d => ({
           name: d.disease,
+          disease: d.disease,
           confidence: d.confidence,
-          severity: d.severity
+          severity: d.severity,
+          detectionMethod: d.detectionMethod || '',
+          matchedKeywords: d.matchedKeywords || [],
+          colorProfile: d.colorProfile || null,
+          note: d.note || '',
+          treatments: d.treatments || [],
+          prevention: d.prevention || [],
+          source: d.source || '',
+          sourceUrl: d.sourceUrl || ''
         })),
         recommendations: recommendations.flatMap(rec => rec.items),
         imageData,
@@ -540,12 +550,26 @@ class PlantScanner {
   }
 
   isPlantImage(predictions) {
-    // Check if any prediction is plant-related
+    // In offline mode, accept all images — color analysis validates later
+    if (this.offlineMode) {
+      return true;
+    }
+
+    // Comprehensive plant-related keyword list for strict validation
     const plantKeywords = [
       'plant', 'leaf', 'flower', 'crop', 'vegetable', 'fruit',
       'tree', 'bush', 'herb', 'grass', 'seedling', 'vine',
       'maize', 'corn', 'tomato', 'potato', 'wheat', 'rice',
-      'cabbage', 'lettuce', 'spinach', 'bean', 'pea'
+      'cabbage', 'lettuce', 'spinach', 'bean', 'pea',
+      'garden', 'greenhouse', 'field', 'flora', 'botanical',
+      'seed', 'stem', 'petal', 'sprout', 'weed', 'mushroom',
+      'moss', 'fern', 'palm', 'cactus', 'succulent', 'shrub',
+      'blossom', 'bud', 'acorn', 'bulb', 'stalk', 'twig',
+      'banana', 'apple', 'orange', 'lemon', 'grape', 'berry',
+      'cucumber', 'pepper', 'onion', 'carrot', 'squash', 'melon',
+      'soybean', 'sorghum', 'millet', 'barley', 'oat', 'rye',
+      'daisy', 'rose', 'tulip', 'orchid', 'sunflower', 'poppy',
+      'clover', 'aloe', 'ivy', 'willow', 'oak', 'pine', 'maple'
     ];
 
     for (const pred of predictions) {
@@ -557,9 +581,15 @@ class PlantScanner {
       }
     }
 
-    // Check confidence - if top prediction is > 30%, assume it might be a plant
-    if (predictions[0].probability > 0.3) {
-      return true;
+    // Secondary: accept if nature-related with high confidence (>50%)
+    const natureKeywords = ['outdoor', 'nature', 'green', 'soil', 'organic', 'hay', 'straw', 'fungus'];
+    if (predictions[0] && predictions[0].probability > 0.5) {
+      const className = predictions[0].className.toLowerCase();
+      for (const keyword of natureKeywords) {
+        if (className.includes(keyword)) {
+          return true;
+        }
+      }
     }
 
     return false;
@@ -716,10 +746,28 @@ class PlantScanner {
       }
     }
 
-    // Method 3: Texture and pattern analysis
+    // Method 3: Texture and pattern analysis (enhanced with spots)
     const textureAnalysis = this.analyzeTexture(imageFeatures);
     if (textureAnalysis.abnormal) {
       healthScore -= 0.1;
+      // If texture finds spots with high confidence, add as a disease detection
+      if (textureAnalysis.spotsDetected > 0 && textureAnalysis.confidence > 0.55) {
+        const spotDisease = this.diseaseModel.patterns['leaf_spot'];
+        if (spotDisease && !diseaseScores.has('leaf_spot_texture')) {
+          detectedDiseases.push({
+            disease: spotDisease.name || 'Leaf Spot Disease',
+            severity: spotDisease.severity || 'mild',
+            confidence: textureAnalysis.confidence,
+            detectionMethod: 'Texture + Spot Analysis',
+            note: textureAnalysis.note,
+            treatments: spotDisease.treatments || ['Apply fungicide', 'Remove affected leaves'],
+            prevention: spotDisease.prevention || ['Ensure good air circulation', 'Avoid overhead watering'],
+            source: spotDisease.source || 'Computer Vision Analysis',
+            sourceUrl: spotDisease.sourceUrl || ''
+          });
+          healthScore -= 0.15;
+        }
+      }
     }
 
     // Determine overall health status
@@ -747,18 +795,30 @@ class PlantScanner {
       }
     }
 
+    // Add quality warning if image quality is poor
+    const qualityWarning = imageFeatures.imageQuality && imageFeatures.imageQuality.overallScore < 40
+      ? ' (Low image quality — results may be less accurate)'
+      : '';
+
     return {
-      status,
+      status: status + qualityWarning,
       statusClass,
       healthScore,
       diseases: detectedDiseases,
       confidence: detectedDiseases.length > 0 ?
-        detectedDiseases[0].confidence : 0.95
+        detectedDiseases[0].confidence : 0.95,
+      // Enhanced analysis metadata
+      imageQuality: imageFeatures.imageQuality,
+      zoneAnomalies: imageFeatures.zones ? imageFeatures.zones.anomalies.length : 0,
+      spotsDetected: imageFeatures.spots ? imageFeatures.spots.count : 0,
+      plantCoverage: imageFeatures.plantCoverage,
+      textureNote: textureAnalysis.note
     };
   }
 
   async extractImageFeatures(img) {
-    // Advanced feature extraction using Pixel-level HSL Analysis
+    // ===== ENHANCED FEATURE EXTRACTION PIPELINE =====
+    // Two-pass analysis with segmentation, adaptive baselines, zones, and spots
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
 
@@ -768,16 +828,12 @@ class PlantScanner {
     let height = img.height;
 
     if (width > height) {
-      if (width > maxSize) {
-        height = height * (maxSize / width);
-        width = maxSize;
-      }
+      if (width > maxSize) { height = height * (maxSize / width); width = maxSize; }
     } else {
-      if (height > maxSize) {
-        width = width * (maxSize / height);
-        height = maxSize;
-      }
+      if (height > maxSize) { width = width * (maxSize / height); height = maxSize; }
     }
+    width = Math.round(width);
+    height = Math.round(height);
 
     tempCanvas.width = width;
     tempCanvas.height = height;
@@ -785,71 +841,108 @@ class PlantScanner {
 
     const imageData = tempCtx.getImageData(0, 0, width, height);
     const data = imageData.data;
+    const pixelCount = width * height;
 
-    // Analysis Buckets
-    let healthyPixels = 0;
-    let chloroticPixels = 0; // Yellowing
-    let necroticPixels = 0;  // Brown/Dead
-    let otherPixels = 0;
-    let totalPlantPixels = 0;
-
-    // Color accumulators for average calculation
+    // ===== PASS 1: Plant segmentation + adaptive green baseline =====
+    const plantMask = new Uint8Array(pixelCount); // 0=background, 1=healthy, 2=chlorotic, 3=necrotic
+    const greenHues = [];
+    const greenSats = [];
     let totalR = 0, totalG = 0, totalB = 0;
 
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-
-      totalR += r;
-      totalG += g;
-      totalB += b;
-
-      // Convert to HSL for better biological classification
+    for (let i = 0; i < pixelCount; i++) {
+      const idx = i * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+      totalR += r; totalG += g; totalB += b;
       const [h, s, l] = this.rgbToHsl(r, g, b);
 
-      // Filter out background (very bright white/gray or very dark)
-      if (s < 0.1 || l > 0.95 || l < 0.05) {
-        continue;
-      }
+      // Skip background
+      if (s < 0.1 || l > 0.95 || l < 0.05) { plantMask[i] = 0; continue; }
 
-      // Classification Logic based on Plant Pathology Color Indices
-      // Green (Healthy): Hue 70-160
-      // Yellow (Chlorosis): Hue 40-70
-      // Brown (Necrosis): Hue 0-40 or 330-360 (with lower lightness)
-
-      if (h >= 70 && h <= 170 && s > 0.2 && l > 0.15 && l < 0.85) {
-        healthyPixels++;
-        totalPlantPixels++;
-      } else if (h >= 35 && h < 70 && s > 0.25) {
-        chloroticPixels++;
-        totalPlantPixels++;
-      } else if ((h < 35 || h > 330) && s > 0.2 && l < 0.6) {
-        necroticPixels++;
-        totalPlantPixels++;
+      // Broad plant detection for Pass 1
+      if (h >= 60 && h <= 180 && s > 0.15 && l > 0.1 && l < 0.9) {
+        plantMask[i] = 1; // Likely plant (green)
+        greenHues.push(h);
+        greenSats.push(s);
+      } else if (h >= 30 && h < 60 && s > 0.2) {
+        plantMask[i] = 2; // Chlorotic
+      } else if ((h < 30 || h > 330) && s > 0.15 && l < 0.65) {
+        plantMask[i] = 3; // Necrotic
       } else {
-        otherPixels++;
+        plantMask[i] = 0;
       }
     }
 
-    const pixelCount = data.length / 4;
+    // Compute adaptive green baseline from detected green pixels
+    let greenBaseline = { meanHue: 120, stdHue: 30, meanSat: 0.4, stdSat: 0.15 };
+    if (greenHues.length > 20) {
+      const meanH = greenHues.reduce((a, b) => a + b, 0) / greenHues.length;
+      const stdH = Math.sqrt(greenHues.reduce((a, b) => a + (b - meanH) ** 2, 0) / greenHues.length);
+      const meanS = greenSats.reduce((a, b) => a + b, 0) / greenSats.length;
+      const stdS = Math.sqrt(greenSats.reduce((a, b) => a + (b - meanS) ** 2, 0) / greenSats.length);
+      greenBaseline = { meanHue: meanH, stdHue: Math.max(stdH, 10), meanSat: meanS, stdSat: Math.max(stdS, 0.05) };
+    }
 
-    // Normalize stats
+    // ===== PASS 2: Re-classify using adaptive thresholds =====
+    let healthyPixels = 0, chloroticPixels = 0, necroticPixels = 0, totalPlantPixels = 0;
+    const adaptiveGreenMin = greenBaseline.meanHue - 2.5 * greenBaseline.stdHue;
+    const adaptiveGreenMax = greenBaseline.meanHue + 2.5 * greenBaseline.stdHue;
+
+    for (let i = 0; i < pixelCount; i++) {
+      if (plantMask[i] === 0) continue;
+      const idx = i * 4;
+      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
+      const [h, s, l] = this.rgbToHsl(r, g, b);
+
+      totalPlantPixels++;
+      if (h >= adaptiveGreenMin && h <= adaptiveGreenMax && s > (greenBaseline.meanSat - 2 * greenBaseline.stdSat)) {
+        healthyPixels++; plantMask[i] = 1;
+      } else if (h >= 30 && h < adaptiveGreenMin && s > 0.2) {
+        chloroticPixels++; plantMask[i] = 2;
+      } else if ((h < 30 || h > 330) && l < 0.65) {
+        necroticPixels++; plantMask[i] = 3;
+      } else {
+        healthyPixels++; plantMask[i] = 1; // Default to healthy if on plant
+      }
+    }
+
+    // ===== IMAGE QUALITY ASSESSMENT =====
+    const imageQuality = this.assessImageQuality(data, width, height);
+
+    // ===== MULTI-ZONE ANALYSIS (4x4 grid) =====
+    const zones = this.analyzeZones(data, width, height, plantMask);
+
+    // ===== SPOT / LESION DETECTION =====
+    const spots = this.detectSpots(data, width, height, plantMask);
+
+    // ===== COMPILE ENRICHED FEATURES =====
     const stats = {
-      healthyRadio: totalPlantPixels > 0 ? healthyPixels / totalPlantPixels : 0,
+      // Core ratios (adaptive)
+      healthyRatio: totalPlantPixels > 0 ? healthyPixels / totalPlantPixels : 0,
       chlorosisRatio: totalPlantPixels > 0 ? chloroticPixels / totalPlantPixels : 0,
       necrosisRatio: totalPlantPixels > 0 ? necroticPixels / totalPlantPixels : 0,
       plantCoverage: totalPlantPixels / pixelCount,
       avgRed: totalR / pixelCount,
       avgGreen: totalG / pixelCount,
       avgBlue: totalB / pixelCount,
-      rawImageData: imageData
+      rawImageData: imageData,
+      width, height,
+      // Enhanced features
+      greenBaseline,
+      imageQuality,
+      zones,
+      spots,
+      plantMask,
+      totalPlantPixels
     };
 
-    console.log('🔬 Micro-Analysis Results:', {
-      'Healthy Tissue': (stats.healthyRadio * 100).toFixed(1) + '%',
-      'Chlorosis (Yellow)': (stats.chlorosisRatio * 100).toFixed(1) + '%',
-      'Necrosis (Brown)': (stats.necrosisRatio * 100).toFixed(1) + '%'
+    console.log('🔬 Enhanced Analysis Results:', {
+      'Healthy': (stats.healthyRatio * 100).toFixed(1) + '%',
+      'Chlorosis': (stats.chlorosisRatio * 100).toFixed(1) + '%',
+      'Necrosis': (stats.necrosisRatio * 100).toFixed(1) + '%',
+      'Plant Coverage': (stats.plantCoverage * 100).toFixed(1) + '%',
+      'Image Quality': stats.imageQuality.overallScore.toFixed(0) + '/100',
+      'Zones w/ Issues': stats.zones.anomalies.length,
+      'Spots Detected': stats.spots.count
     });
 
     return stats;
@@ -878,17 +971,177 @@ class PlantScanner {
     return [h * 360, s, l];
   }
 
+  // ========================================
+  // PHASE 2: SMART ANALYSIS HELPERS
+  // ========================================
+
+  assessImageQuality(data, width, height) {
+    // Measures blur, exposure, and contrast to calibrate confidence
+    const pixelCount = width * height;
+    let sumBrightness = 0, sumBrSq = 0;
+    let veryDark = 0, veryBright = 0;
+    // Laplacian-like blur detection: measure sharpness via neighbor differences
+    let laplacianSum = 0, lapCount = 0;
+    const step = Math.max(1, Math.floor(pixelCount / 2000)); // Sample ~2000 pixels
+
+    for (let y = 1; y < height - 1; y += Math.max(1, Math.floor(height / 50))) {
+      for (let x = 1; x < width - 1; x += Math.max(1, Math.floor(width / 50))) {
+        const idx = (y * width + x) * 4;
+        const gray = data[idx] * 0.299 + data[idx + 1] * 0.587 + data[idx + 2] * 0.114;
+        sumBrightness += gray;
+        sumBrSq += gray * gray;
+        if (gray < 20) veryDark++;
+        if (gray > 235) veryBright++;
+
+        // Laplacian: 4*center - top - bottom - left - right
+        const top = ((y - 1) * width + x) * 4;
+        const bot = ((y + 1) * width + x) * 4;
+        const lft = (y * width + (x - 1)) * 4;
+        const rgt = (y * width + (x + 1)) * 4;
+        const gT = data[top] * 0.299 + data[top + 1] * 0.587 + data[top + 2] * 0.114;
+        const gB = data[bot] * 0.299 + data[bot + 1] * 0.587 + data[bot + 2] * 0.114;
+        const gL = data[lft] * 0.299 + data[lft + 1] * 0.587 + data[lft + 2] * 0.114;
+        const gR = data[rgt] * 0.299 + data[rgt + 1] * 0.587 + data[rgt + 2] * 0.114;
+        const lap = Math.abs(4 * gray - gT - gB - gL - gR);
+        laplacianSum += lap;
+        lapCount++;
+      }
+    }
+
+    const samples = lapCount || 1;
+    const meanBrightness = sumBrightness / samples;
+    const stdBrightness = Math.sqrt((sumBrSq / samples) - meanBrightness * meanBrightness);
+    const blurScore = Math.min(100, (laplacianSum / samples) * 2.5); // Higher = sharper
+    const exposureScore = 100 - (veryDark + veryBright) / samples * 100 * 3; // Penalty for extremes
+    const contrastScore = Math.min(100, stdBrightness * 1.5);
+
+    const overallScore = Math.max(0, Math.min(100,
+      blurScore * 0.4 + Math.max(0, exposureScore) * 0.3 + contrastScore * 0.3
+    ));
+
+    return { blurScore, exposureScore: Math.max(0, exposureScore), contrastScore, overallScore, meanBrightness };
+  }
+
+  analyzeZones(data, width, height, plantMask) {
+    // Divide image into 4x4 grid and analyze each zone independently
+    const gridSize = 4;
+    const zoneW = Math.floor(width / gridSize);
+    const zoneH = Math.floor(height / gridSize);
+    const zoneResults = [];
+
+    for (let row = 0; row < gridSize; row++) {
+      for (let col = 0; col < gridSize; col++) {
+        let zHealthy = 0, zChlorotic = 0, zNecrotic = 0, zPlant = 0;
+        for (let y = row * zoneH; y < (row + 1) * zoneH && y < height; y++) {
+          for (let x = col * zoneW; x < (col + 1) * zoneW && x < width; x++) {
+            const pi = y * width + x;
+            const m = plantMask[pi];
+            if (m === 0) continue;
+            zPlant++;
+            if (m === 1) zHealthy++;
+            else if (m === 2) zChlorotic++;
+            else if (m === 3) zNecrotic++;
+          }
+        }
+        zoneResults.push({
+          row, col,
+          plantPixels: zPlant,
+          healthyRatio: zPlant > 0 ? zHealthy / zPlant : 0,
+          chlorosisRatio: zPlant > 0 ? zChlorotic / zPlant : 0,
+          necrosisRatio: zPlant > 0 ? zNecrotic / zPlant : 0
+        });
+      }
+    }
+
+    // Detect zone anomalies: zones that deviate significantly from the mean
+    const plantZones = zoneResults.filter(z => z.plantPixels > 20);
+    const anomalies = [];
+    if (plantZones.length >= 4) {
+      const avgChlor = plantZones.reduce((a, z) => a + z.chlorosisRatio, 0) / plantZones.length;
+      const avgNecr = plantZones.reduce((a, z) => a + z.necrosisRatio, 0) / plantZones.length;
+
+      for (const zone of plantZones) {
+        // Zone has significantly more disease than average
+        if (zone.chlorosisRatio > avgChlor + 0.15 && zone.chlorosisRatio > 0.2) {
+          anomalies.push({ row: zone.row, col: zone.col, type: 'chlorosis_cluster', severity: zone.chlorosisRatio });
+        }
+        if (zone.necrosisRatio > avgNecr + 0.15 && zone.necrosisRatio > 0.2) {
+          anomalies.push({ row: zone.row, col: zone.col, type: 'necrosis_cluster', severity: zone.necrosisRatio });
+        }
+      }
+    }
+
+    return { grid: zoneResults, anomalies };
+  }
+
+  detectSpots(data, width, height, plantMask) {
+    // Detect isolated spots/lesions: non-green pixels surrounded by green
+    let spotPixels = 0;
+    let spotClusters = 0;
+    let totalChecked = 0;
+    const checked = new Uint8Array(width * height);
+    const neighborOffsets = [-width - 1, -width, -width + 1, -1, 1, width - 1, width, width + 1];
+    // Sample every 3rd pixel for performance
+    const stepX = 3, stepY = 3;
+
+    for (let y = 2; y < height - 2; y += stepY) {
+      for (let x = 2; x < width - 2; x += stepX) {
+        const pi = y * width + x;
+        // Looking for disease pixels (2=chlorotic, 3=necrotic) surrounded by healthy (1)
+        if (plantMask[pi] < 2) continue;
+        totalChecked++;
+
+        let greenNeighbors = 0;
+        let totalNeighbors = 0;
+        for (const offset of neighborOffsets) {
+          const ni = pi + offset;
+          if (ni >= 0 && ni < width * height) {
+            totalNeighbors++;
+            if (plantMask[ni] === 1) greenNeighbors++;
+          }
+        }
+
+        // Spot: disease pixel with mostly green neighbors (isolated lesion)
+        if (totalNeighbors >= 6 && greenNeighbors / totalNeighbors >= 0.5) {
+          spotPixels++;
+          if (!checked[pi]) {
+            checked[pi] = 1;
+            spotClusters++;
+          }
+        }
+      }
+    }
+
+    const spotDensity = totalChecked > 0 ? spotPixels / totalChecked : 0;
+    return {
+      count: spotClusters,
+      density: spotDensity,
+      isSignificant: spotClusters >= 3 || spotDensity > 0.05,
+      note: spotClusters >= 5 ? 'Multiple isolated lesions detected' :
+        spotClusters >= 2 ? 'Some spotting detected' : 'No significant spots'
+    };
+  }
+
+  calibrateConfidence(rawConfidence, imageQuality) {
+    // Reduce confidence when image quality is poor
+    if (!imageQuality) return rawConfidence;
+    const qualityFactor = Math.max(0.5, imageQuality.overallScore / 100);
+    return Math.min(0.95, rawConfidence * qualityFactor);
+  }
+
   analyzeColors(features) {
-    const { healthyRadio, chlorosisRatio, necrosisRatio, avgRed, avgGreen, avgBlue } = features;
+    const { healthyRatio, chlorosisRatio, necrosisRatio, avgRed, avgGreen, avgBlue } = features;
+    const { zones, spots, imageQuality, greenBaseline } = features;
 
     const colorProfile = {
-      healthy: (healthyRadio * 100).toFixed(1) + '%',
+      healthy: (healthyRatio * 100).toFixed(1) + '%',
       yellowing: (chlorosisRatio * 100).toFixed(1) + '%',
       browning: (necrosisRatio * 100).toFixed(1) + '%',
       avgRed: avgRed.toFixed(1),
       avgGreen: avgGreen.toFixed(1),
       avgBlue: avgBlue.toFixed(1),
-      greenRatio: (healthyRadio * 100).toFixed(1) + '%' // Computed healthy ratio
+      greenRatio: (healthyRatio * 100).toFixed(1) + '%',
+      adaptiveBaseline: greenBaseline ? `Hue ${greenBaseline.meanHue.toFixed(0)}±${greenBaseline.stdHue.toFixed(0)}` : 'N/A'
     };
 
     let abnormal = false;
@@ -897,15 +1150,21 @@ class PlantScanner {
     let confidence = 0.0;
     let note = 'Plant appears healthy based on color analysis';
 
-    // Pathology Logic Rule Engine
+    // === Enhanced Pathology Rule Engine ===
 
     // Case 1: Severe Necrosis (Blight/Rot)
     if (necrosisRatio > 0.15) {
       abnormal = true;
       diseaseType = 'blight';
       suggestedIssue = 'Blight or fungal rot detected';
-      confidence = Math.min(0.5 + (necrosisRatio * 2), 0.95); // High confidence if lots of brown
-      note = 'Significant necrotic (dead) tissue detected. High risk of blight.';
+      confidence = Math.min(0.5 + (necrosisRatio * 2), 0.95);
+      // Boost if necrosis is concentrated (zone anomalies)
+      if (zones && zones.anomalies.some(a => a.type === 'necrosis_cluster')) {
+        confidence = Math.min(confidence + 0.1, 0.95);
+        note = 'Concentrated necrotic tissue detected in localized areas. Strong blight indicator.';
+      } else {
+        note = 'Widespread necrotic (dead) tissue detected. High risk of blight or rot.';
+      }
     }
     // Case 2: Significant Chlorosis (Yellowing)
     else if (chlorosisRatio > 0.15) {
@@ -913,9 +1172,13 @@ class PlantScanner {
       diseaseType = 'yellowing';
       suggestedIssue = 'Nutrient Deficiency (Chlorosis)';
       confidence = Math.min(0.5 + (chlorosisRatio * 2), 0.9);
-      note = 'Widespread yellowing suggests nitrogen or iron deficiency.';
+      if (zones && zones.anomalies.some(a => a.type === 'chlorosis_cluster')) {
+        note = 'Localized yellowing pattern suggests early-stage nutrient deficiency or viral infection.';
+      } else {
+        note = 'Widespread yellowing suggests nitrogen or iron deficiency.';
+      }
     }
-    // Case 3: Rust (Specific Orange/Reddish brown hues often mixed)
+    // Case 3: Rust (Orange/Reddish brown)
     else if (necrosisRatio > 0.05 && avgRed > avgGreen * 1.2) {
       abnormal = true;
       diseaseType = 'rust';
@@ -923,12 +1186,41 @@ class PlantScanner {
       confidence = 0.65;
       note = 'Reddish-brown discoloration is consistent with Rust.';
     }
-    // Case 4: Minor Stress
-    else if (healthyRadio < 0.6) {
+    // Case 4: Spotted lesion pattern (NEW - uses spot detection)
+    else if (spots && spots.isSignificant) {
+      abnormal = true;
+      diseaseType = 'leaf_spot';
+      suggestedIssue = 'Leaf Spot Disease (Cercospora/Alternaria)';
+      confidence = Math.min(0.55 + (spots.density * 3), 0.85);
+      note = `${spots.count} isolated lesion(s) detected on otherwise healthy tissue. Consistent with fungal leaf spot.`;
+    }
+    // Case 5: Zone-localized issues not caught by averages (NEW)
+    else if (zones && zones.anomalies.length > 0) {
+      abnormal = true;
+      const worst = zones.anomalies[0];
+      if (worst.type === 'necrosis_cluster') {
+        diseaseType = 'blight';
+        suggestedIssue = 'Localized tissue death';
+        confidence = 0.55;
+        note = `Necrosis concentrated in zone [${worst.row},${worst.col}]. Early-stage blight possible.`;
+      } else {
+        diseaseType = 'yellowing';
+        suggestedIssue = 'Localized yellowing';
+        confidence = 0.50;
+        note = `Chlorosis concentrated in zone [${worst.row},${worst.col}]. May indicate localized nutrient issue.`;
+      }
+    }
+    // Case 6: Minor Stress
+    else if (healthyRatio < 0.6) {
       abnormal = true;
       suggestedIssue = 'General Plant Stress';
       confidence = 0.5;
       note = 'Plant shows low healthy leaf area. Check water and sunlight.';
+    }
+
+    // Calibrate confidence based on image quality
+    if (abnormal && imageQuality) {
+      confidence = this.calibrateConfidence(confidence, imageQuality);
     }
 
     return {
@@ -942,58 +1234,70 @@ class PlantScanner {
   }
 
   analyzeTexture(features) {
-    // Simple texture analysis based on pixel variance
-    // In a production system, this would use more sophisticated algorithms
-    const { imageData } = features;
+    // Enhanced texture analysis combining variance + spot detection
+    const rawImageData = features.rawImageData;
+    const { spots, imageQuality } = features;
 
-    if (!imageData || imageData.length < 1000) {
+    if (!rawImageData || !rawImageData.data || rawImageData.data.length < 1000) {
       return { abnormal: false, confidence: 0.5 };
     }
 
-    // Sample pixels to calculate variance (performance optimization)
+    const data = rawImageData.data;
+
+    // Pixel variance analysis (on plant region only for accuracy)
     let sumVariance = 0;
     let sampleCount = 0;
-    const sampleStep = Math.floor(imageData.length / 400); // Sample ~100 pixels
+    const sampleStep = Math.max(4, Math.floor(data.length / 400));
 
-    for (let i = 0; i < imageData.length - 8; i += sampleStep) {
-      const r1 = imageData[i];
-      const g1 = imageData[i + 1];
-      const b1 = imageData[i + 2];
-      const r2 = imageData[i + 4];
-      const g2 = imageData[i + 5];
-      const b2 = imageData[i + 6];
-
+    for (let i = 0; i < data.length - 8; i += sampleStep) {
+      const r1 = data[i], g1 = data[i + 1], b1 = data[i + 2];
+      const r2 = data[i + 4], g2 = data[i + 5], b2 = data[i + 6];
       const variance = Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2);
       sumVariance += variance;
       sampleCount++;
     }
 
     const avgVariance = sampleCount > 0 ? sumVariance / sampleCount : 0;
+    let abnormal = false;
+    let confidence = 0.5;
+    let note = 'Normal texture pattern';
 
-    // High variance suggests spots, lesions, or irregular patterns
-    if (avgVariance > 60) {
-      return {
-        abnormal: true,
-        confidence: 0.60,
-        note: 'High texture variance detected - possible spots or lesions',
-        variance: avgVariance.toFixed(1)
-      };
+    // High variance + spots = strong lesion indicator
+    if (avgVariance > 60 && spots && spots.isSignificant) {
+      abnormal = true;
+      confidence = Math.min(0.75, 0.60 + spots.density * 2);
+      note = `High texture variance (${avgVariance.toFixed(0)}) with ${spots.count} isolated lesion(s). Strong disease indicator.`;
+    }
+    // High variance alone
+    else if (avgVariance > 60) {
+      abnormal = true;
+      confidence = 0.60;
+      note = `High texture variance (${avgVariance.toFixed(0)}) - possible spots or lesions`;
+    }
+    // Spots alone (moderate or detected but variance normal)
+    else if (spots && spots.isSignificant) {
+      abnormal = true;
+      confidence = 0.55;
+      note = `${spots.count} spot(s) detected despite normal texture variance. Monitor for progression.`;
+    }
+    // Very low variance = possible powdery coating
+    else if (avgVariance < 15) {
+      abnormal = true;
+      confidence = 0.55;
+      note = 'Very uniform texture - possible powdery mildew coating';
     }
 
-    // Very low variance might indicate powdery coating
-    if (avgVariance < 15) {
-      return {
-        abnormal: true,
-        confidence: 0.55,
-        note: 'Very uniform texture - possible powdery mildew coating',
-        variance: avgVariance.toFixed(1)
-      };
+    // Calibrate with image quality
+    if (abnormal && imageQuality) {
+      confidence = this.calibrateConfidence(confidence, imageQuality);
     }
 
     return {
-      abnormal: false,
-      confidence: 0.70,
-      variance: avgVariance.toFixed(1)
+      abnormal,
+      confidence,
+      note,
+      variance: avgVariance.toFixed(1),
+      spotsDetected: spots ? spots.count : 0
     };
   }
 
@@ -1186,8 +1490,8 @@ class PlantScanner {
       historyItem.innerHTML = `
         <img src="${item.imageData}" class="history-thumb" alt="Scan">
         <div class="history-info">
-          <strong>${item.plant.species}</strong>
-          <div class="status-indicator ${item.disease.statusClass}">${item.disease.status}</div>
+          <strong>${item.plantInfo ? item.plantInfo.name : 'Unknown Plant'}</strong>
+          <div class="status-indicator">${item.status || 'Unknown'}</div>
           <p style="font-size: 14px; color: #6b7280;">
             ${new Date(item.timestamp).toLocaleString()}
           </p>
@@ -1202,67 +1506,12 @@ class PlantScanner {
   // ========================================
 
   setupEventListeners() {
-    // Start camera - use correct button ID
-    const startBtn = document.getElementById('startBtn');
-    if (startBtn) {
-      startBtn.addEventListener('click', () => {
-        this.startCamera();
-      });
-    }
-
-    // Capture and analyze
-    const captureBtn = document.getElementById('captureBtn');
-    if (captureBtn) {
-      captureBtn.addEventListener('click', async () => {
-        const imageData = this.captureImage();
-        await this.analyzeImage(imageData);
-      });
-    }
-
-    // Upload image
-    const uploadBtn = document.getElementById('uploadBtn');
-    const fileInput = document.getElementById('fileInput');
-
-    if (uploadBtn && fileInput) {
-      uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-      });
-
-      fileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            await this.analyzeImage(event.target.result);
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-
-    // Scan again
-    const scanAgainBtn = document.getElementById('scanAgainBtn');
-    if (scanAgainBtn) {
-      scanAgainBtn.addEventListener('click', () => {
-        const results = document.getElementById('results');
-        if (results) {
-          results.classList.remove('show');
-        }
-        if (this.video) {
-          this.video.scrollIntoView({ behavior: 'smooth' });
-        }
-      });
-    }
-
-    // Save result
-    const saveResultBtn = document.getElementById('saveResultBtn');
-    if (saveResultBtn) {
-      saveResultBtn.addEventListener('click', () => {
-        alert('Result saved to history!');
-      });
-    }
-
-    console.log('✅ Event listeners setup complete');
+    // Event binding is managed by the HTML page's inline handlers
+    // (startCamera, captureAndAnalyze, handleImageUpload, etc.)
+    // PlantScanner exposes its public API methods which the page calls
+    // through the global `scanner` / `plantScanner` instance.
+    // This avoids duplicate listener conflicts and mismatched element IDs.
+    console.log('✅ PlantScanner ready — awaiting commands from page');
   }
 }
 

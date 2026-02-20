@@ -13,7 +13,7 @@ pip install -r backend/requirements.txt
 2. Start the Backend Server (Term 1)
 // turbo
 ```bash
-python -m uvicorn backend.main:app --reload --port 8001
+cd backend && python -m uvicorn main:app --reload --port 8001
 ```
 
 3. Start the Frontend Server (Term 2)

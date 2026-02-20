@@ -17,6 +17,13 @@
     <!-- AI/ML Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+    <!-- Shared Styles & Nav -->
+    <link rel="stylesheet" href="style.css?v=20260220">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <script src="js/theme.js"></script>
+    <script src="js/settings.js" defer></script>
+    <script src="js/shared-nav.js" defer></script>
+    <script src="js/smart-tour.js" defer></script>
     <style>
         * {
             margin: 0;
@@ -27,7 +34,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #2E7D32 0%, #4CAF50 100%);
+            background: var(--page-bg-gradient);
             min-height: 100vh;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             -webkit-font-smoothing: antialiased;
@@ -37,30 +44,30 @@
 
         /* Dark Theme for Scanner */
         body.dark-theme {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: var(--page-bg-gradient);
         }
 
         body.dark-theme .scanner-card {
-            background: #2d2d2d;
-            color: #e8e8e8;
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
         body.dark-theme .section-title {
-            color: #e8e8e8;
+            color: var(--text-primary);
         }
 
         body.dark-theme .btn-secondary {
-            background: #3d3d3d;
-            color: #e8e8e8;
+            background: var(--surface-tertiary);
+            color: var(--text-primary);
         }
 
         body.dark-theme .result-card {
-            background: #2d2d2d;
-            color: #e8e8e8;
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
         body.dark-theme #themeBtn:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Device Banner */
@@ -268,12 +275,8 @@
             object-fit: cover;
         }
 
-        /* Mobile: no mirror for back camera */
-        @media (max-width: 768px) {
-            #video {
-                /* transform: scaleX(-1); REMOVED */
-            }
-        }
+
+        /* Mobile: back camera - no mirror needed (scaleX(-1) removed) */
 
         .camera-overlay {
             position: absolute;
@@ -950,49 +953,7 @@
             }
         };
 
-        // ===== THEME TOGGLE =====
-        window.toggleTheme = function () {
-            const body = document.body;
-            const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-            if (newTheme === 'dark') {
-                body.classList.add('dark-theme');
-            } else {
-                body.classList.remove('dark-theme');
-            }
-
-            const themeBtn = document.getElementById('themeBtn');
-            if (themeBtn) {
-                themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            }
-
-            localStorage.setItem('theme', newTheme);
-        };
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.body.classList.add('dark-theme');
-            const themeBtn = document.getElementById('themeBtn');
-            if (themeBtn) themeBtn.textContent = '☀️';
-        }
-
-        // Listen for theme changes from other tabs
-        window.addEventListener('storage', function (e) {
-            if (e.key === 'theme') {
-                const newTheme = e.newValue;
-                if (newTheme === 'dark') {
-                    document.body.classList.add('dark-theme');
-                    const themeBtn = document.getElementById('themeBtn');
-                    if (themeBtn) themeBtn.textContent = '☀️';
-                } else {
-                    document.body.classList.remove('dark-theme');
-                    const themeBtn = document.getElementById('themeBtn');
-                    if (themeBtn) themeBtn.textContent = '🌙';
-                }
-            }
-        });
+        // Theme is now handled by js/theme.js (centralized)
 
         var currentStream = null;
         const video = document.getElementById('video');

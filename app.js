@@ -365,7 +365,8 @@ class MiniAgronomist {
 
     // Help and settings
     document.getElementById("helpBtn")?.addEventListener("click", () => this.showHelpModal());
-    document.getElementById("settingsBtn")?.addEventListener("click", () => this.showSettingsModal());
+    // document.getElementById("settingsBtn") is already handled by settings.js globally
+
 
     // Mobile menu toggle
     document.getElementById("mobileMenuBtn")?.addEventListener("click", () => this.toggleMobileMenu());
@@ -2310,80 +2311,8 @@ class MiniAgronomist {
     });
   }
 
-  showSettingsModal() {
-    // Create settings modal dynamically if it doesn't exist
-    let settingsModal = document.getElementById('settingsModal');
-    if (!settingsModal) {
-      settingsModal = this.createSettingsModal();
-      document.body.appendChild(settingsModal);
-    }
-    settingsModal.classList.remove('hidden');
-    settingsModal.querySelector('.modal-close')?.focus();
-  }
+  // showSettingsModal and createSettingsModal are now handled by settings.js
 
-  createSettingsModal() {
-    const modal = document.createElement('div');
-    modal.id = 'settingsModal';
-    modal.className = 'modal hidden';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-labelledby', 'settings-title');
-    modal.setAttribute('aria-modal', 'true');
-
-    modal.innerHTML = `
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h2 id="settings-title">⚙️ App Settings</h2>
-          <button class="modal-close" aria-label="Close settings dialog">
-            <span class="material-icons">close</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="settings-section">
-            <h3>🌍 Regional Preferences</h3>
-            <label for="defaultRegion">Default Region:</label>
-            <select id="defaultRegion">
-              <option value="">Auto-detect</option>
-              <option value="temperate">Temperate</option>
-              <option value="tropical">Tropical</option>
-              <option value="arid">Arid</option>
-            </select>
-          </div>
-          
-          <div class="settings-section">
-            <h3>📊 Display Options</h3>
-            <label>
-              <input type="checkbox" id="showAdvancedMetrics" checked>
-              Show advanced analytics
-            </label>
-            <label>
-              <input type="checkbox" id="enableNotifications" checked>
-              Enable prediction notifications
-            </label>
-          </div>
-          
-          <div class="settings-section">
-            <h3>💾 Data Management</h3>
-            <button type="button" class="tool-btn" onclick="this.clearHistory()">
-              <span class="material-icons">delete</span>
-              Clear All Data
-            </button>
-            <button type="button" class="tool-btn" onclick="this.exportSettings()">
-              <span class="material-icons">download</span>
-              Export Settings
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Add event listeners
-    modal.querySelector('.modal-close').addEventListener('click', () => this.closeModal(modal));
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) this.closeModal(modal);
-    });
-
-    return modal;
-  }
 
   closeModal(modal) {
     if (modal) {
@@ -2642,69 +2571,8 @@ class MiniAgronomist {
   }
 }
 
-// ========================================
-// THEME TOGGLE
-// ========================================
-function toggleTheme() {
-  const body = document.body;
-  const currentTheme = body.classList.contains('dark-theme') ? 'dark' : 'light';
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-
-  // Toggle theme class
-  if (newTheme === 'dark') {
-    body.classList.add('dark-theme');
-  } else {
-    body.classList.remove('dark-theme');
-  }
-
-  // Update theme button icon
-  const themeBtn = document.getElementById('themeBtn');
-  if (themeBtn) {
-    const icon = themeBtn.querySelector('.material-icons');
-    if (icon) {
-      // Main app uses material icons
-      icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
-    } else {
-      // Plant scanner uses emoji
-      themeBtn.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    }
-  }
-
-  // Save preference
-  localStorage.setItem('theme', newTheme);
-
-  // Show toast notification
-  const themeName = newTheme === 'dark' ? 'Dark' : 'Light';
-  console.log(`🎨 Switched to ${themeName} Mode`);
-}
-
-// Load saved theme on page load
-function loadSavedTheme() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-theme');
-  }
-
-  // Update button icon
-  const themeBtn = document.getElementById('themeBtn');
-  if (themeBtn) {
-    const icon = themeBtn.querySelector('.material-icons');
-    if (icon) {
-      // Main app uses material icons
-      icon.textContent = savedTheme === 'dark' ? 'light_mode' : 'dark_mode';
-    } else {
-      // Plant scanner uses emoji
-      themeBtn.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    }
-  }
-}
-
-// Load theme immediately (before DOM ready to avoid flash)
-loadSavedTheme();
-
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   window.miniAgronomist = new MiniAgronomist();
-  loadSavedTheme(); // Ensure theme is applied after DOM loads
 });
+

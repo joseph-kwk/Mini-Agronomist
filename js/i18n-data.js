@@ -10,17 +10,30 @@ const translations = {
     "nav.game": "🎮 Play Game",
     "nav.ml": "🤖 ML Analytics",
     "nav.help": "📚 Help & FAQ",
-    
+
     // Header Buttons
     "btn.help": "Help & Tutorial",
     "btn.settings": "Settings",
-    
+
+    // Settings Modal
+    "settings.title": "App Settings",
+    "settings.language": "Language",
+    "settings.units": "Unit System",
+    "settings.preferences": "Preferences",
+    "settings.analytics": "Enable advanced analytics",
+    "settings.notifications": "Prediction notifications",
+    "settings.data": "Data Management",
+    "settings.export": "Export My Data",
+    "settings.clear": "Reset All Settings",
+    "units.metric": "Metric (kg, °C, mm)",
+    "units.imperial": "Imperial (lb, °F, in)",
+
     // Welcome Banner
     "welcome.title": "🌾 Welcome to Mini Agronomist!",
     "welcome.text": "Get AI-powered crop yield predictions in 4 simple steps. New here?",
     "welcome.tour": "📚 Take the Tour",
     "welcome.dismiss": "✓ I've got this",
-    
+
     // Input Section
     "input.title": "Crop Information",
     "input.region": "Agricultural Region",
@@ -37,7 +50,7 @@ const translations = {
     "input.rain.help": "Enter your expected weekly rainfall (typical range: 30-150mm)",
     "input.date": "Planned Planting Date",
     "input.date.help": "When do you plan to plant this crop?",
-    
+
     // Buttons
     "btn.predict": "Generate Prediction",
     "btn.reset": "Reset Form",
@@ -46,7 +59,7 @@ const translations = {
     "btn.export": "Export Results",
     "btn.compare": "Compare Scenarios",
     "btn.print": "Print Report",
-    
+
     // Results Section
     "results.title": "Yield Prediction Results",
     "results.summary.title": "Prediction Summary",
@@ -57,7 +70,7 @@ const translations = {
     "results.risk.low": "🟩 Low Risk",
     "results.risk.medium": "🟨 Moderate Risk",
     "results.risk.high": "🟥 High Risk",
-    
+
     // Analytics
     "analytics.title": "Detailed Analysis",
     "analytics.temp": "Temperature Match",
@@ -68,20 +81,20 @@ const translations = {
     "analytics.soil.desc": "pH and soil type match",
     "analytics.timing": "Timing Score",
     "analytics.timing.desc": "Seasonal planting window",
-    
+
     // Harvest Info
     "harvest.title": "Harvest Information",
     "harvest.date": "Expected Harvest Date:",
     "harvest.varieties": "Recommended Varieties:",
     "harvest.period": "Growing Period:",
-    
+
     // History
     "history.title": "Prediction History",
     "history.empty": "No predictions yet. Make your first prediction to see history here.",
-    
+
     // Tools
     "tools.title": "Tools & Export",
-    
+
     // Footer
     "footer.tagline": "AI-powered agricultural intelligence for farmers worldwide 🌾",
     "footer.features": "Features",
@@ -90,7 +103,7 @@ const translations = {
     "footer.copyright": "© 2025 Mini Agronomist. Open source agricultural intelligence platform.",
     "footer.made": "Made with 🌱 for farmers worldwide",
     "footer.github": "View on GitHub",
-    
+
     // Game Specific
     "game.title": "Farm Genius - Immersive Edition",
     "game.loading": "🌱 Loading Farm Genius...",
@@ -109,24 +122,37 @@ const translations = {
     "game.hud.rain": "Rain",
     "game.hud.temp": "Temp"
   },
-  
+
   fr: {
     // Navigation
     "nav.yield": "🌾 Prédiction de Récolte",
     "nav.game": "🎮 Jouer au Jeu",
     "nav.ml": "🤖 Analytique IA",
     "nav.help": "📚 Aide & FAQ",
-    
+
     // Header Buttons
     "btn.help": "Aide & Tutoriel",
     "btn.settings": "Paramètres",
-    
+
+    // Settings Modal
+    "settings.title": "Paramètres de l'Application",
+    "settings.language": "Langue",
+    "settings.units": "Système d'Unités",
+    "settings.preferences": "Préférences",
+    "settings.analytics": "Activer l'analytique avancée",
+    "settings.notifications": "Notifications de prédiction",
+    "settings.data": "Gestion des Données",
+    "settings.export": "Exporter mes Données",
+    "settings.clear": "Réinitialiser les Paramètres",
+    "units.metric": "Métrique (kg, °C, mm)",
+    "units.imperial": "Impérial (lb, °F, in)",
+
     // Welcome Banner
     "welcome.title": "🌾 Bienvenue sur Mini Agronomist !",
     "welcome.text": "Obtenez des prédictions de récolte par IA en 4 étapes simples. Nouveau ici ?",
     "welcome.tour": "📚 Faire la Visite",
     "welcome.dismiss": "✓ J'ai compris",
-    
+
     // Input Section
     "input.title": "Informations sur la Culture",
     "input.region": "Région Agricole",
@@ -143,7 +169,7 @@ const translations = {
     "input.rain.help": "Entrez les précipitations hebdomadaires prévues (typique : 30-150mm)",
     "input.date": "Date de Plantation Prévue",
     "input.date.help": "Quand prévoyez-vous de planter cette culture ?",
-    
+
     // Buttons
     "btn.predict": "Générer la Prédiction",
     "btn.reset": "Réinitialiser",
@@ -152,7 +178,7 @@ const translations = {
     "btn.export": "Exporter les Résultats",
     "btn.compare": "Comparer des Scénarios",
     "btn.print": "Imprimer le Rapport",
-    
+
     // Results Section
     "results.title": "Résultats de la Prédiction",
     "results.summary.title": "Résumé de la Prédiction",
@@ -163,7 +189,7 @@ const translations = {
     "results.risk.low": "🟩 Risque Faible",
     "results.risk.medium": "🟨 Risque Modéré",
     "results.risk.high": "🟥 Risque Élevé",
-    
+
     // Analytics
     "analytics.title": "Analyse Détaillée",
     "analytics.temp": "Compatibilité Température",
@@ -174,20 +200,20 @@ const translations = {
     "analytics.soil.desc": "Correspondance pH et type de sol",
     "analytics.timing": "Score de Timing",
     "analytics.timing.desc": "Fenêtre de plantation saisonnière",
-    
+
     // Harvest Info
     "harvest.title": "Informations de Récolte",
     "harvest.date": "Date de Récolte Prévue :",
     "harvest.varieties": "Variétés Recommandées :",
     "harvest.period": "Période de Croissance :",
-    
+
     // History
     "history.title": "Historique des Prédictions",
     "history.empty": "Aucune prédiction. Faites votre première prédiction pour voir l'historique ici.",
-    
+
     // Tools
     "tools.title": "Outils & Export",
-    
+
     // Footer
     "footer.tagline": "Intelligence agricole par IA pour les agriculteurs du monde entier 🌾",
     "footer.features": "Fonctionnalités",
@@ -215,24 +241,37 @@ const translations = {
     "game.hud.rain": "Pluie",
     "game.hud.temp": "Temp"
   },
-  
+
   es: {
     // Navigation
     "nav.yield": "🌾 Predicción de Cosecha",
     "nav.game": "🎮 Jugar Juego",
     "nav.ml": "🤖 Analítica IA",
     "nav.help": "📚 Ayuda y FAQ",
-    
+
     // Header Buttons
     "btn.help": "Ayuda y Tutorial",
     "btn.settings": "Configuración",
-    
+
+    // Settings Modal
+    "settings.title": "Configuración de la Aplicación",
+    "settings.language": "Idioma",
+    "settings.units": "Sistema de Unidades",
+    "settings.preferences": "Preferencias",
+    "settings.analytics": "Activar analítica avanzada",
+    "settings.notifications": "Notificaciones de predicción",
+    "settings.data": "Gestión de Datos",
+    "settings.export": "Exportar mis Datos",
+    "settings.clear": "Restablecer Configuración",
+    "units.metric": "Métrico (kg, °C, mm)",
+    "units.imperial": "Imperial (lb, °F, in)",
+
     // Welcome Banner
     "welcome.title": "🌾 ¡Bienvenido a Mini Agronomist!",
     "welcome.text": "Obtenga predicciones de cosecha con IA en 4 pasos simples. ¿Nuevo aquí?",
     "welcome.tour": "📚 Tomar el Tour",
     "welcome.dismiss": "✓ Entendido",
-    
+
     // Input Section
     "input.title": "Información del Cultivo",
     "input.region": "Región Agrícola",
@@ -249,7 +288,7 @@ const translations = {
     "input.rain.help": "Ingrese la lluvia semanal esperada (típico: 30-150mm)",
     "input.date": "Fecha de Siembra Planeada",
     "input.date.help": "¿Cuándo planea sembrar este cultivo?",
-    
+
     // Buttons
     "btn.predict": "Generar Predicción",
     "btn.reset": "Reiniciar",
@@ -258,7 +297,7 @@ const translations = {
     "btn.export": "Exportar Resultados",
     "btn.compare": "Comparar Escenarios",
     "btn.print": "Imprimir Reporte",
-    
+
     // Results Section
     "results.title": "Resultados de la Predicción",
     "results.summary.title": "Resumen de Predicción",
@@ -269,7 +308,7 @@ const translations = {
     "results.risk.low": "🟩 Riesgo Bajo",
     "results.risk.medium": "🟨 Riesgo Moderado",
     "results.risk.high": "🟥 Riesgo Alto",
-    
+
     // Analytics
     "analytics.title": "Análisis Detallado",
     "analytics.temp": "Compatibilidad Térmica",
@@ -280,20 +319,20 @@ const translations = {
     "analytics.soil.desc": "Coincidencia de pH y tipo de suelo",
     "analytics.timing": "Puntaje de Tiempo",
     "analytics.timing.desc": "Ventana de siembra estacional",
-    
+
     // Harvest Info
     "harvest.title": "Información de Cosecha",
     "harvest.date": "Fecha de Cosecha Esperada:",
     "harvest.varieties": "Variedades Recomendadas:",
     "harvest.period": "Período de Crecimiento:",
-    
+
     // History
     "history.title": "Historial de Predicciones",
     "history.empty": "Sin predicciones. Haga su primera predicción para ver el historial aquí.",
-    
+
     // Tools
     "tools.title": "Herramientas y Exportación",
-    
+
     // Footer
     "footer.tagline": "Inteligencia agrícola con IA para agricultores de todo el mundo 🌾",
     "footer.features": "Características",
